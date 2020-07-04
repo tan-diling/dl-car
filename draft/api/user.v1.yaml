@@ -1,0 +1,1238 @@
+openapi: 3.0.0
+info:
+  title: Client Portal Api
+  version: '1.0'
+  description: Client Portal Api for mvp1
+servers:
+  - url: 'http://localhost:3000/api'
+paths:
+  /user/:
+    get:
+      summary: retrieve user list
+      tags:
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    - id: 5ef1680aa5d7a708b8546964
+                      name: admin
+                      role: admin
+                      email: admin@admin.com
+                      company: ' '
+                      phone: '1234567890'
+                      department: ''
+                      job: ''
+                      logo: ''
+                      emailValidated: true
+                      updated_at: '2020-06-23T02:25:14.468Z'
+                      created_at: '2020-06-23T02:25:14.468Z'
+                    - id: 5ef1680aa5d7a708b8546960
+                      name: user01
+                      role: client
+                      email: user01@test.com
+                      company: ' '
+                      phone: '2234569870'
+                      department: ''
+                      job: ''
+                      logo: ''
+                      emailValidated: false
+                      updated_at: '2020-06-23T02:25:14.468Z'
+                      created_at: '2020-06-23T02:25:14.468Z'
+      operationId: get-user
+      parameters:
+        - schema:
+            type: integer
+            minimum: 0
+          in: query
+          name: skip
+        - schema:
+            type: integer
+          in: query
+          name: limit
+      description: |-
+        get user list
+        - need 'admin' site_role
+      security:
+        - jwt: []
+    post:
+      summary: create a user
+      operationId: post-user
+      description: "admin create a user , \n-  system will send a confirm email to mail,\n-  before user login, user need to validate it's mail \n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                  default: '123456'
+                role:
+                  type: string
+                  enum:
+                    - staff
+                    - client
+                  default: client
+              required:
+                - name
+                - email
+            examples:
+              example-1:
+                value:
+                  name: user01
+                  email: user01@test.com
+                  password: '123456'
+                  role: client
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+      security:
+        - jwt: []
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    id: 5ef1680aa5d7a708b8546964
+                    name: user01
+                    role: client
+                    email: user01@test.com
+                    updated_at: '2020-06-23T02:25:14.468Z'
+                    created_at: '2020-06-23T02:25:14.468Z'
+                    emailValidated: false
+        '406':
+          description: Not Acceptable
+      tags:
+        - user
+    parameters: []
+  '/user/{id}/':
+    parameters:
+      - schema:
+          type: string
+          example: 5ef1680aa5d7a708b8546964
+          default: 5ef1680aa5d7a708b8546964
+          pattern: '^[a-f0-9]{24}'
+          format: ''
+        name: id
+        in: path
+        required: true
+        description: user id
+    get:
+      summary: get user by id
+      tags:
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    id: 5ef1680aa5d7a708b8546964
+                    name: admin
+                    role: admin
+                    email: admin@admin.com
+                    location: 'Los '
+                    phone: '2345678901'
+                    company: google
+                    logo: /image/5ef1680aa5d7a708b8546964/logo.png
+                    updated_at: '2020-06-23T02:25:14.468Z'
+                    created_at: '2020-06-23T02:25:14.468Z'
+      operationId: get-user-id
+      description: ''
+      security:
+        - jwt: []
+    patch:
+      summary: update user
+      operationId: patch-user-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                  pattern: "\\d{10}"
+                department:
+                  type: string
+                job:
+                  type: string
+                logo:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - staff
+                    - client
+                  description: "role can update by 'admin' "
+                company:
+                  type: string
+              required:
+                - name
+            examples:
+              example-1:
+                value:
+                  name: admin
+                  job: 'developer '
+                  phone: '2345678901'
+                  department: google
+                  company: us
+                  logo: "\\images\\logo.png"
+      tags:
+        - user
+      security:
+        - jwt: []
+      description: |
+        update user info
+        - if current role is 'admin', can change all other's info
+        - others only change own info.  system user jwt token payload "id"  must eq Path Params "id"
+    delete:
+      summary: delete user
+      operationId: delete-user-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      tags:
+        - user
+      security:
+        - jwt: []
+      description: admin can delete user
+  /login:
+    post:
+      summary: user login get access_token
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  role:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYjhiOTE2NGY5YjEwNDBmZTYzMTVjYiIsImVtYWlsIjoiYWRtaW5Ab2theWNoYXQuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTkyOTY3ODQ0LCJleHAiOjE1OTI5NzUwNDR9.jl6zpbLdpvxc19HwGFRX2BrF-qAQ4kgpmcYXYFZUgKg
+                    role: admin
+                    id: 5eb8b9164f9b1040fe6315cb
+                    name: admin
+                    refresh_token: UNXJIkMCoBhlMDtfA3AOzr9FwxBAh7Fr8ZV6qBJS9gbIF8dSGNOgyaIl1s444zvw
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  message:
+                    type: string
+                  httpCode:
+                    type: number
+              examples:
+                example-1:
+                  value:
+                    httpCode: 404
+                    name: NotFoundError
+                    message: email password not matched
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 30
+              required:
+                - device
+                - email
+                - password
+            examples:
+              example-1:
+                value:
+                  device: chrome
+                  email: admin@admin.com
+                  password: '12345678'
+          application/xml:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                device:
+                  type: string
+              required:
+                - email
+                - password
+                - device
+            examples:
+              example-1: {}
+        description: ''
+      tags:
+        - login
+      description: user login . user email must be validated.
+  /refresh_token:
+    post:
+      summary: refresh user access_token
+      operationId: post-refresh_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                required:
+                  - access_token
+              examples:
+                example-1:
+                  value:
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYjhiOTE2NGY5YjEwNDBmZTYzMTVjYiIsImVtYWlsIjoiYWRtaW5Ab2theWNoYXQuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTkyOTY4MTAwLCJleHAiOjE1OTI5NzUzMDB9.uoEsSzKWTt8jsKwo-EUQk3cv4axOT0R_cbYH1v_ZINg
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                example-1:
+                  value:
+                    httpCode: 404
+                    name: NotFoundError
+                    message: refresh_token not match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+            examples:
+              example-1:
+                value:
+                  refresh_token: UNXJIkMCoBhlMDtfA3AOzr9FwxBAh7Fr8ZV6qBJS9gbIF8dSGNOgyaIl1s444zvw
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+      description: ''
+      tags:
+        - login
+  /signup:
+    post:
+      summary: ''
+      operationId: post-sign
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    id: 5ef1680aa5d7a708b8546964
+                    name: user01
+                    role: client
+                    email: user01@test.com
+                    updated_at: '2020-06-23T02:25:14.468Z'
+                    created_at: '2020-06-23T02:25:14.468Z'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    error: email exists
+      tags:
+        - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+              required:
+                - name
+                - email
+                - password
+            examples:
+              example-1:
+                value:
+                  name: user01
+                  email: user01@admin.com
+                  password: '12345678'
+        description: ''
+      description: "user sign up ,\n-  default role is 'client'\n-  system will send a email to mail,\n-  before user login, user need to validate it's mail "
+  /group:
+    get:
+      summary: get group list
+      tags:
+        - group
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+              examples:
+                example-1:
+                  value:
+                    - _id: 12345678901234567890abcdee
+                      name: group1
+                      owner: 12345678901234567890a111
+                      users:
+                        - _id: 12345678901234567890a111
+                          email: user01@test.com
+                          status: confirmed
+                        - _id: 12345678901234567890a222
+                          email: user02@test.com
+                          status: invited
+                    - _id: 12345678901234567890abcdef
+                      name: group2
+                      owner: 12345678901234567890abc111
+                      users:
+                        - _id: 12345678901234567890a555
+                          email: user05@test.com
+                          status: confirmed
+                        - email: user06@test.com
+                          status: invited
+      operationId: get-group
+      security:
+        - jwt: []
+      description: 'user query group '
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: owner
+          description: filter group by owner
+    post:
+      summary: create group
+      operationId: post-group
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                example-1:
+                  value:
+                    _id: 12345678901234567890abcdef
+                    name: group1
+                    owner: 12345678901234567890abcdef
+                    users: []
+      tags:
+        - group
+      security:
+        - jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                owner:
+                  type: string
+              required:
+                - name
+                - owner
+            examples:
+              example-1:
+                value:
+                  name: group1
+                  owner: 12345678901234567890abcdef
+        description: ''
+      description: user create group
+    parameters:
+      - schema:
+          type: string
+        name: owner
+        in: path
+        required: true
+        description: ''
+  '/group/{id}/users':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: get group user
+      tags:
+        - group
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupUser'
+              examples:
+                example-1:
+                  value:
+                    - email: user01@test.com
+                      status: confirmed
+                      user:
+                        _id: 5ef1680aa5d7a708b8546964
+                        name: user01
+                        role: client
+                        email: user01@test.com
+                        company: 'Los '
+                        phone: '2345678901'
+                        department: google
+                        job: develop
+                        logo: /image/5ef1680aa5d7a708b8546964/logo
+                        updated_at: '2020-06-23T02:25:14.468Z'
+                        created_at: '2020-06-23T02:25:14.468Z'
+                        emailValidated: true
+                    - email: user02@test.com
+                      status: invited
+      operationId: get-group-id-user
+      security:
+        - jwt: []
+      description: ''
+    put:
+      summary: add group user by email
+      operationId: put-group-id-user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupUser'
+              examples:
+                example-1:
+                  value:
+                    - email: user01@test.com
+                      status: confirmed
+                      user:
+                        _id: 5ef1680aa5d7a708b8546964
+                        name: user01
+                        role: client
+                        email: user01@test.com
+                        company: 'Los '
+                        phone: '2345678901'
+                        department: google
+                        job: develop
+                        logo: /image/5ef1680aa5d7a708b8546964/logo
+                        updated_at: '2020-06-23T02:25:14.468Z'
+                        created_at: '2020-06-23T02:25:14.468Z'
+                        emailValidated: true
+                    - email: user02@test.com
+                      status: invited
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      tags:
+        - group
+      security:
+        - jwt: []
+    delete:
+      summary: delete  group user by email
+      operationId: delete-group-id-user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupUser'
+              examples:
+                example-1:
+                  value:
+                    - email: user01@test.com
+                      status: confirmed
+                      user:
+                        _id: 5ef1680aa5d7a708b8546964
+                        name: user01
+                        role: client
+                        email: user01@test.com
+                        company: 'Los '
+                        phone: '2345678901'
+                        department: google
+                        job: develop
+                        logo: /image/5ef1680aa5d7a708b8546964/logo
+                        updated_at: '2020-06-23T02:25:14.468Z'
+                        created_at: '2020-06-23T02:25:14.468Z'
+                        emailValidated: true
+                    - email: user02@test.com
+                      status: invited
+      tags:
+        - group
+      security:
+        - jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+            examples:
+              example-1: {}
+      description: ''
+  '/group/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    patch:
+      summary: update group info
+      operationId: patch-group-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+      security:
+        - jwt: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                owner:
+                  type: string
+              required:
+                - name
+      description: user can modify self  group info
+      tags:
+        - group
+    delete:
+      summary: delete group
+      operationId: delete-group-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+      tags:
+        - group
+      security:
+        - jwt: []
+  /change_password:
+    post:
+      summary: change user password
+      operationId: post-change_password
+      responses:
+        '200':
+          description: OK
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                oldPassword:
+                  type: string
+                  minLength: 6
+                newPassword:
+                  type: string
+                  minLength: 6
+              required:
+                - email
+                - oldPassword
+                - newPassword
+      tags:
+        - user
+  /user/email_validate:
+    get:
+      summary: user validate email address by mail link
+      responses:
+        '200':
+          description: OK
+      operationId: get-user-emailValidate
+      parameters:
+        - schema:
+            type: string
+            format: email
+          in: query
+          name: email
+          description: user email to be validate
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: id
+          required: true
+          description: user  _id
+      description: ''
+      tags:
+        - user
+    parameters: []
+  /group/join:
+    get:
+      summary: user confirm join a group
+      tags:
+        - group
+      responses:
+        '200':
+          description: OK
+      operationId: get-group-confirm_join
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: groupId
+          description: group id
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: email
+          description: email
+          required: true
+      description: ''
+    parameters: []
+  /resource/project:
+    get:
+      summary: get project list
+      tags:
+        - project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    - _id: '012345678901234567890001'
+                      title: 'new project#001'
+                      description: here is simple desc
+                      created_at: '2020-02-02T03:45:00Z'
+                      update_at: '2020-02-02T03:45:00Z'
+                      deadline: '2020-06-01T00:00:00Z'
+                      estimate: '2020-05-01T00:00:00Z'
+                      members:
+                        - user: '12345698745621452001'
+                          role: project_qa
+                        - user: '12345698745621452002'
+                          role: project_develop
+                    - _id: '012345678901234567890002'
+                      title: 'new project#002'
+                      description: here is simple desc
+                      created_at: '2020-02-01T03:45:00Z'
+                      update_at: '2020-02-01T03:45:00Z'
+                      deadline: '2020-06-01T00:00:00Z'
+                      estimate: '2020-05-01T00:00:00Z'
+                      members:
+                        - user: '12345698745621452001'
+                          role: project_qa
+                        - user: '12345698745621452002'
+                          role: project_develop
+                        - user: '12345698745621452003'
+                          role: project_pm
+      operationId: get-project
+      description: |-
+        query project list
+        - if role is admin, can view all project
+        - else can view his related project
+      security:
+        - jwt: []
+    post:
+      summary: create a project
+      operationId: post-project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    _id: '012345678901234567890001'
+                    title: 'new project#001'
+                    description: here is simple desc
+                    created_at: '2020-02-02T03:45:00Z'
+                    update_at: '2020-02-02T03:45:00Z'
+                    deadline: '2020-06-01T00:00:00Z'
+                    estimate: '2020-05-01T00:00:00Z'
+                    members:
+                      - user: '12345698745621452001'
+                        role: project_qa
+                      - user: '12345698745621452002'
+                        role: project_develop
+      description: |-
+        every site user can create project
+        - current site user is default as "project_admin"
+      security:
+        - jwt: []
+      tags:
+        - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                logo:
+                  type: string
+              required:
+                - title
+                - description
+            examples:
+              example-1:
+                value:
+                  title: 'new project#001'
+                  description: here is simple desc
+                  logo: /image/logo.png
+  '/resource/project/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: get project by id
+      tags:
+        - project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    _id: '012345678901234567890001'
+                    title: 'new project#001'
+                    description: here is simple desc
+                    created_at: '2020-02-02T03:45:00Z'
+                    update_at: '2020-02-02T03:45:00Z'
+                    deadline: '2020-06-01T00:00:00Z'
+                    estimate: '2020-05-01T00:00:00Z'
+                    members:
+                      - user: '12345698745621452001'
+                        role: project_qa
+                      - user: '12345698745621452002'
+                        role: project_develop
+      operationId: get-project-id
+      security:
+        - jwt: []
+      description: ''
+    patch:
+      summary: update project
+      operationId: patch-project-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    _id: '012345678901234567890001'
+                    title: 'new project#001'
+                    description: here is simple desc
+                    created_at: '2020-02-02T03:45:00Z'
+                    update_at: '2020-02-02T03:45:00Z'
+                    deadline: '2020-06-01T00:00:00Z'
+                    estimate: '2020-05-01T00:00:00Z'
+                    members:
+                      - user: '12345698745621452001'
+                        role: project_qa
+                      - user: '12345698745621452002'
+                        role: project_develop
+      security:
+        - jwt: []
+      tags:
+        - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                logo:
+                  type: string
+                deadline:
+                  type: string
+                estimate:
+                  type: string
+                status:
+                  type: string
+                members:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                      project_role:
+                        type: string
+            examples:
+              example-1:
+                value:
+                  title: 'new project#001'
+                  description: here is simple desc
+              example-2:
+                value:
+                  members:
+                    - user: '12345698745621452001'
+                      role: project_qa
+                    - user: '12345698745621452002'
+                      role: project_develop
+        description: "- every body argument is optional\n- members is only modified by 'project_admin' "
+    delete:
+      summary: delete project
+      operationId: delete-project-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    _id: '012345678901234567890001'
+                    title: 'new project#001'
+                    description: here is simple desc
+                    created_at: '2020-02-02T03:45:00Z'
+                    update_at: '2020-02-02T03:45:00Z'
+                    deadline: '2020-06-01T00:00:00Z'
+                    estimate: '2020-05-01T00:00:00Z'
+                    members:
+                      - user: '12345698745621452001'
+                        role: project_qa
+                      - user: '12345698745621452002'
+                        role: project_develop
+      security:
+        - jwt: []
+      tags:
+        - project
+components:
+  schemas:
+    User:
+      title: user
+      type: object
+      description: user model
+      x-examples:
+        example-1:
+          _id: 5ef1680aa5d7a708b8546964
+          name: admin
+          role: admin
+          email: admin@admin.com
+          company: 'Los '
+          phone: '2345678901'
+          department: google
+          job: develop
+          logo: "\\images\\logo.png"
+          updated_at: '2020-06-23T02:25:14.468Z'
+          created_at: '2020-06-23T02:25:14.468Z'
+          emailValidated: true
+      properties:
+        _id:
+          type: string
+        role:
+          type: string
+          default: site_visit
+          enum:
+            - admin
+            - staff
+            - client
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          minLength: 5
+          maxLength: 50
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        phone:
+          type: string
+        department:
+          type: string
+        logo:
+          type: string
+        job:
+          type: string
+        company:
+          type: string
+        emailValidated:
+          type: boolean
+      required:
+        - role
+        - email
+        - name
+    Group:
+      title: Group
+      type: object
+      x-tags:
+        - group
+      description: ''
+      x-examples:
+        example-1:
+          _id: 12345678901234567890abcdef
+          name: group1
+          owner: 12345678901234567890abcdef
+          users:
+            - _id: 12345678901234567890abc111
+              email: user01@test.com
+              status: confirmed
+            - email: user02@test.com
+              status: invited
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        owner:
+          type: string
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+              status:
+                type: string
+                enum:
+                  - invited
+                  - confirmed
+              _id:
+                type: string
+    GroupUser:
+      title: GroupUser
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum:
+            - invited
+            - confirmed
+        user:
+          $ref: '#/components/schemas/User'
+      x-examples:
+        example-1:
+          email: user01@test.com
+          status: confirmed
+          user:
+            _id: 5ef1680aa5d7a708b8546964
+            name: user01
+            role: client
+            email: user01@test.com
+            company: 'Los '
+            phone: '2345678901'
+            department: google
+            job: develop
+            logo: /image/5ef1680aa5d7a708b8546964/logo
+            updated_at: '2020-06-23T02:25:14.468Z'
+            created_at: '2020-06-23T02:25:14.468Z'
+            emailValidated: true
+    Project:
+      title: Project
+      type: object
+      description: ''
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        estimate:
+          type: string
+          format: date-time
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: string
+              project_role:
+                type: string
+        status:
+          type: string
+        owner:
+          type: string
+      required:
+        - title
+        - description
+        - members
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      description: ''

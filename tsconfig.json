@@ -1,0 +1,33 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@packages/*": ["./packages/*"]
+    },
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,       
+    "importHelpers": true,
+    "module": "commonjs",
+    "target": "es6",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom"]
+  },
+    
+  "include":[  
+    "./test/**/*" ,  
+    "./packages/**/*",
+    "./src/**/*"  
+], 
+
+
+"exclude":[ 
+  "node_modules",
+  "dist",  
+]  
+
+}
