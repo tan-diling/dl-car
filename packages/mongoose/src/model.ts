@@ -5,11 +5,30 @@
  * @packageDocumentation
  * @module startup
  */
-import {MONGODB_URL} from '@packages/core';
+import {MONGODB_URL,config_get} from '@packages/core';
 import {Schema,model,Document,connect, Mongoose } from 'mongoose';
 import { Db } from 'mongodb';
 
 let db: Db = null ;
+
+
+async function init_db(db:Db){
+    const db_init = config_get('init') || [] ;
+
+    for(const d of db_init){
+        const {table, dataArray} = d
+        if(table && dataArray) {
+            console.log(`init ${table} `);
+            for( const data of dataArray){
+                const {key,doc} = data ;
+                const _doc = await db.collection(table).findOne(key) ;
+                if(_doc == null ) {
+                    await db.collection(table).insertOne({...key,...doc});
+                }
+            }
+        }        
+    }
+}
 
 export const db_startup =  async (init?:Function): Promise<Db> => {
     if (db != null)
@@ -28,16 +47,18 @@ export const db_startup =  async (init?:Function): Promise<Db> => {
         },
     );
 
-    // mongoose.pluralize(null);
+
+    db = connection.connection.db ;
+    await init_db(db)
 
     if( init != null ) {
         
         await init();
+
     }
 
     
 
-    db = connection.connection.db ;
     return  db ;
 };
 
@@ -55,48 +76,4 @@ function getModel<T>(name:string,schema:Schema) {
 
 /** user login model */
 
-import { ILoginSession } from './interface/loginSession';
-import { IUser } from './interface/user';
-import { UserSchema } from './schema/user';
-import { LoginSessionSchema } from './schema/loginSession';
-
-export {IUser, ILoginSession}
-
-export const UserModel =  getModel<IUser>('user',UserSchema) ;
-export const LoginSessionModel = getModel<ILoginSession>('login_session',LoginSessionSchema) ;
-
-
-/** ai logs model */
-import { ISystemLog } from './interface/systemLog';
-import { SystemLogSchema } from './schema/systemLog';
-export {ISystemLog }
-export const SystemLogModel = model<ISystemLog & Document>('system_log',SystemLogSchema) ;
-
-
-/** chat module */
-import { IVisitor } from './interface/visitor';
-import { IVisitLog } from './interface/visitLog';
-import { VisitorSchema } from './schema/visitor';
-import { VisitLogSchema } from './schema/visitLog';
-import { IClient } from './interface/client';
-import { ClientSchema } from './schema/client';
-import { IMeeting, IGoogleEvent } from './interface/meeting';
-import { MeetingSchema } from './schema/meeting';
-import { IChatLog } from './interface/chatLog';
-import { ChatLogSchema } from './schema/chatLog';
-import { GoogleEventSchema } from './schema/googleEvent';
-
-export {IVisitor, IVisitLog, IChatLog, IClient, IMeeting}
-
-export const VisitorModel = getModel<IVisitor>('visitor',VisitorSchema) ;
-export const VisitLogModel = getModel<IVisitLog>('visitor_log',VisitLogSchema) ;
-
-export const ChatLogModel = getModel<IChatLog>('chat_log',ChatLogSchema) ;
-
-export const ClientModel = getModel<IClient>('client',ClientSchema) ;
-export const MeetingModel = getModel<IMeeting>('meeting',MeetingSchema) ;
-
-export const GoogleEvent = getModel<IGoogleEvent>('google_event', GoogleEventSchema);
-
-export * from './interface/meeting' ;
-
+export * from './model/user';

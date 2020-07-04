@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug login module",
+            "name": "Debug ts",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
             "args": [
-                "test/login.test.ts"
+                "src/index.ts"
             ],
             "env":{
                 "DEBUG":"express:*"            

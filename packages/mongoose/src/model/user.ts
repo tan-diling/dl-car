@@ -1,5 +1,8 @@
-import { prop, Typegoose, ModelType, InstanceType, Ref } from 'typegoose';
+import { prop, Typegoose, ModelType, InstanceType, Ref, plugin } from 'typegoose';
 
+import * as mongooseHidden from 'mongoose-hidden';
+ 
+@plugin(mongooseHidden({ defaultHidden: {  password: true } }))
 class User extends Typegoose {
   @prop()
   name: string;
@@ -45,9 +48,15 @@ class LoginSession extends Typegoose {
 
   @prop()
   ip?: string;
+
+  @prop()
+  accessTime?: Date;
+  
+  @prop()
+  refreshTime?: Date;
   
 };
  
-const UserModel = new User().getModelForClass(User);
+export const UserModel = new User().getModelForClass(User);
   
-const LoginSessionModel = new LoginSession().getModelForClass(LoginSession);
+export const LoginSessionModel = new LoginSession().getModelForClass(LoginSession);

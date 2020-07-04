@@ -7,7 +7,7 @@ export class LoginDto{
 }
 
 export class AdminLoginDto extends LoginDto{
-    @IsString()
+    @IsEmail()
     email: string;    
 
     @IsString()

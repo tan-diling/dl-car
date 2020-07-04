@@ -69,11 +69,12 @@ useExpressServer(app, { // register created express server in routing-controller
         return action.request.user;
     },
     authorizationChecker: async (action: Action, roles: string[]) => {
-      const authorizationHeader:string = action.request.headers["authorization"];
-      if (! /jwt .*/.test(authorizationHeader)) 
+      const authorizationHeader:string = action.request.headers["authorization"] || "";
+      const array = authorizationHeader.split(' ') ;
+      if (array.length != 2 || array[0]!='Bearer' ) 
         return false ;
-      
-      const token = authorizationHeader.substr(4) ;
+      const token = array[1] ;
+      // const token = authorizationHeader.substr(4) ;
 
       action.request.user= jwt.decode(token);
       const user = action.request.user;
