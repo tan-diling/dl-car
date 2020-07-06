@@ -4,9 +4,7 @@ import { Type } from 'class-transformer';
 export class LoginDto{
     @IsString()
     device: string;    
-}
 
-export class AdminLoginDto extends LoginDto{
     @IsEmail()
     email: string;    
 

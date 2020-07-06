@@ -402,7 +402,7 @@ paths:
       description: ''
       tags:
         - login
-  /signup:
+  /sign_up:
     post:
       summary: ''
       operationId: post-sign

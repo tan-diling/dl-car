@@ -1,7 +1,14 @@
 import { prop, Typegoose, ModelType, InstanceType, Ref, plugin } from 'typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
- 
+
+enum UserRole {
+  admin ='admin',
+  staff = 'staff',
+  client='client',
+
+}
+
 @plugin(mongooseHidden({ defaultHidden: {  password: true } }))
 class User extends Typegoose {
   @prop()
@@ -10,8 +17,8 @@ class User extends Typegoose {
   @prop()
   email: string;    
 
-  @prop()
-  role: string;
+  @prop({default:'client',enum: UserRole })
+  role?: string;
 
   @prop()
   password : string ;
@@ -44,7 +51,7 @@ class LoginSession extends Typegoose {
   device: string;
   
   @prop()
-  refreshToken: String;
+  refreshToken: string;
 
   @prop()
   ip?: string;

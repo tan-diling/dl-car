@@ -16,11 +16,15 @@ design for web api framework include
   - email
   - name
   - password
+  - emailValidated
+  - ...
 - login-session
   - _id
   - device
-  - refresh token
-  - access token
+  - refreshToken
+  - accessTime
+  - refreshTime
+  - user: ref(user)
   
 
 ## test login module script
@@ -29,7 +33,7 @@ design for web api framework include
 ts-node ./test/login.test.ts
 ```
 ###  code
-```t
+```ts
 // import 'reflect-metadata';
 
 require('module-alias/register');

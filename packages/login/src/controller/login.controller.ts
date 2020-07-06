@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam } from 'routing-controllers';
 
-import { LoginDto, AdminLoginDto, RefreshTokenDto } from './dto/login.dto';
+import { LoginDto, RefreshTokenDto } from './dto/login.dto';
 import * as moment from 'moment';
 import * as requestIp from 'request-ip';
 import { LoginService } from './login.service'
@@ -13,10 +13,10 @@ export class LoginController {
     }
     
     @Post('/login')
-    async login(@Body() dto:AdminLoginDto, @Req() req: Request) {
+    async login(@Body() dto:LoginDto, @Req() req: Request) {
         const ip = requestIp.getClientIp(req);
         console.log("/admin/login ip -- "+ip) ;
-        return await this.service.loginAsAdmin({ip,...dto})    ;
+        return await this.service.login({ip,...dto})    ;
     }
 
     @Post('/refresh_token')

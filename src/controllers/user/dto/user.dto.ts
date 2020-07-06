@@ -18,7 +18,8 @@ export class UserCreateDto {
     password: string;
 
     @IsEnum(UserCreateRole)
-    role: string;
+    @IsOptional()
+    role?: string;
 }
 
 

@@ -10,14 +10,14 @@ export class UserService {
      * create an new user
      * @param dto 
      */
-    async create(dto: {email:string, name:string, password:string, role:string }) {
+    async create(dto: {email:string, name:string, password:string, role?:string }) {
 
         let user = await UserModel.findOne({ email: dto.email }).exec();
         if (user != null ) {
             throw new NotAcceptableError('user email exists');
         }
 
-        user = await UserModel.create({emailValidated:false,...dto}) ;
+        user = await UserModel.create({emailValidated:false, ...dto}) ;
         UserModel.emit('created',user) ;
         return user;
     }

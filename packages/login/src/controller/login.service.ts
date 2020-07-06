@@ -1,12 +1,8 @@
 import { sign } from 'jsonwebtoken';
-import * as moment from 'moment';
 
-import * as randToken from 'rand-token';
-import { NotFoundError, NotAcceptableError } from 'routing-controllers';
-
-import { LoginSessionModel, UserModel } from '@packages/mongoose';
-
-import { config_get } from "@packages/core";
+import { IdentityService } from './identity.service';
+import { Inject, Token, Service } from 'typedi';
+import { IUserToken, IIdentityServiceToken, IIdentityService } from '../interface/login';
 
 const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
 
@@ -14,13 +10,6 @@ const jwtOptions = {
     expiresIn: 60 * 60 * 2, // 1h=60*60s
 };
 
-interface IUserToken {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    // password?: string;
-}
 
 export const createJwtToken = (user: IUserToken) => {
     const payload = {
@@ -30,95 +19,61 @@ export const createJwtToken = (user: IUserToken) => {
         role: user.role,
     };
 
-    const token = sign(
+    return sign(
         payload,
         jwtSecretOrKey,
         jwtOptions ,
     );
 
-    return {
-        // access_type: 'jwt',
-        access_token: token,
-        // expires: new Date(new Date().valueOf() + jwtOptions.expiresIn * 1000),
-        role: user.role,
-    };
 };
 
+@Service()
 export class LoginService {
+    @Inject() 
+    service: IdentityService ;
+    /**
+     * user login
+     * @param dto 
+     */
+    async login(dto: { email: string; password: string; device: string; ip: string; }) {
 
-    async loginAsAdmin(dto: { email, password, device, ip }) {
+        // check user is valid
+        var { user, session } = await this.service.userLogin(dto);
 
-        const account = await UserModel.findOne({ email: dto.email }).exec();
-        if (account == null || account.password != dto.password) {
-            throw new NotFoundError('email password not matched');
-        }
-
-        const loginDto = { device: dto.device, user: account._id };
-        let login = await LoginSessionModel.findOne(loginDto).exec();
-        if (login == null) {
-            login = new LoginSessionModel(loginDto);
-        }
-
-        const refreshToken = randToken.uid(64);
-        const user = {
-            id: account.id,
-            name: account.name,
-            email: account.email,
-            role: account.role,
+        // generate access token ,
+        const userInfo = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
         };
+        const access_token = createJwtToken(userInfo);
 
-        const jwtToken = createJwtToken(user);
-        //login.accessToken = jwtToken.access_token;
-        login.accessTime = new Date();
-        login.refreshTime = moment().add(7, 'day').toDate();
-        login.refreshToken = refreshToken;
-        login.ip = dto.ip;
-        await login.save();
-        return { ...jwtToken, id: account.id, name: account.name, refresh_token: refreshToken };
+        return { ...userInfo, access_token, refresh_token: session.refreshToken };
     }
 
-    async refreshToken(dto: { refresh_token }) {
-        const login = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
-        if (login == null) {
-            throw new NotFoundError('refresh_token not match');
-        }
 
-        if (new Date() > login.refreshTime) {
-            throw new NotAcceptableError('refresh_token expired');
-        }
+    /**
+     * user refresh token 
+     * @param dto 
+     */
+    async refreshToken(dto: { refresh_token: string }) {
+        // check token is valid
+        const user = await this.service.userRefreshToken(dto);
 
-        const account = await UserModel.findById(login.user).exec();
-        if (login == null) {
-            throw new NotFoundError('account not exist');
-        }
-
-        const user = {
-            id: account.id,
-            name: account.name,
-            email: account.email,
-            role: account.role,
+        // generate access token 
+        const userInfo = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
         };
 
-        const jwtToken = createJwtToken(user);
-        login.accessTime = new Date();
+        const access_token = createJwtToken(userInfo);
 
-        // login.session = session;
-        // login.refreshToken = refreshToken ;
-        await login.save();
-        return jwtToken;
+        return { access_token };
     }
 
-    // async initAccountData() {
-    //     const defaultAdmin = config_get("login.default_admin");
-
-
-    //     if (await UserModel.exists({ email: defaultAdmin.email })) {
-    //         return;
-    //     };
-
-    //     const account = new UserModel(defaultAdmin);
-    //     await account.save();
-
-    //     console.log('create default admin');
-    // }
 }
+
+
