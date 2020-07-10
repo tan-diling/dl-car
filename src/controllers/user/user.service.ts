@@ -1,10 +1,15 @@
-import { UserModel } from '@packages/mongoose';
+import { UserModel, Operation, ModelQueryService  } from '@packages/mongoose';
 import { NotFoundError, NotAcceptableError } from 'routing-controllers';
+
 
 /**
  * user service
  */
 export class UserService {
+
+    private queryService= new ModelQueryService() ;
+    constructor() {
+    }
 
     /**
      * create an new user
@@ -18,7 +23,7 @@ export class UserService {
         }
 
         user = await UserModel.create({emailValidated:false, ...dto}) ;
-        UserModel.emit('created',user) ;
+        UserModel.emit(Operation.Created, user) ;
         return user;
     }
 
@@ -32,7 +37,7 @@ export class UserService {
         if (user != null &&  user.email == dto.email ) {
             user.emailValidated = true ;
             await user.save() ;
-            return null ;
+            return ;
         }
 
         throw new NotAcceptableError('user id or email error') ;        
@@ -42,15 +47,8 @@ export class UserService {
      * get user list
      * @param query 
      */
-    async list(query:{ filter?, order? , skip?:number, limit?:number}){
-        let q = UserModel.find(query?.filter) ;
-        if(query?.order) q.sort(query.order) ;
-
-        if(query?.skip) q.skip(query.skip) ;
-
-        if(query?.limit) q.limit(query.limit) ;
-
-        return await q.exec() ;
+    async list(query:any){
+        return await this.queryService.list(UserModel,query) ;
     }
 
     /**

@@ -34,8 +34,8 @@ export class IdentityService implements IIdentityService {
         if (user == null || user.password != dto.password) {
             throw new NotFoundError('email password not matched');
         }
-        if (!user.emailValidated) {
-            throw new NotAcceptableError('email need to be validated');
+        if (! user.isNormal()) {
+            throw new NotAcceptableError('user is not in normal state');
         }
         // save user session info
         const loginDto = { device: dto.device, user: user._id };

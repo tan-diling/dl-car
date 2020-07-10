@@ -1,19 +1,26 @@
-import { config_get,logger } from '@packages/core';
+/**
+ * mail service 
+ * @packageDocumentation
+ */
 import { createTransport, TransportOptions} from 'nodemailer';
+import { config_get } from '@packages/core';
 
-// webmail: mail.nicjob.com
+// mail: mail.nicjob.com
 // username: do-not-reply@nicjob.com
 // pass: 4Il0IIlHR2KpHP5AOtV7gRMiU7wlz
 // smtp: my.modestlab.com:587
 // imap: my.modestlab.com:993 
 
 const Mail_Server_Host = config_get("mail.host","smtp.gmail.com") ;
-const Mail_Server_User = config_get("mail.user","dev@nicjob.com") ;
-const Mail_Server_Password = config_get("mail.password","gvE85vZblylGB*qp4%ZXJwRV") ;
+const Mail_Server_User = config_get("mail.user","dealing790@gmail.com") ;
+const Mail_Server_Password = config_get("mail.password","82242237") ;
 
 
+// const Mail_Server_Host = config_get("mail.host","mail.dealing.tech") ;
+// const Mail_Server_User = config_get("mail.user","tan.yw@dealing.tech") ;
+// const Mail_Server_Password = config_get("mail.password","82242237") ;
 
-const WebSite_Server = config_get("website.server","http://127.0.0.1:3000") 
+
 
 const transportOption = {
   host: Mail_Server_Host,
@@ -72,8 +79,8 @@ export async function sendMail(email: string, html: string,  subject: string = '
     from: transportOption.auth.user, // sender
     to: email, // receiver
     subject, // title
-    // text: 'Hello world',
-    html,
+    text: html,
+    // html,
   };
 
   try 
@@ -83,29 +90,10 @@ export async function sendMail(email: string, html: string,  subject: string = '
   }
   catch(err)
   {
-      logger.error(`mail send error ${err}`) ;
+      console.error(`mail send error ${err}`) ;
     return  {error:err} ;
   }
   
 
   
-}
-
-/**
- * send mail validation
- * @param email email
- * @param code valid type
- */
-export async function sendValidateMail(email: string, code: string) {
-
-  const validationUrl = `${WebSite_Server}/validate-mail?code=${code}&email=${email}`;
-  const html = `<h2>Mailbox verify</h2>
-  <h3>
-    <span>code: ${code}</span>
-    Please click to validate
-    <a href="${validationUrl}">${validationUrl}</a>
-  </h3>`;
-
-  return sendMail(email, html,"email validate")    ;
-
 }

@@ -1,4 +1,4 @@
-import { prop, Typegoose, ModelType, InstanceType, Ref, plugin } from 'typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
 
@@ -10,7 +10,7 @@ enum UserRole {
 }
 
 @plugin(mongooseHidden({ defaultHidden: {  password: true } }))
-class User extends Typegoose {
+class User {
   @prop()
   name: string;
 
@@ -40,9 +40,16 @@ class User extends Typegoose {
   
   @prop()
   emailValidated : boolean ;
+
+  @prop({ required: false, default: false})
+  deleted?: boolean ;
+
+  isNormal() {
+    return (this.emailValidated && (!this.deleted));
+  }
 }
 
-class LoginSession extends Typegoose {
+class LoginSession{
 
   @prop({ ref: User })
   user: Ref<User>;
@@ -63,7 +70,8 @@ class LoginSession extends Typegoose {
   refreshTime?: Date;
   
 };
- 
-export const UserModel = new User().getModelForClass(User);
-  
-export const LoginSessionModel = new LoginSession().getModelForClass(LoginSession);
+
+
+export const UserModel = getModelForClass(User);
+
+export const LoginSessionModel = getModelForClass(LoginSession);

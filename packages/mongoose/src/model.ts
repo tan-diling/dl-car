@@ -47,6 +47,12 @@ export const db_startup =  async (init?:Function): Promise<Db> => {
         },
     );
 
+    const conn = connection.connection ;
+    conn.on('error', console.error.bind(console, '**db connection error:'));
+    conn.once('open', function() {
+        // we're connected!
+        console.info( '**db connection error:**')
+    });
 
     db = connection.connection.db ;
     await init_db(db)

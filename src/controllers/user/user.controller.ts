@@ -59,7 +59,8 @@ export class UserController {
     @Post('/user/email_exists')
     async emailExists(@Body() dto:EmailExistDto){
         const users = await this.service.list({filter:{email:dto.email}}) ;
-        if(users.length >0 ) return {register:true,emailValidated:users[0].emailValidated} ;
+        if(users.length >0 ) 
+            return {register:true} ;
 
         return {register:false} ;
     }
@@ -78,7 +79,7 @@ export class UserController {
 
     @Authorized()
     @Patch('/user/:id([0-9a-f]{24})')
-    async update(@Param('id') id:string, dto:UserUpdateDto,@CurrentUser() currentUser:IUser) {
+    async update(@Param('id') id:string, @Body() dto:UserUpdateDto, @CurrentUser() currentUser:IUser) {
         this.checkPermission(Operation.UPDATE,currentUser,{id,dto}) ;
         return await this.service.update(id,dto) ;
     }

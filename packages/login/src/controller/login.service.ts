@@ -7,7 +7,7 @@ import { IUserToken, IIdentityServiceToken, IIdentityService } from '../interfac
 const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
 
 const jwtOptions = {
-    expiresIn: 60 * 60 * 2, // 1h=60*60s
+    expiresIn: 60 * 60 * 2, // 2h=60*60s
 };
 
 
