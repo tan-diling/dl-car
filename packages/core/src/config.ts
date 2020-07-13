@@ -48,6 +48,11 @@ export const MONGODB_URL : string = config_get('mongodb.url') || 'mongodb://loca
 // /** google calendar oauth2 token file */
 // export const GOOGLE_AUTH_TOKEN_FILE = path.join(ConfigDir, 'token.json');
 
+export const JWT_OPTION = {
+    secretOrKey:  process.env.JWT_SECRET || 'dealing' ,
+    algorithm: process.env.JWT_ALGORITHM || 'HS256',
+    expiresIn: 2* 60 * 60 , // 1h=60*60s
+};
 
 // export const JWT_SECRET  = process.env.JWT_SECRET || 'intakeBot' ;
 // export const JWT_ALGORITHM :string = process.env.JWT_ALGORITHM || 'HS256' ;

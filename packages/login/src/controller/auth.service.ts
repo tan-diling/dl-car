@@ -3,13 +3,11 @@ import { sign } from 'jsonwebtoken';
 import { IdentityService } from './identity.service';
 import { Inject, Token, Service } from 'typedi';
 import { IUserToken, IIdentityServiceToken, IIdentityService } from '../interface/login';
+import { JWT_OPTION } from '@packages/core';
 
-const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
+// const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
 
-const jwtOptions = {
-    expiresIn: 60 * 60 * 2, // 2h=60*60s
-};
-
+const jwtOptions = JWT_OPTION ;
 
 export const createJwtToken = (user: IUserToken) => {
     const payload = {
@@ -21,14 +19,14 @@ export const createJwtToken = (user: IUserToken) => {
 
     return sign(
         payload,
-        jwtSecretOrKey,
-        jwtOptions ,
+        jwtOptions.secretOrKey,
+        {expiresIn: jwtOptions.expiresIn } ,
     );
 
 };
 
 @Service()
-export class LoginService {
+export class AuthService {
     @Inject() 
     service: IdentityService ;
     /**

@@ -4,12 +4,12 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import { LoginDto, RefreshTokenDto } from './dto/login.dto';
 import * as moment from 'moment';
 import * as requestIp from 'request-ip';
-import { LoginService } from './login.service'
+import { AuthService } from './auth.service'
 
 
 @JsonController()
 export class LoginController {
-    constructor(private service: LoginService) {
+    constructor(private service: AuthService) {
     }
     
     @Post('/login')

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError } from 'routing-controllers';
 
 import * as moment from 'moment';
-import { UserCreateDto, UserUpdateDto, EmailExistDto } from './dto/user.dto';
+import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
 enum Operation{
@@ -15,8 +15,10 @@ enum Operation{
 interface IUser{role:string,id:string} ;
 
 interface RequestContext{
-  id?:string;
-  dto:any;
+  method:Operation,
+  user?:IUser;
+  filter?:any;  
+  dto?:any;    
 } 
 
 @JsonController()
@@ -24,21 +26,24 @@ export class UserController {
     constructor(private service: UserService) {
     }
     
-    checkPermission(op:Operation,user,ctx:any){
-        switch(op)
+    checkPermission(ctx:RequestContext){
+        if (ctx.user?.role == 'admin')
+            return ;
+
+        switch(ctx.method)
         {
             case Operation.CREATE:
                 break ;
             case Operation.RETRIEVE:
                 break ;
             case Operation.UPDATE:
-                if((user?.role == 'admin') || (user?.id != ctx.id))
-                    break ;
-                throw new MethodNotAllowedError('permission Error') ;
+                if( ctx.user?.id != ctx.filter?.id)                    
+                    throw new MethodNotAllowedError('permission check error') ;
+
+                if( ctx.dto?.role != null || ctx.dto?.defaultContact != null)                    
+                    throw new MethodNotAllowedError('permission check error') ;
                 break ;
-            case Operation.DELETE:
-                if( user?.role == 'admin')
-                    break ;
+            case Operation.DELETE:                
                 throw new MethodNotAllowedError('permission Error') ;
             default:
                 throw new InternalServerError('check permission error');
@@ -46,10 +51,16 @@ export class UserController {
     }
 
     @Post('/sign_up')
+    async signUp(@Body() dto:VisitorUserCreateDto) {
+        return await this.service.create(dto) ;
+    }
+
+    @Authorized('admin')
     @Post('/user')
     async create(@Body() dto:UserCreateDto) {
         return await this.service.create(dto) ;
     }
+
 
     @Get('/user/email_validate')
     async emailValidate(@QueryParam('id') id:string, @QueryParam('email') email:string){
@@ -80,7 +91,12 @@ export class UserController {
     @Authorized()
     @Patch('/user/:id([0-9a-f]{24})')
     async update(@Param('id') id:string, @Body() dto:UserUpdateDto, @CurrentUser() currentUser:IUser) {
-        this.checkPermission(Operation.UPDATE,currentUser,{id,dto}) ;
+        this.checkPermission({
+            method:Operation.UPDATE,
+            user:currentUser,
+            filter:{id},
+            dto
+        }) ;
         return await this.service.update(id,dto) ;
     }
 

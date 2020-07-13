@@ -18,7 +18,8 @@ enum UserCreateRole {
     visitor = 'visitor',
 }
 
-export class UserCreateDto {
+
+export class VisitorUserCreateDto {
     @IsString()
     @Matches(RULE_USER_NAME_REGEX)
     name: string;
@@ -30,10 +31,26 @@ export class UserCreateDto {
     @Matches(RULE_PASSWORD_REGEX)
     password: string;
 
+}
+
+export class UserCreateDto extends VisitorUserCreateDto {
+    // @IsString()
+    // @Matches(RULE_USER_NAME_REGEX)
+    // name: string;
+
+    // @IsEmail()
+    // email: string;
+
+    // @IsString()
+    // @Matches(RULE_PASSWORD_REGEX)
+    // password: string;
+
     @IsEnum(UserCreateRole)
     @IsOptional()
     role?: string;
 }
+
+
 
 
 export class EmailExistDto {

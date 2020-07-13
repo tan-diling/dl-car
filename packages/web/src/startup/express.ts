@@ -12,6 +12,7 @@ import { ErrorMiddleware } from './errorMiddleware';
 import { BackendServer } from '../index';
 import * as jwt from 'jsonwebtoken' ;
 import {Container} from "typedi";
+import { userCheck, initPassport } from './passport';
 
 export default (server: BackendServer) => {
   /**
@@ -43,7 +44,8 @@ export default (server: BackendServer) => {
   // Middleware that transforms the raw string of req.body into json
   app.use(bodyParser.json({limit: '5mb',}))
   app.use(bodyParser.urlencoded({limit: '5mb', extended: true}))  
-  
+
+  initPassport(app) ;
   app.get("/", function (req: any, res: any) {
     res.send("hello express");
 });
@@ -65,32 +67,53 @@ useExpressServer(app, { // register created express server in routing-controller
     // controllers: [__dirname + "/../controller/*Controller.js"],
     // middlewares: [__dirname + "/../middleware/*Middleware.js"],
     defaultErrorHandler: false,
-    currentUserChecker: async (action: Action) => {
-        return action.request.user;
-    },
-    authorizationChecker: async (action: Action, roles: string[]) => {
-      const authorizationHeader:string = action.request.headers["authorization"] || "";
-      const array = authorizationHeader.split(' ') ;
-      if (array.length != 2 || array[0]!='Bearer' ) 
-        return false ;
-      const token = array[1] ;
-      // const token = authorizationHeader.substr(4) ;
+    authorizationChecker: userCheck ,
+    //  (action: Action) => new Promise<boolean>((resolve, reject) => {
+    //   passport.authenticate('jwt', (err, user) => {
+    //     if (err) {
+    //       return reject(err);
+    //     }
+    //     if (!user) {
+    //       return resolve(false);
+    //     }
+    //     action.request.user = user;
+    //     return resolve(true);
+    //   })(action.request, action.response, action.next);
+    // }),
+    currentUserChecker: (action: Action) => action.request.user,
 
-      action.request.user= jwt.decode(token);
-      const user = action.request.user;
-      if (user) {
-        if(roles.length == 0) return true ;
+    // currentUserChecker: async (action: Action) => {
+    //     return action.request.user;
+    // },
+    // authorizationChecker: async (action: Action, roles: string[]) => {
+    //   const authorizationHeader:string = action.request.headers["authorization"] || "";
+    //   const array = authorizationHeader.split(' ') ;
+    //   if (array.length != 2 || array[0]!='Bearer' ) 
+    //     return false ;
+    //   const token = array[1] ;
+    //   // const token = authorizationHeader.substr(4) ;
 
-        const currentRole: string =  user?.permission || user?.role ;
-        const userRoles:Array<string>  = [currentRole] ;
+    //   action.request.user= jwt.decode(token);
+    //   const user = action.request.user;
+    //   if (user) {
+    //     if(user.exp && user.exp < Date.now()){
+    //       action.response.status(401).json({error:'TokenExpiredError'}).end();     
+          
+    //       return  ;        
+    //     }
+
+    //     if(roles.length == 0) return true ;
+
+    //     const currentRole: string =  user?.permission || user?.role ;
+    //     const userRoles:Array<string>  = [currentRole] ;
          
-        if (userRoles && roles.find(x => userRoles.indexOf(x) !== -1))
-            return true;
+    //     if (userRoles && roles.find(x => userRoles.indexOf(x) !== -1))
+    //         return true;
 
-      }
+    //   }
             
-      return false;
-    },
+    //   return false;
+    // },
 
     defaults: {
       //with this option, null will return 404 by default

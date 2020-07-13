@@ -44,6 +44,10 @@ class User {
   @prop({ required: false, default: false})
   deleted?: boolean ;
 
+
+  @prop({ required: false, default: false})
+  defaultContact?: boolean ;
+
   isNormal() {
     return (this.emailValidated && (!this.deleted));
   }

@@ -1,11 +1,14 @@
+import { Request, Response, NextFunction } from 'express';
 import { Middleware, ExpressErrorMiddlewareInterface, HttpError } from 'routing-controllers';
 
 @Middleware({ type: 'after' })
 export class ErrorMiddleware implements ExpressErrorMiddlewareInterface {
-    error(error: any, request: any, response: any, next: (err: any) => any) {
+    error(error: any, request: any, response: Response, next: (err: any) => any) {
 
         if (error instanceof HttpError) {
+
             const {stack, ...httpError} = error ;
+            
             response.status(error.httpCode || 500)
             .json(httpError)
             .end();

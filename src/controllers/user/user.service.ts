@@ -81,7 +81,8 @@ export class UserService {
     async delete(id){
         const doc = await this.getById(id) ;
         if(doc){
-            return await doc.remove() ;
+            doc.deleted = true ;
+            return await doc.save() ;
         }
 
         return doc ;
