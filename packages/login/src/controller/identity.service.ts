@@ -14,10 +14,10 @@ export class IdentityService implements IIdentityService {
     async userRefreshToken(dto: { refresh_token: string; }) {
         const session = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
-            throw new NotFoundError('refresh_token not match');
+            throw new NotFoundError('refresh token not match');
         }
         if (new Date() > session.refreshTime) {
-            throw new NotAcceptableError('refresh_token expired');
+            throw new NotAcceptableError('refresh token expired');
         }
         const user = await UserModel.findById(session.user).exec();
         if (session == null) {

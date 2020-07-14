@@ -33,6 +33,20 @@ export class VisitorUserCreateDto {
 
 }
 
+export class ChangePasswordDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @Matches(RULE_PASSWORD_REGEX)
+    oldPassword: string;
+
+
+    @IsString()
+    @Matches(RULE_PASSWORD_REGEX)
+    newPassword: string;
+}
+
 export class UserCreateDto extends VisitorUserCreateDto {
     // @IsString()
     // @Matches(RULE_USER_NAME_REGEX)

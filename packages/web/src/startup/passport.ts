@@ -1,4 +1,4 @@
-import { ExpressMiddlewareInterface, UseBefore, Middleware } from 'routing-controllers';
+import { ExpressMiddlewareInterface, UseBefore, Middleware, UnauthorizedError } from 'routing-controllers';
 import  passport = require( 'passport');
 import { StrategyOptions, ExtractJwt, Strategy } from 'passport-jwt';
 import { logger, JWT_OPTION } from '@packages/core';
@@ -49,7 +49,8 @@ export const userCheck = (action: { request, response, next }, roles: string[]) 
             }
             if (!user) {
                 
-                action.response.status(401).json(info);
+                reject(new UnauthorizedError(info?.message || "jwt error") ) ;
+                // action.response.status(401).json(info);
                 
 
                 return resolve(false);

@@ -11,6 +11,18 @@ export class UserService {
     constructor() {
     }
 
+    async changePassword(dto:{email:string, oldPassword:string, newPassword:string}){
+        const user = await UserModel.findOne({email:dto.email}).exec() ;
+        if(user && user.password==dto.oldPassword){
+            user.password = dto.newPassword ;
+            await user.save() ;
+
+            return user;
+        }
+
+        return null ;
+    }
+
     /**
      * create an new user
      * @param dto 
@@ -41,7 +53,7 @@ export class UserService {
         }
 
         throw new NotAcceptableError('user id or email error') ;        
-    }
+    }    
 
     /**
      * get user list
@@ -67,10 +79,10 @@ export class UserService {
     async update(id:string,dto:any){
         const doc = await this.getById(id) ;
         if(doc){
-            return await doc.updateOne(doc,{new:true}).exec() ;
+            return UserModel.findByIdAndUpdate(id,dto,{new:true}).exec() ;            
         }
 
-        return doc ;
+        return null ;
     }
 
     /**
@@ -85,7 +97,7 @@ export class UserService {
             return await doc.save() ;
         }
 
-        return doc ;
+        return null ;
     }
 
  

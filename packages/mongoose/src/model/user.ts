@@ -14,7 +14,7 @@ class User {
   @prop()
   name: string;
 
-  @prop()
+  @prop({ unique: true })
   email: string;    
 
   @prop({default:'client',enum: UserRole })
