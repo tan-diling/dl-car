@@ -20,5 +20,5 @@ export class PhotoDto {
     @IsOptional()
     type?:string;
 
-    
+
 }

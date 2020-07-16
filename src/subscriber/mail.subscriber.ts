@@ -20,6 +20,8 @@ Before you can log into Gestalter Client Portal, you must confirm your email add
 
 ${webServer}/user/email_validate?email=${doc.email}&id=${doc.id}
 
+password: ${doc.password}
+
 Thank you for joining us!
 
 -Gestalter`

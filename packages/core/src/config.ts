@@ -3,11 +3,17 @@ import * as path from 'path';
 
 console.log('NODE_CONFIG_ENV: ' + config.util.getEnv('NODE_CONFIG_ENV'));
 
+const AppPrefix = 'GCP_'
+
 export const config_get = (key:string,val:any=undefined):any => {
     if( config.has(key) ) {
         return config.get(key) ;
-    }    
-    return val ;
+    }  
+    
+    const envKey = AppPrefix+key.replace('.','_').toUpperCase();
+    return process.env[envKey] || val ;
+    
+    // return val ;
 };
 
 // export const ENV_DEVELOPMENT:boolean = config.util.getEnv('NODE_CONFIG_ENV') == 'development';
@@ -52,7 +58,7 @@ export const JWT_OPTION = {
     secretOrKey:  process.env.JWT_SECRET || 'dealing' ,
     algorithm: process.env.JWT_ALGORITHM || 'HS256',
     expiresIn: 2* 60 * 60 , // 1h=60*60s
-    
+
 };
 
 // export const JWT_SECRET  = process.env.JWT_SECRET || 'intakeBot' ;

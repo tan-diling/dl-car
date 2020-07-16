@@ -12,8 +12,8 @@ import { config_get } from '@packages/core';
 // imap: my.modestlab.com:993 
 
 const Mail_Server_Host = config_get("mail.host","smtp.gmail.com") ;
-const Mail_Server_User = config_get("mail.user","dealing790@gmail.com") ;
-const Mail_Server_Password = config_get("mail.password","82242237") ;
+const Mail_Server_User = config_get("mail.user","rscbg@testmvp.com") ;
+const Mail_Server_Password = config_get("mail.password","$7G!WFYkz2tlm") ;
 
 
 // const Mail_Server_Host = config_get("mail.host","mail.dealing.tech") ;

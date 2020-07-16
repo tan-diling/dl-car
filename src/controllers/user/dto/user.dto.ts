@@ -1,8 +1,8 @@
-import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum } from 'class-validator';
+import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 
 /** user name rule: <first> [middle] <last> */
-const RULE_USER_NAME_REGEX = /^([a-zA-Z0-9]+\s{1}[a-zA-Z0-9]{1,}|[a-zA-Z0-9]+\s{1}[a-zA-Z0-9]{3,}\s{1}[a-zA-Z0-9]{1,})$/ ;
+const RULE_USER_NAME_REGEX = /^[a-zA-Z0-9]+\s{1}([a-zA-Z0-9\.]{1,}\s{1}){0,1}[a-zA-Z0-9]{1,}$/ ;
 
 /** phone rule  */
 const RULE_PHONE_REGEX = /^(\+?1)?[2-9]\d{2}[2-9](?!11)\d{6}$/ ;
@@ -22,6 +22,7 @@ enum UserCreateRole {
 export class VisitorUserCreateDto {
     @IsString()
     @Matches(RULE_USER_NAME_REGEX)
+    @MaxLength(24)
     name: string;
 
     @IsEmail()
@@ -76,6 +77,7 @@ export class EmailExistDto {
 export class UserUpdateDto {
     @IsString()
     @Matches(RULE_USER_NAME_REGEX)
+    @MaxLength(24)
     @IsOptional()
     name?: string;
 

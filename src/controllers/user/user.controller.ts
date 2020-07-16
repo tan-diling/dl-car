@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 
 import * as moment from 'moment';
 import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
@@ -52,6 +52,7 @@ export class UserController {
             case Operation.DELETE:   
                 if( ctx.user?.id == ctx.filter?.id )              
                     throw new MethodNotAllowedError('permission check: cannot delete self') ;
+                break ;
             default:
                 throw new InternalServerError('check permission error');
         }
@@ -88,8 +89,9 @@ export class UserController {
 
 
     @Get('/user/email_validate')
+    @Redirect('/login')
     async emailValidate(@QueryParam('id') id:string, @QueryParam('email') email:string){
-        return await this.service.validateEmail({id,email}) ;
+        await this.service.validateEmail({id,email}) ;        
     }
 
     @Post('/user/email_exists')

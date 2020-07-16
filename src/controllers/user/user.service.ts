@@ -17,10 +17,10 @@ export class UserService {
             user.password = dto.newPassword ;
             await user.save() ;
 
-            return user;
+            return ;
         }
 
-        return null ;
+        throw new NotAcceptableError("email or password not matched ") ;
     }
 
     /**

@@ -4,6 +4,7 @@ import { Middleware, ExpressErrorMiddlewareInterface, HttpError } from 'routing-
 @Middleware({ type: 'after' })
 export class ErrorMiddleware implements ExpressErrorMiddlewareInterface {
     error(error: any, request: any, response: Response, next: (err: any) => any) {
+        if (response.headersSent) return ;
 
         if (error instanceof HttpError) {
 
