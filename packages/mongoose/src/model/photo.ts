@@ -1,11 +1,13 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { User } from './user';
 
 class Photo {
+  // @prop()
+  // name: string;
+  id:string ;
+  
   @prop()
-  name: string;
-
-  @prop()
-  album: string;    
+  folder?: string;    
 
   @prop()
   title?: string;
@@ -16,11 +18,15 @@ class Photo {
   @prop()
   type?: string ;
 
+  @prop({ ref: User })
+  owner?: Ref<User>;
+
   path() {
-    return `/${this.album}/${this.name}`;
+    return `/${this.folder}/${this.id}${this.type}`;
   }
+  
   
 }
 
 
-export const PhotoModel = getModelForClass(Photo);
+export const PhotoModel = getModelForClass(Photo,{schemaOptions:{timestamps:true}});

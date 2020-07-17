@@ -7,41 +7,35 @@ import { PhotoDto } from './dto/photo.dto';
 import { PhotoModel } from '@packages/mongoose';
 import * as util from 'util';
 import { config_get } from '@packages/core';
+import * as moment from 'moment';
 
-// export const fileUploadOptions = () => {
-//     storage: multer.diskStorage({
-//         destination: (req: any, file: any, cb: any) => { ...
-//         },
-//         filename: (req: any, file: any, cb: any) => { ...
-//         }
-//     }),
-//     fileFilter: (req: any, file: any, cb: any) => { ...
-//     },
-//     limits: {
-//         fieldNameSize: 255,
-//         fileSize: 1024 * 1024 * 5
-//     }
-// };
+const allowedFileExtNameList =[".jpg",".gif",".png"] ;
+
+export const fileUploadOptions =  {        
+    limits: {
+        // fieldNameSize: 255,
+        fields: 1,
+        fileSize: 1024 * 1024 * 2
+    }
+};
 
 export const PHOTO_BASE_PATH = config_get("photo.path","./dist/upload") ;
 
-@JsonController('/photo')
+@JsonController('/image')
 export class PhotoController{
     @Authorized()
     @Post()
-    async upload(@UploadedFile("photo") file: any, @Body({required:false}) dto:PhotoDto) {
-        dto.album = dto.album || 'default' ;
-        dto.name = dto.name || file.originalname ; 
-        dto.type = dto.type || file.mimetype ;
-        // const obj =  Object.assign({name:file.filename,type:file.mimetype,album:'default'},dto) ;
+    async upload(@UploadedFile("photo",{options:fileUploadOptions}) file: any, @Body({required:false}) dto:PhotoDto,@CurrentUser() currentUser:any) {
+        const fileName = file.originalname ;
+        const extName  = path.extname(fileName).toLowerCase() ;
+        if(! allowedFileExtNameList.includes(extName))
+            throw new NotAcceptableError("Invalid file type. You may only upload PNG, JPG or GIF files.") ;
 
-        let existPhoto = await PhotoModel.findOne({name:dto.name,album:dto.album}).exec() ;
-
-        if(existPhoto){
-            throw new NotAcceptableError("photo exists")
-        }
-
-        const photo = new PhotoModel(dto) ;
+        dto.folder = dto.folder || moment().format('yyyyMMDD') ;
+        dto.title = dto.title || fileName ; 
+        dto.type = dto.type || extName ;
+              
+        const photo = new PhotoModel({...dto,owner:currentUser.id}) ;
 
         if(file.buffer) {
             const filePath = path.join(PHOTO_BASE_PATH,photo.path()) ;
@@ -51,7 +45,7 @@ export class PhotoController{
         
         await photo.save() ;
 
-        return photo ;
+        return {...photo.toJSON(),url:"/image"+photo.path() } ;
     }
 
 }

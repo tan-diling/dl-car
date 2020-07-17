@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 import * as randToken from 'rand-token';
-import { NotFoundError, NotAcceptableError } from 'routing-controllers';
+import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 
 import { LoginSessionModel, UserModel } from '@packages/mongoose';
 
@@ -14,14 +14,14 @@ export class IdentityService implements IIdentityService {
     async userRefreshToken(dto: { refresh_token: string; }) {
         const session = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
-            throw new NotFoundError('refresh token not match');
+            throw new UnauthorizedError('refresh token not valid');
         }
         if (new Date() > session.refreshTime) {
-            throw new NotAcceptableError('refresh token expired');
+            throw new UnauthorizedError('refresh token expired');
         }
         const user = await UserModel.findById(session.user).exec();
         if (session == null) {
-            throw new NotFoundError('user not exist');
+            throw new UnauthorizedError('account not valid');
         }
         // update session info
         session.accessTime = new Date();
@@ -32,10 +32,10 @@ export class IdentityService implements IIdentityService {
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
         const user = await UserModel.findOne({ email: dto.email }).exec();
         if (user == null || user.password != dto.password) {
-            throw new NotFoundError('email password not matched');
+            throw new UnauthorizedError('email or password not valid');
         }
         if (! user.isNormal()) {
-            throw new NotAcceptableError('user is not in normal state');
+            throw new UnauthorizedError('this account is not allowed to login.');
         }
         // save user session info
         const loginDto = { device: dto.device, user: user._id };

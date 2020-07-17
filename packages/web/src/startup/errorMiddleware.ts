@@ -8,15 +8,15 @@ export class ErrorMiddleware implements ExpressErrorMiddlewareInterface {
 
         if (error instanceof HttpError) {
 
-            const {stack, ...httpError} = error ;
+            const {stack,name, ...httpError} = error ;
             
             response.status(error.httpCode || 500)
             .json(httpError)
             .end();
         } else if (error instanceof Error) {
             response.status(500).json({
-                codeCode: 500,
-                error: error.message,
+                httpCode: 500,
+                message: error.message,
             })
             .end();
         }

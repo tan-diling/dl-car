@@ -1,12 +1,12 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum } from 'class-validator';
 export class PhotoDto {
-    @IsString()
-    @IsOptional()
-    name?:string;
+    // @IsString()
+    // @IsOptional()
+    // name?:string;
 
     @IsString()
     @IsOptional()
-    album?:string;
+    folder?:string;
 
     @IsString()
     @IsOptional()

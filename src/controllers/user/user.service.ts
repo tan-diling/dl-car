@@ -1,6 +1,6 @@
 import { UserModel, Operation, ModelQueryService  } from '@packages/mongoose';
 import { NotFoundError, NotAcceptableError } from 'routing-controllers';
-
+import * as randToken from 'rand-token';
 
 /**
  * user service
@@ -27,14 +27,18 @@ export class UserService {
      * create an new user
      * @param dto 
      */
-    async create(dto: {email:string, name:string, password:string, role?:string }) {
+    async create(dto: {email:string, name:string, password?:string, role?:string }) {
 
         let user = await UserModel.findOne({ email: dto.email }).exec();
         if (user != null ) {
             throw new NotAcceptableError('user email exists');
         }
 
-        user = await UserModel.create({emailValidated:false, ...dto}) ;
+        user = new UserModel(dto) ;
+        user.emailValidated = false ;
+        if(! user.password) user.password = randToken.uid(8) ;
+
+        await user.save() ;
         UserModel.emit(Operation.Created, user) ;
         return user;
     }

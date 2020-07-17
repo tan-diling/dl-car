@@ -6,11 +6,12 @@ enum UserRole {
   admin ='admin',
   staff = 'staff',
   client='client',
+  visitor='visitor',
 
 }
 
 @plugin(mongooseHidden({ defaultHidden: {  password: true } }))
-class User {
+export class User {
   @prop()
   name: string;
 
@@ -24,7 +25,7 @@ class User {
   password : string ;
 
   @prop()
-  logo?: string;  
+  image?: string;  
 
   @prop()
   company?: string;
@@ -53,7 +54,7 @@ class User {
   }
 }
 
-class LoginSession{
+export class LoginSession{
 
   @prop({ ref: User })
   user: Ref<User>;
