@@ -1,5 +1,4 @@
 import { Schema, Model, model, Document, Types } from 'mongoose';
-import { schemaNames } from './constant';
 import { INotification } from '../interface/notification';
 
 export type INotificationDocument = INotification & Document;
@@ -26,4 +25,4 @@ const schema: Schema = new Schema(
 
 export type NotificationModel = Model<INotificationDocument, {}>;
 
-export const Notification = model<INotificationDocument>(schemaNames.notification, schema);  
+export const Notification = model<INotificationDocument>('notification', schema);  

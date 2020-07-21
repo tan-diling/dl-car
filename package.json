@@ -6,7 +6,7 @@
   "description": "client portal",
   "scripts": {
     "lint": "tslint -p tsconfig.json -c tslint.json \"packages/**/*.ts\" -e \"*.spec.ts\"",
-    "tsc": "tsc",
+    "build": "tsc",
     "doc:api": "ts-node ./draft/doc.ts ",
     "run:login": "ts-node test/login.run.ts",
     "run:web": "ts-node test/web.run.ts",
@@ -14,13 +14,13 @@
     "test": "mocha --exit --reporter mocha-junit-reporter -r ts-node/register ./test/web.ts",
     "test:login": "mocha --exit  -r ts-node/register ./test/login.test.ts",
     "test:crud": "mocha --exit  -r ts-node/register ./test/crud.test.ts",
-    "start": "ts-node src/index.ts"
+    "start": "node ./dist/src/index.js"
   },
   "engines": {
     "node": ">= 10"
   },
   "_moduleAliases": {
-    "@packages": "packages"
+    "@packages": "dist/packages"
   },
   "repository": {
     "type": "git",

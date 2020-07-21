@@ -14,6 +14,8 @@ export class IdentityService implements IIdentityService {
     async userRefreshToken(dto: { refresh_token: string; }) {
         const session = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
+            const err = new UnauthorizedError('refresh token not valid');            
+            
             throw new UnauthorizedError('refresh token not valid');
         }
         if (new Date() > session.refreshTime) {

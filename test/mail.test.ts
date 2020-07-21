@@ -7,12 +7,12 @@
 
 require('module-alias/register') ;
 
-import {sendValidateMail } from '@packages/mail';
+import {sendMail } from '@packages/mail';
 
 
 async function run() {
     const receiver = 'tan.yw@dealing.tech';
-   const ret = await sendValidateMail(receiver,new Date().toISOString()) ;
+   const ret = await sendMail(receiver,new Date().toISOString()) ;
 
    console.log(`${receiver} result:${ret}`) ;
 };

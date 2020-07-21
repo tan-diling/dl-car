@@ -6,12 +6,13 @@ console.log('NODE_CONFIG_ENV: ' + config.util.getEnv('NODE_CONFIG_ENV'));
 const AppPrefix = 'GCP_'
 
 export const config_get = (key:string,val:any=undefined):any => {
+    let v = val ;
     if( config.has(key) ) {
-        return config.get(key) ;
+        v = config.get(key) ;
     }  
     
     const envKey = AppPrefix+key.replace('.','_').toUpperCase();
-    return process.env[envKey] || val ;
+    return process.env[envKey] || v ;
     
     // return val ;
 };
