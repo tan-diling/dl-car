@@ -48,8 +48,9 @@ export const userCheck = (action: { request, response, next }, roles: string[]) 
                 return reject(err);
             }
             if (!user) {
-                
-                reject(new UnauthorizedError(info?.message || "jwt error") ) ;
+                const jwtError = new UnauthorizedError(info?.message || "jwt error") ;
+                jwtError.name = "jwt_error" ;                
+                reject(jwtError ) ;
                 // action.response.status(401).json(info);
                 
 

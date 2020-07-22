@@ -40,4 +40,12 @@ postman
 - http://localhost:3001/api_docs
 
 
+#### nginx selinux config
+
+```
+#nginx log:connect() to 127.0.0.1:3000 failed (13: Permission denied)
+setsebool -P httpd_can_network_connect 1
+```
+
+
 

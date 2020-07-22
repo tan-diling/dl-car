@@ -14,16 +14,16 @@ export class IdentityService implements IIdentityService {
     async userRefreshToken(dto: { refresh_token: string; }) {
         const session = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
-            const err = new UnauthorizedError('refresh token not valid');            
+            // const err = new UnauthorizedError('refresh_invalid');            
             
-            throw new UnauthorizedError('refresh token not valid');
+            throw new UnauthorizedError('refresh_invalid');
         }
         if (new Date() > session.refreshTime) {
-            throw new UnauthorizedError('refresh token expired');
+            throw new UnauthorizedError('refresh_expired');
         }
         const user = await UserModel.findById(session.user).exec();
         if (session == null) {
-            throw new UnauthorizedError('account not valid');
+            throw new UnauthorizedError('account_invalid');
         }
         // update session info
         session.accessTime = new Date();
@@ -34,10 +34,10 @@ export class IdentityService implements IIdentityService {
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
         const user = await UserModel.findOne({ email: dto.email }).exec();
         if (user == null || user.password != dto.password) {
-            throw new UnauthorizedError('email or password not valid');
+            throw new UnauthorizedError('account_invalid');
         }
         if (! user.isNormal()) {
-            throw new UnauthorizedError('this account is not allowed to login.');
+            throw new UnauthorizedError('account_forbidden');
         }
         // save user session info
         const loginDto = { device: dto.device, user: user._id };

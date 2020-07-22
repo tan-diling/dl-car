@@ -29,7 +29,7 @@ export class PhotoController{
         const fileName = file.originalname ;
         const extName  = path.extname(fileName).toLowerCase() ;
         if(! allowedFileExtNameList.includes(extName))
-            throw new NotAcceptableError("Invalid file type. You may only upload PNG, JPG or GIF files.") ;
+            throw new NotAcceptableError("file_invalid") ;
 
         dto.folder = dto.folder || moment().format('yyyyMMDD') ;
         dto.title = dto.title || fileName ; 

@@ -1,5 +1,5 @@
 import { UserModel, Operation, ModelQueryService  } from '@packages/mongoose';
-import { NotFoundError, NotAcceptableError } from 'routing-controllers';
+import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 
 /**
@@ -20,7 +20,7 @@ export class UserService {
             return ;
         }
 
-        throw new NotAcceptableError("email or password not matched ") ;
+        throw new UnauthorizedError("password_check_error") ;
     }
 
     /**

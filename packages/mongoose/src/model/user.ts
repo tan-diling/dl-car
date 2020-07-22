@@ -18,7 +18,7 @@ export class User {
   @prop({ unique: true })
   email: string;    
 
-  @prop({default:'client',enum: UserRole })
+  @prop({default:UserRole.client, enum: UserRole })
   role?: string;
 
   @prop()
