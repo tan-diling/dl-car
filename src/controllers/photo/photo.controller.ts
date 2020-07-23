@@ -19,7 +19,8 @@ export const fileUploadOptions =  {
     }
 };
 
-export const PHOTO_BASE_PATH = config_get("photo.path","./dist/upload") ;
+const photo_base_path:string = config_get("photo.path","./dist/upload") ;
+export const PHOTO_BASE_PATH = photo_base_path.startsWith("/") ? photo_base_path : path.join(process.cwd(),photo_base_path) ;
 
 @JsonController('/image')
 export class PhotoController{
@@ -59,7 +60,7 @@ export class ImageController{
         const photo = await PhotoModel.findById(id) ;
         
         if(photo) {
-            const filePath = path.join(__dirname,'../../../', PHOTO_BASE_PATH,photo.path()) ;
+            const filePath = path.join( PHOTO_BASE_PATH,photo.path()) ;
             
             console.log('File: ', filePath);
             

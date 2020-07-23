@@ -17,7 +17,7 @@ export class UserService {
             user.password = dto.newPassword ;
             await user.save() ;
 
-            return ;
+            return { result:"password updated"};
         }
 
         throw new UnauthorizedError("password_check_error") ;
@@ -31,7 +31,7 @@ export class UserService {
 
         let user = await UserModel.findOne({ email: dto.email }).exec();
         if (user != null ) {
-            throw new NotAcceptableError('user email exists');
+            throw new NotAcceptableError('account_exists');
         }
 
         user = new UserModel(dto) ;
