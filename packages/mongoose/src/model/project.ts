@@ -4,7 +4,11 @@ import { User } from './user';
 
 export class Resource {
 
-  @prop({ default: false})
+  @prop()
+  creator?: Types.ObjectId ;
+
+
+  @prop()
   parentId?: Types.ObjectId ;
 
   @prop({ default: false})
@@ -18,16 +22,18 @@ export class Resource {
 }
 
 
-enum ProjectRole {
-  admin ='admin',
-  staff = 'staff',
-  client='client',
-  visitor='visitor',
-
-}
-
 export class Project extends Resource {
 
+
+  @prop({required:true})
+  title :string;
+
+  @prop()
+  description  :string;
+
+  @prop()
+  logo? :string;
+  
   @prop()
   estimate? :number;
 
@@ -44,10 +50,12 @@ export class ProjectMember {
   projectId: Ref<Project>;;
 
   
-  @prop({default:ProjectRole.visitor, enum: ProjectRole })
-  projectRole :ProjectRole;
+  @prop()
+  projectRole :string;
 }
 
 
 
 export const ProjectModel = getModelForClass(Project,{schemaOptions:{timestamps:true}});
+
+export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});

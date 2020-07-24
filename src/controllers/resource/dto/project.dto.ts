@@ -1,21 +1,35 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum } from 'class-validator';
-export class ProjectDto {
-    
+export class ProjectCreateDto {    
     @IsString()
-    @IsOptional()
-    folder?:string;
+    title:string;
+
+    @IsString()
+    description:string;
 
     @IsString()
     @IsOptional()
-    title?:string;
+    logo? :string;
+
+}
+
+
+export class ProjectUpdateDto {    
+    @IsString()
+    title:string;
+
+    @IsString()
+    description:string;
 
     @IsString()
     @IsOptional()
-    description?:string;
+    logo? :string;
 
-    @IsString()
+    @Min(0)
     @IsOptional()
-    type?:string;
-
+    estimate? :number;
+  
+    @IsDate()
+    @IsOptional()
+    deadline? :Date;
 
 }

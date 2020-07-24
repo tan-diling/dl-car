@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UnauthorizedError, ForbiddenError } from 'routing-controllers';
 
 import * as moment from 'moment';
 import { Inject } from 'typedi';
@@ -10,15 +10,15 @@ import { PermissionService } from './permission.service';
 // @Authorized()
 // @JsonController('/resource/'+resourceType)
 export class AbstractResourceController {
-    private resourceType:string ='';
+    resourceType:string ='';
 
     @Inject()
-    private permissionService:PermissionService ;
+    permissionService:PermissionService ;
 
-    private repoService:RepoCRUDInterface ;
+    repoService:RepoCRUDInterface ;
 
-    checkPermission(ctx:RequestContext){
-        return this.permissionService.checkPermission(ctx) ;
+    async checkPermission(ctx:RequestContext){
+        return await this.permissionService.checkPermission(ctx) ;
     }
 
     async processRequest(ctx:RequestContext){
@@ -31,10 +31,10 @@ export class AbstractResourceController {
                 return await this.repoService.list(ctx.filter) ;
                 break ;
             case Operation.DELETE:
-                return await this.repoService.delete(ctx.filter.id) ;
+                return await this.repoService.delete(ctx.resourceId) ;
                 break ;
             case Operation.UPDATE:
-                return await this.repoService.update(ctx.filter.id,ctx.dto) ;
+                return await this.repoService.update(ctx.resourceId,ctx.dto) ;
                 break ;                
         }
     }
@@ -51,50 +51,11 @@ export class AbstractResourceController {
             ...ctx,
         };
 
-        this.checkPermission(requestContext) ;
+        if(true !== await this.checkPermission(requestContext))
+            throw new ForbiddenError('resource_permission_forbidden') ;
 
-        return this.processRequest(requestContext) ;
+        return await this.processRequest(requestContext) ;
     }
 
-    
-    
-    @Post()
-    async create(@Body() dto, @Req() request) {  
-        
-        return await this.process(request,{
-            method:Operation.CREATE,
-            dto
-        }) ;
-    }
-    
-    @Get()
-    async list(@QueryParams() query:any, @Req() request) {
-        return await this.process(request,{       
-            method:Operation.RETRIEVE,
-            filter:query,
-            // dto
-        }) ;
-        
-        // return await this.service.list(query) ;
-    }
-
-    
-    @Patch('/:id([0-9a-f]{24})')
-    async update(@Param('id') id:string, @Req() request, ) {
-        return await this.process(request,{         
-            resourceId: id,
-            method:Operation.UPDATE,            
-        }) ;
-        // return await this.service.update(id,dto) ;
-    }
-
-
-    @Delete('/:id([0-9a-f]{24})')
-    async delete(@Param('id') id:string,@Req() request,) {
-        return await this.process(request,{           
-            resourceId: id,
-            method:Operation.DELETE,            
-        }) ;
-        // return await this.service.delete(id) ;
-    }
+ 
 }
