@@ -49,3 +49,13 @@ setsebool -P httpd_can_network_connect 1
 
 
 
+#### cicd
+```
+cicd.dev.intime.ai
+tan
+TFoPw0IDWUGa4ZtXGL8JlyA1@FT8kxs
+
+cicd.dev.onwards.ai
+tan
+G5tgDVn2Wrwl6lsEH&gt;oVOKEAs@850EH
+```

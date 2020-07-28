@@ -3,7 +3,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import { AbstractResourceController } from './abstractResource.controller';
 import { createResourceRepoService } from './resource.service';
 import { ProjectModel } from '@packages/mongoose/src/model/project';
-import { Operation } from './dto/types';
+import { Operation, IUser } from './dto/types';
 import { ProjectCreateDto, ProjectUpdateDto } from './dto/project.dto';
 import { ResourceType } from '../constant';
 
@@ -22,15 +22,16 @@ export class ProjectController extends AbstractResourceController{
  
     @Post()
     async create(@Body() dto:ProjectCreateDto, @Req() request) {  
-        
+        const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
             method:Operation.CREATE,
-            dto
+            dto:obj,
         }) ;
     }
     
     @Get()
     async list(@QueryParams() query:any, @Req() request) {
+        
         return await this.process(request,{       
             method:Operation.RETRIEVE,
             filter:query,

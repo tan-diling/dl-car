@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate } from 'class-validator';
+import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class LoginDto{
@@ -9,11 +9,13 @@ export class LoginDto{
     email: string;    
 
     @IsString()
+    @IsNotEmpty()
     password: string;    
 }
 
 export class RefreshTokenDto {
     @IsString()
+    @IsNotEmpty()
     refresh_token: string;    
 
 }

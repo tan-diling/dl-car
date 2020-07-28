@@ -4,7 +4,7 @@ import { User } from './user';
 
 export class Resource {
 
-  @prop()
+  @prop({ required: true } )
   creator?: Types.ObjectId ;
 
 
@@ -29,6 +29,9 @@ export class Project extends Resource {
   title :string;
 
   @prop()
+  key :string;
+
+  @prop()
   description  :string;
 
   @prop()
@@ -43,14 +46,13 @@ export class Project extends Resource {
 
 export class ProjectMember {
 
-  @prop({ ref: User })
+  @prop({ ref: User, required: true })
   userId: Ref<User>;;
 
-  @prop({ ref: Project })
+  @prop({ ref: Project, required: true })
   projectId: Ref<Project>;;
-
   
-  @prop()
+  @prop({ required: true })
   projectRole :string;
 }
 

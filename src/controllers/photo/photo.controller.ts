@@ -4,7 +4,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { PhotoDto } from './dto/photo.dto';
-import { PhotoModel } from '@packages/mongoose';
+import { PhotoModel, UserModel } from '@packages/mongoose';
 import * as util from 'util';
 import { config_get } from '@packages/core';
 import * as moment from 'moment';
@@ -19,7 +19,7 @@ export const fileUploadOptions =  {
     }
 };
 
-const photo_base_path:string = config_get("photo.path","./dist/upload") ;
+const photo_base_path:string = config_get("photo.path","../upload") ;
 export const PHOTO_BASE_PATH = photo_base_path.startsWith("/") ? photo_base_path : path.join(process.cwd(),photo_base_path) ;
 
 @JsonController('/image')
@@ -48,6 +48,17 @@ export class PhotoController{
 
         return {...photo.toJSON(),url:"/image"+photo.path() } ;
     }
+
+    @Authorized()
+    @Post('/user')
+    async userUpload(@UploadedFile("photo",{options:fileUploadOptions}) file: any, @Body({required:false}) dto:PhotoDto,@CurrentUser() currentUser:any) {
+        const img = await this.upload(file,dto,currentUser) ;
+        
+        await UserModel.findByIdAndUpdate(currentUser.id,{image:img.url}).exec() ;
+
+        return img ;
+    }
+
 
 }
 

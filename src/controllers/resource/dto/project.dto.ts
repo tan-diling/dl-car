@@ -1,5 +1,14 @@
-import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum } from 'class-validator';
+import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, IsAlphanumeric, IsUppercase, MinLength, MaxLength } from 'class-validator';
+import { ProjectRole } from '../../constant';
+import { Type } from 'class-transformer';
 export class ProjectCreateDto {    
+    @IsString()
+    @IsAlphanumeric()
+    @IsUppercase()
+    @MinLength(2)
+    @MaxLength(8)
+    key:string;
+
     @IsString()
     title:string;
 
@@ -12,13 +21,31 @@ export class ProjectCreateDto {
 
 }
 
+export class ProjectMemberDto {
+    @IsMongoId()
+    userId: string;
+  
+    
+    @IsEnum(ProjectRole)
+    projectRole :string;
+  }
+
 
 export class ProjectUpdateDto {    
     @IsString()
-    title:string;
+    @IsAlphanumeric()
+    @IsUppercase()
+    @MinLength(2)
+    @MaxLength(8)
+    key?:string;
 
     @IsString()
-    description:string;
+    @IsOptional()
+    title?:string;
+
+    @IsString()
+    @IsOptional()
+    description?:string;
 
     @IsString()
     @IsOptional()
@@ -30,6 +57,11 @@ export class ProjectUpdateDto {
   
     @IsDate()
     @IsOptional()
+    @Type(()=>Date)
     deadline? :Date;
 
+    @ValidateNested()    
+    @Type(()=>ProjectMemberDto)
+    @IsOptional()
+    members?: ProjectMemberDto[]
 }
