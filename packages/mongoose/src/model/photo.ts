@@ -1,5 +1,6 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, types, mapProp } from '@typegoose/typegoose';
 import { User } from './user';
+import { Types } from 'mongoose';
 
 class Photo {
   // @prop()
@@ -20,6 +21,10 @@ class Photo {
 
   @prop({ ref: User })
   owner?: Ref<User>;
+
+  @mapProp({ of: Types.ObjectId })
+  maps?: Map<string, Types.ObjectId>;
+  
 
   path() {
     return `/${this.folder}/${this.id}${this.type}`;

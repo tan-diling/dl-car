@@ -52,7 +52,7 @@ export class PhotoController{
     @Authorized()
     @Post('/user')
     async userUpload(@UploadedFile("photo",{options:fileUploadOptions}) file: any, @Body({required:false}) dto:PhotoDto,@CurrentUser() currentUser:any) {
-        const img = await this.upload(file,dto,currentUser) ;
+        const img = await this.upload(file,{...dto,maps:{"user":currentUser.id}},currentUser) ;
         
         await UserModel.findByIdAndUpdate(currentUser.id,{image:img.url}).exec() ;
 
