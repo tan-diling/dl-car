@@ -83,4 +83,4 @@ function getModel<T>(name:string,schema:Schema) {
 /** user login model */
 
 export * from './model/user';
-export * from './model/photo';
+// export * from './model/photo';

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 import { AbstractResourceController } from './abstractResource.controller';
 import { createResourceRepoService } from './resource.service';
-import { ProjectModel } from '@packages/mongoose/src/model/project';
 import { Operation, IUser } from './dto/types';
 import { ProjectCreateDto, ProjectUpdateDto } from './dto/project.dto';
 import { ResourceType } from '../constant';
@@ -16,7 +15,7 @@ export class ProjectController extends AbstractResourceController{
      */
     constructor() {
         super();
-        this.resourceType = ResourceType.project;
+        this.resourceType = ResourceType.Project;
         this.repoService = createResourceRepoService(this.resourceType) ;       
     }
  

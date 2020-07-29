@@ -3,16 +3,23 @@ import * as moment from 'moment';
 import * as randToken from 'rand-token';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 
-import { LoginSessionModel, UserModel } from '@packages/mongoose';
+import * as mongoose from 'mongoose';
 
 import { config_get } from "@packages/core";
 import { Service } from 'typedi';
-import { IIdentityServiceToken, IIdentityService } from '../interface/login';
+import { IIdentityServiceToken, IIdentityService, IUserToken } from '../interface/login';
+
+// let UserModel = mongoose.model< any & mongoose.Document> ('User') ;
+// let LoginSessionModel = mongoose.model< any & mongoose.Document>('LoginSession') ;
 
 @Service(IIdentityServiceToken)
 export class IdentityService implements IIdentityService {
+    UserModel = mongoose.model< any & mongoose.Document> ('User') ;
+    LoginSessionModel = mongoose.model< any & mongoose.Document>('LoginSession') ;
+
+
     async userRefreshToken(dto: { refresh_token: string; }) {
-        const session = await LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
+        const session = await this.LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec(); 
         if (session == null) {
             // const err = new UnauthorizedError('refresh_invalid');            
             
@@ -21,18 +28,18 @@ export class IdentityService implements IIdentityService {
         if (new Date() > session.refreshTime) {
             throw new UnauthorizedError('refresh_expired');
         }
-        const user = await UserModel.findById(session.user).exec();
+        const user = await this.UserModel.findById(session.user).exec();
         if (session == null) {
             throw new UnauthorizedError('account_invalid');
         }
         // update session info
         session.accessTime = new Date();
         await session.save();
-        return {id:user.id,role:user.role,name:user.name,email:user.email};
+        return {id:user.id,role:user.role, name:user.name, email:user.email};
     }
 
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
-        const user = await UserModel.findOne({ email: dto.email }).exec();
+        const user = await this.UserModel.findOne({ email: dto.email }).exec();
         if (user == null || user.password != dto.password) {
             throw new UnauthorizedError('account_invalid');
         }
@@ -41,9 +48,9 @@ export class IdentityService implements IIdentityService {
         }
         // save user session info
         const loginDto = { device: dto.device, user: user._id };
-        let session = await LoginSessionModel.findOne(loginDto).exec();
+        let session = await this.LoginSessionModel.findOne(loginDto).exec();
         if (session == null) {
-            session = new LoginSessionModel(loginDto);
+            session = new this.LoginSessionModel(loginDto);
         }
         session.accessTime = new Date();
         session.refreshTime = moment().add(7, 'day').toDate();

@@ -4,10 +4,11 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { PhotoDto } from './dto/photo.dto';
-import { PhotoModel, UserModel } from '@packages/mongoose';
+import { UserModel } from '@packages/mongoose';
 import * as util from 'util';
 import { config_get } from '@packages/core';
 import * as moment from 'moment';
+import { PhotoModel } from '../../model/photo';
 
 const allowedFileExtNameList =[".jpg",".gif",".png"] ;
 

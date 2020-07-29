@@ -26,7 +26,7 @@ export const createJwtToken = (user: IUserToken) => {
 };
 
 @Service()
-export class AuthService {
+export class LoginService {
     @Inject() 
     service: IdentityService ;
     /**

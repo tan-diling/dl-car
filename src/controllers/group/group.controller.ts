@@ -2,9 +2,8 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 
 import * as moment from 'moment';
-import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
-import { UserService } from './user.service';
-import { SiteRole } from '../constant';
+import { GroupUpdateDto, GroupCreateDto } from './dto/group.dto';
+import { GroupService } from './group.service';
 
 enum Operation{
     CREATE,
@@ -23,9 +22,10 @@ interface RequestContext{
     dto?:any;    
 } 
 
-@JsonController()
-export class UserController {
-    constructor(private service: UserService) {
+@Authorized()
+@JsonController('/group')
+export class GroupController {
+    constructor(private service: GroupService) {
     }
     
     checkPermission(ctx:RequestContext){
@@ -76,41 +76,20 @@ export class UserController {
                 break ;                
         }
     }
-
-    @Post('/sign_up')
-    async signUp(@Body() dto:VisitorUserCreateDto) {
-        return await this.service.create(dto) ;
+    
+    @Post()
+    async create(@Body() dto:GroupCreateDto,@Req() request,@CurrentUser() currentUser) {        
+        return await this.processRequest({
+            request,
+            method:Operation.CREATE,
+            user:currentUser,
+            filter:query,
+            dto:{owner:currentUser.id,email:currentUser.email,...dto}
+        }) ;
+        
     }
-
-    @Authorized(SiteRole.Admin)
-    @Post('/user')
-    async create(@Body() dto:UserCreateDto) {        
-        return await this.service.create(dto) ;
-    }
-
-
-    @Get('/user/email_validate')
-    @Redirect('/login')
-    async emailValidate(@QueryParam('id') id:string, @QueryParam('email') email:string){
-        await this.service.validateEmail({id,email}) ;        
-    }
-
-    @Post('/user/email_exists')
-    async emailExists(@Body() dto:EmailExistDto){
-        const users = await this.service.list({filter:{email:dto.email}}) ;
-        if(users.length >0 ) 
-            return {register:true} ;
-
-        return {register:false} ;
-    }
-
-    @Post('/change_password')
-    async changePassword(@Body() dto:ChangePasswordDto) {
-        return await this.service.changePassword(dto) ;            
-    }
-
-    @Authorized()
-    @Get('/user')
+    
+    @Get()
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser:IUser) {
         return await this.processRequest({
             request,
@@ -122,23 +101,9 @@ export class UserController {
         
         // return await this.service.list(query) ;
     }
-
-    // @Authorized()
-    // @Get('/user/:id([0-9a-f]{24})')
-    // async get(@Param('id') id:string,) {
-    //     return await this.processRequest({
-    //         method:Operation.RETRIEVE,
-    //         // user:currentUser,
-    //         filter:{id},
-    //         // dto
-    //     }) ;
         
-    //     return await this.service.getById(id) ;
-    // }
-
-    @Authorized()
-    @Patch('/user/:id([0-9a-f]{24})')
-    async update(@Param('id') id:string, @Body() dto:UserUpdateDto, @Req() request, @CurrentUser() currentUser:IUser) {
+    @Patch('/:id([0-9a-f]{24})')
+    async update(@Param('id') id:string, @Body() dto:GroupUpdateDto, @Req() request, @CurrentUser() currentUser:IUser) {
         return await this.processRequest({
             request,
             method:Operation.UPDATE,
@@ -149,8 +114,7 @@ export class UserController {
         // return await this.service.update(id,dto) ;
     }
 
-    @Authorized(SiteRole.Admin)
-    @Delete('/user/:id([0-9a-f]{24})')
+    @Delete('/:id([0-9a-f]{24})')
     async delete(@Param('id') id:string,@Req() request, @CurrentUser() currentUser:IUser) {
         return await this.processRequest({
             request,

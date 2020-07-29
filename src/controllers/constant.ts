@@ -2,10 +2,10 @@
  * user role, define model 'User', field 'role'
  */
 export enum SiteRole {
-    admin = 'admin',
-    client = 'client',
-    staff = 'staff',
-    visitor = 'visitor',
+    Admin = 'admin',
+    Client = 'client',
+    Staff = 'staff',
+    Visitor = 'visitor',
 }
 
 /**
@@ -22,27 +22,27 @@ export enum ProjectRole {
  * resource type define
  */
 export enum ResourceType {
-    project = 'project',    
-    goal = 'goal', 
-    requirement = 'requirement', 
-    task= 'task' ,
-    workLog = 'workLog',
+    Project = 'project',    
+    Goal = 'goal', 
+    Requirement = 'requirement', 
+    Task= 'task' ,
+    WorkLog = 'workLog',
 }
 
 /**
  * group role ,define model 'GroupMember' , field 'groupRole'
  */
 export enum GroupRole{
-    manager = "group_manager",
-    member = "group_member"
+    Manager = "group_manager",
+    Member = "group_member"
 }
 
 /**
  * group role ,define model 'GroupMember' , field 'status'
  */
 export enum GroupMemberStatus{
-    invited = "invited",
-    refused = "refused",
-    confirmed = "confirmed"
+    Invited = "invited",
+    Refused = "refused",
+    Confirmed = "confirmed"
 }
 

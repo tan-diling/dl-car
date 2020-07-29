@@ -1,7 +1,7 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface } from './dto/types';
 import { ResourceType, ProjectRole } from '../constant';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '@packages/mongoose/src/model/project';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../../model/project';
 import { ModelQueryService, UserModel } from '@packages/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
@@ -180,7 +180,7 @@ class ProjectResourceService extends ResourceService<Project>{
             const projectMemberFilter = {projectId:id,userId:projectMember.userId} ;
             const pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
             if(pm) {
-                pm.projectRole = projectMember.projectRole ;
+                pm.projectRole = projectMember.projectRole ;                
                 await pm.save();
             }
             else
@@ -224,7 +224,7 @@ export function createResourceRepoService(
     resourceType: ResourceType| string ,
   ): RepoCRUDInterface
   {
-      if (resourceType == ResourceType.project) {
+      if (resourceType == ResourceType.Project) {
         //   const projectRepoService = createRepoService (ProjectModel) ;  
         //   const projectMemberRepoService = createRepoService (ProjectMemberModel) ;  
           

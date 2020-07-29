@@ -46,15 +46,15 @@ export class PermissionService {
 
     async checkSiteAdminPolicy(ctx:RequestContext){
 
-        if(ctx.user.role == SiteRole.admin ) return true ;
+        if(ctx.user.role == SiteRole.Admin ) return true ;
 
     }
 
     async checkProjectCreatePolicy(ctx:RequestContext){
 
-        if(ctx.resourceType != ResourceType.project) 
+        if(ctx.resourceType != ResourceType.Project) 
 
-            return ctx.user.role != SiteRole.visitor ;
+            return ctx.user.role != SiteRole.Visitor ;
         
     }
  

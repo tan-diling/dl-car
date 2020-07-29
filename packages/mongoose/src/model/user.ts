@@ -2,13 +2,13 @@ import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } f
 
 import * as mongooseHidden from 'mongoose-hidden';
 
-enum UserRole {
-  admin ='admin',
-  staff = 'staff',
-  client='client',
-  visitor='visitor',
+// enum UserRole {
+//   admin ='admin',
+//   staff = 'staff',
+//   client='client',
+//   visitor='visitor',
 
-}
+// }
 
 @plugin(mongooseHidden({ defaultHidden: {  password: true } }))
 export class User {
@@ -18,7 +18,8 @@ export class User {
   @prop({ unique: true })
   email: string;    
 
-  @prop({default:UserRole.client, enum: UserRole })
+  // @prop({default:UserRole.client, enum: UserRole })
+  @prop()
   role?: string;
 
   @prop()

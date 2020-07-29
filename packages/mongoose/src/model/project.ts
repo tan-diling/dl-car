@@ -1,63 +1,63 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
-import { Types } from 'mongoose';
-import { User } from './user';
+// import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+// import { Types } from 'mongoose';
+// import { User } from './user';
 
-export class Resource {
+// export class Resource {
 
-  @prop({ required: true } )
-  creator?: Types.ObjectId ;
-
-
-  @prop()
-  parentId?: Types.ObjectId ;
-
-  @prop({ default: false})
-  deleted?: boolean ;
-
-  @prop()
-  createdAt?: Date;
-
-  @prop()
-  updatedAt?: Date;
-}
+//   @prop({ required: true } )
+//   creator?: Types.ObjectId ;
 
 
-export class Project extends Resource {
+//   @prop()
+//   parentId?: Types.ObjectId ;
+
+//   @prop({ default: false})
+//   deleted?: boolean ;
+
+//   @prop()
+//   createdAt?: Date;
+
+//   @prop()
+//   updatedAt?: Date;
+// }
 
 
-  @prop({required:true})
-  title :string;
+// export class Project extends Resource {
 
-  @prop()
-  key :string;
 
-  @prop()
-  description  :string;
+//   @prop({required:true})
+//   title :string;
 
-  @prop()
-  logo? :string;
+//   @prop()
+//   key :string;
+
+//   @prop()
+//   description  :string;
+
+//   @prop()
+//   logo? :string;
   
-  @prop()
-  estimate? :number;
+//   @prop()
+//   estimate? :number;
 
-  @prop()
-  deadline? :Date;
-}
+//   @prop()
+//   deadline? :Date;
+// }
 
-export class ProjectMember {
+// export class ProjectMember {
 
-  @prop({ ref: User, required: true })
-  userId: Ref<User>;;
+//   @prop({ ref: User, required: true })
+//   userId: Ref<User>;;
 
-  @prop({ ref: Project, required: true })
-  projectId: Ref<Project>;;
+//   @prop({ ref: Project, required: true })
+//   projectId: Ref<Project>;;
   
-  @prop({ required: true })
-  projectRole :string;
-}
+//   @prop({ required: true })
+//   projectRole :string;
+// }
 
 
 
-export const ProjectModel = getModelForClass(Project,{schemaOptions:{timestamps:true}});
+// export const ProjectModel = getModelForClass(Project,{schemaOptions:{timestamps:true}});
 
-export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});
+// export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});
