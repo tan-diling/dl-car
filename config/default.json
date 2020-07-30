@@ -22,6 +22,7 @@
     "mongodb": {
         "url": "mongodb://localhost:27017/client_portal"
     },
+    "webServer":"https://dev.onwards.ai/api",
     "error":{        
         "account_invalid":"email or password not valid", 
         "account_forbidden":"this account is not allowed to login.",

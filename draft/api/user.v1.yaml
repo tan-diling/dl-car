@@ -5,10 +5,13 @@ info:
   description: Client Portal Api for mvp1
 servers:
   - url: 'http://localhost:3000/api'
+    description: local
+  - url: 'https://dev.onwards.ai/api'
+    description: dev
 paths:
   /user/:
     get:
-      summary: retrieve user list
+      summary: user list
       tags:
         - user
       responses:
@@ -23,7 +26,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    - id: 5ef1680aa5d7a708b8546964
+                    - _id: 5ef1680aa5d7a708b8546964
                       name: admin
                       role: admin
                       email: admin@admin.com
@@ -33,9 +36,10 @@ paths:
                       job: ''
                       logo: ''
                       emailValidated: true
+                      deleted: false
                       updated_at: '2020-06-23T02:25:14.468Z'
                       created_at: '2020-06-23T02:25:14.468Z'
-                    - id: 5ef1680aa5d7a708b8546960
+                    - _id: 5ef1680aa5d7a708b8546960
                       name: user01
                       role: client
                       email: user01@test.com
@@ -45,6 +49,7 @@ paths:
                       job: ''
                       logo: ''
                       emailValidated: false
+                      deleted: false
                       updated_at: '2020-06-23T02:25:14.468Z'
                       created_at: '2020-06-23T02:25:14.468Z'
       operationId: get-user
@@ -64,7 +69,7 @@ paths:
       security:
         - jwt: []
     post:
-      summary: create a user
+      summary: create user
       operationId: post-user
       description: "admin create a user , \n-  system will send a confirm email to mail,\n-  before user login, user need to validate it's mail \n"
       requestBody:
@@ -78,15 +83,12 @@ paths:
                 email:
                   type: string
                   format: email
-                password:
-                  type: string
-                  minLength: 6
-                  default: '123456'
                 role:
                   type: string
                   enum:
                     - staff
                     - client
+                    - visitor
                   default: client
               required:
                 - name
@@ -96,7 +98,6 @@ paths:
                 value:
                   name: user01
                   email: user01@test.com
-                  password: '123456'
                   role: client
           application/xml:
             schema:
@@ -120,13 +121,14 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 5ef1680aa5d7a708b8546964
+                    _id: 5ef1680aa5d7a708b8546964
                     name: user01
                     role: client
                     email: user01@test.com
                     updated_at: '2020-06-23T02:25:14.468Z'
                     created_at: '2020-06-23T02:25:14.468Z'
                     emailValidated: false
+                    deleted: false
         '406':
           description: Not Acceptable
       tags:
@@ -158,7 +160,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 5ef1680aa5d7a708b8546964
+                    _id: 5ef1680aa5d7a708b8546964
                     name: admin
                     role: admin
                     email: admin@admin.com
@@ -166,6 +168,8 @@ paths:
                     phone: '2345678901'
                     company: google
                     logo: /image/5ef1680aa5d7a708b8546964/logo.png
+                    emailValidated: true
+                    deleted: false
                     updated_at: '2020-06-23T02:25:14.468Z'
                     created_at: '2020-06-23T02:25:14.468Z'
       operationId: get-user-id
@@ -183,7 +187,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
               examples:
-                example-1: {}
+                example-1:
+                  value:
+                    _id: 5ef1680aa5d7a708b8546964
+                    name: admin
+                    role: admin
+                    email: admin@admin.com
+                    location: 'Los '
+                    phone: '2345678901'
+                    company: google
+                    logo: /image/5ef1680aa5d7a708b8546964/logo.png
+                    emailValidated: true
+                    deleted: false
+                    updated_at: '2020-06-23T02:25:14.468Z'
+                    created_at: '2020-06-23T02:25:14.468Z'
       requestBody:
         content:
           application/json:
@@ -206,20 +223,32 @@ paths:
                   enum:
                     - staff
                     - client
-                  description: "role can update by 'admin' "
+                    - visitor
+                  description: "for role: 'admin' "
                 company:
                   type: string
-              required:
-                - name
+                defaultContact:
+                  type: boolean
+                  description: "for role: 'admin' "
             examples:
-              example-1:
+              'manage user ':
                 value:
-                  name: admin
-                  job: 'developer '
-                  phone: '2345678901'
-                  department: google
-                  company: us
-                  logo: "\\images\\logo.png"
+                  name: user01 Li
+                  phone: '2233445566'
+                  department: dev
+                  job: develop
+                  company: google
+                  role: client
+              update self profile:
+                value:
+                  name: user01 Li
+                  phone: '2233445566'
+                  department: dev
+                  job: develop
+                  company: google
+              manage default contact:
+                value:
+                  defaultContact: true
       tags:
         - user
       security:
@@ -239,13 +268,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
               examples:
-                example-1: {}
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: {}
+                example-1:
+                  value:
+                    _id: 5ef1680aa5d7a708b8546964
+                    name: admin
+                    role: admin
+                    email: admin@admin.com
+                    location: 'Los '
+                    phone: '2345678901'
+                    company: google
+                    logo: /image/5ef1680aa5d7a708b8546964/logo.png
+                    emailValidated: true
+                    deleted: true
+                    updated_at: '2020-06-23T02:25:14.468Z'
+                    created_at: '2020-06-23T02:25:14.468Z'
       tags:
         - user
       security:
@@ -253,7 +289,7 @@ paths:
       description: admin can delete user
   /login:
     post:
-      summary: user login get access_token
+      summary: user login
       operationId: post-login
       responses:
         '200':
@@ -349,7 +385,7 @@ paths:
       description: user login . user email must be validated.
   /refresh_token:
     post:
-      summary: refresh user access_token
+      summary: refresh token
       operationId: post-refresh_token
       responses:
         '200':
@@ -404,7 +440,7 @@ paths:
         - login
   /sign_up:
     post:
-      summary: ''
+      summary: sign up
       operationId: post-sign
       responses:
         '200':
@@ -463,9 +499,10 @@ paths:
                   password: '12345678'
         description: ''
       description: "user sign up ,\n-  default role is 'client'\n-  system will send a email to mail,\n-  before user login, user need to validate it's mail "
+    parameters: []
   /group:
     get:
-      summary: get group list
+      summary: group list
       tags:
         - group
       responses:
@@ -705,7 +742,7 @@ paths:
         in: path
         required: true
     patch:
-      summary: update group info
+      summary: update group
       operationId: patch-group-id
       responses:
         '200':
@@ -747,11 +784,22 @@ paths:
         - jwt: []
   /change_password:
     post:
-      summary: change user password
+      summary: change password
       operationId: post-change_password
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    result: password updated
       description: ''
       requestBody:
         content:
@@ -772,14 +820,20 @@ paths:
                 - email
                 - oldPassword
                 - newPassword
+            examples:
+              example-1:
+                value:
+                  email: admin@admin.com
+                  oldPassword: '12345678'
+                  newPassword: '12345678'
       tags:
         - user
   /user/email_validate:
     get:
       summary: user validate email address by mail link
       responses:
-        '200':
-          description: OK
+        '301':
+          description: /login
       operationId: get-user-emailValidate
       parameters:
         - schema:
@@ -825,7 +879,7 @@ paths:
     parameters: []
   /resource/project:
     get:
-      summary: get project list
+      summary: project list
       tags:
         - project
       responses:
@@ -840,32 +894,41 @@ paths:
               examples:
                 example-1:
                   value:
-                    - _id: '012345678901234567890001'
-                      title: 'new project#001'
-                      description: here is simple desc
-                      created_at: '2020-02-02T03:45:00Z'
-                      update_at: '2020-02-02T03:45:00Z'
-                      deadline: '2020-06-01T00:00:00Z'
-                      estimate: '2020-05-01T00:00:00Z'
-                      members:
-                        - user: '12345698745621452001'
-                          role: project_qa
-                        - user: '12345698745621452002'
-                          role: project_develop
-                    - _id: '012345678901234567890002'
+                    - deleted: false
+                      _id: 5f1e4348d8dad04124078bd8
                       title: 'new project#002'
                       description: here is simple desc
-                      created_at: '2020-02-01T03:45:00Z'
-                      update_at: '2020-02-01T03:45:00Z'
-                      deadline: '2020-06-01T00:00:00Z'
-                      estimate: '2020-05-01T00:00:00Z'
+                      logo: /images/logo.png
+                      creator: 5efff7849eaf1f3b9266da2b
+                      createdAt: '2020-07-27T03:00:24.706Z'
+                      updatedAt: '2020-07-27T06:17:52.410Z'
+                      __v: 0
+                      estimate: 240
+                      key: NP2
+                      deadline: '2020-08-27T00:00:00.000Z'
                       members:
-                        - user: '12345698745621452001'
-                          role: project_qa
-                        - user: '12345698745621452002'
-                          role: project_develop
-                        - user: '12345698745621452003'
-                          role: project_pm
+                        - userId: 5f02c8bbe51baa054329514f
+                          projectRole: project_develop
+                          status: confirmed
+                        - userId: 5efff7849eaf1f3b9266da2b
+                          projectRole: project_manager
+                          status: confirmed
+                    - deleted: false
+                      _id: 5f1e628732333f602da84a49
+                      title: 'new project#002'
+                      description: here is simple desc
+                      logo: /images/logo.png
+                      creator: 5efff7849eaf1f3b9266da2b
+                      createdAt: '2020-07-27T05:13:43.458Z'
+                      updatedAt: '2020-07-27T05:13:43.458Z'
+                      __v: 0
+                      members:
+                        - userId: 5f02c8bbe51baa054329514f
+                          projectRole: project_develop
+                          status: invited
+                        - userId: 5efff7849eaf1f3b9266da2b
+                          projectRole: project_manager
+                          status: confirmed
       operationId: get-project
       description: |-
         query project list
@@ -873,8 +936,25 @@ paths:
         - else can view his related project
       security:
         - jwt: []
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: skip
+        - schema:
+            type: string
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: memberUserId
+        - schema:
+            type: string
+          in: query
+          name: deleted
     post:
-      summary: create a project
+      summary: create project
       operationId: post-project
       responses:
         '200':
@@ -886,18 +966,18 @@ paths:
               examples:
                 example-1:
                   value:
-                    _id: '012345678901234567890001'
-                    title: 'new project#001'
+                    deleted: false
+                    _id: 5f222e82f3fb6808c2a70445
+                    key: NP
+                    title: 'new project#003'
                     description: here is simple desc
-                    created_at: '2020-02-02T03:45:00Z'
-                    update_at: '2020-02-02T03:45:00Z'
-                    deadline: '2020-06-01T00:00:00Z'
-                    estimate: '2020-05-01T00:00:00Z'
+                    creator: 5efff7849eaf1f3b9266da2b
+                    createdAt: '2020-07-30T02:20:50.064Z'
+                    updatedAt: '2020-07-30T02:20:50.064Z'
+                    __v: 0
                     members:
-                      - user: '12345698745621452001'
-                        role: project_qa
-                      - user: '12345698745621452002'
-                        role: project_develop
+                      - userId: 5efff7849eaf1f3b9266da2b
+                        projectRole: project_manager
       description: |-
         every site user can create project
         - current site user is default as "project_admin"
@@ -915,17 +995,17 @@ paths:
                   type: string
                 description:
                   type: string
-                logo:
+                key:
                   type: string
               required:
                 - title
-                - description
+                - key
             examples:
               example-1:
                 value:
-                  title: 'new project#001'
+                  key: NP
+                  title: 'new project#002'
                   description: here is simple desc
-                  logo: /image/logo.png
   '/resource/project/{id}':
     parameters:
       - schema:
@@ -1077,10 +1157,11 @@ components:
           phone: '2345678901'
           department: google
           job: develop
-          logo: "\\images\\logo.png"
+          logo: /image/20200711/5ef1680aa5d7a708b8546964.png
           updated_at: '2020-06-23T02:25:14.468Z'
           created_at: '2020-06-23T02:25:14.468Z'
-          emailValidated: true
+          emailValidated: false
+          deleted: false
       properties:
         _id:
           type: string
@@ -1116,6 +1197,12 @@ components:
           type: string
         emailValidated:
           type: boolean
+        deleted:
+          type: boolean
+          default: 'false'
+        defaultContact:
+          type: boolean
+          default: 'false'
       required:
         - role
         - email
@@ -1128,14 +1215,19 @@ components:
       description: ''
       x-examples:
         example-1:
-          _id: 12345678901234567890abcdef
+          _id: 12345678901234567890a001
           name: group1
-          owner: 12345678901234567890abcdef
-          users:
-            - _id: 12345678901234567890abc111
+          owner: 12345678901234567890b001
+          deleted: false
+          members:
+            - _id: 12345678901234567890c001
+              userId: 12345678901234567890b001
               email: user01@test.com
+              groupRole: group_manager
               status: confirmed
-            - email: user02@test.com
+            - _id: 12345678901234567890c001
+              email: user02@test.com
+              groupRole: group_member
               status: invited
       properties:
         _id:
@@ -1144,38 +1236,44 @@ components:
           type: string
         owner:
           type: string
-        users:
+        members:
           type: array
           items:
             type: object
             properties:
               email:
                 type: string
+                format: email
               status:
                 type: string
                 enum:
                   - invited
                   - confirmed
+                  - refused
               _id:
                 type: string
+              groupRole:
+                type: string
+                enum:
+                  - group_manager
+                  - group_member
+              userId:
+                type: string
+            required:
+              - email
+              - status
+              - groupRole
+        deleted:
+          type: boolean
+          default: 'false'
     GroupUser:
       title: GroupUser
       type: object
-      properties:
-        email:
-          type: string
-          format: email
-        status:
-          type: string
-          enum:
-            - invited
-            - confirmed
-        user:
-          $ref: '#/components/schemas/User'
       x-examples:
         example-1:
           email: user01@test.com
           status: confirmed
+          groupRole: group_member
           user:
             _id: 5ef1680aa5d7a708b8546964
             name: user01
@@ -1189,10 +1287,41 @@ components:
             updated_at: '2020-06-23T02:25:14.468Z'
             created_at: '2020-06-23T02:25:14.468Z'
             emailValidated: true
+      properties:
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum:
+            - invited
+            - confirmed
+        user:
+          $ref: '#/components/schemas/User'
+        groupRole:
+          type: string
     Project:
       title: Project
       type: object
       description: ''
+      x-examples:
+        example-1:
+          deleted: false
+          _id: 5f1e628732333f602da84a49
+          title: 'new project#002'
+          description: here is simple desc
+          logo: /images/logo.png
+          creator: 5efff7849eaf1f3b9266da2b
+          createdAt: '2020-07-27T05:13:43.458Z'
+          updatedAt: '2020-07-27T05:13:43.458Z'
+          __v: 0
+          members:
+            - userId: 5f02c8bbe51baa054329514f
+              projectRole: project_develop
+              status: invited
+            - userId: 5efff7849eaf1f3b9266da2b
+              projectRole: project_manager
+              status: confirmed
       properties:
         _id:
           type: string
@@ -1202,14 +1331,14 @@ components:
           type: string
         logo:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
         deadline:
-          type: string
+          type: number
           format: date-time
         estimate:
           type: string
@@ -1221,16 +1350,32 @@ components:
             properties:
               user:
                 type: string
-              project_role:
+              projectRole:
                 type: string
-        status:
+              status:
+                type: string
+                default: invited
+                enum:
+                  - invited
+                  - confirmed
+                  - refused
+            required:
+              - user
+              - projectRole
+        creator:
           type: string
-        owner:
+        deleted:
+          type: boolean
+          default: 'false'
+        key:
           type: string
+          minLength: 2
+          maxLength: 8
       required:
         - title
         - description
         - members
+        - key
   securitySchemes:
     jwt:
       type: http

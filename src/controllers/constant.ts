@@ -46,3 +46,8 @@ export enum GroupMemberStatus{
     Confirmed = "confirmed"
 }
 
+export enum ProjectMemberStatus{
+    Invited = "invited",
+    Refused = "refused",
+    Confirmed = "confirmed"
+}

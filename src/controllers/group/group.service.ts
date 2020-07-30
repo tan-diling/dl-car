@@ -3,37 +3,60 @@ import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import { GroupModel, Group, GroupMemberModel, GroupMember } from '../../model/group';
 import { GroupRole, GroupMemberStatus } from '../constant';
+import { model, Types } from 'mongoose';
+import { type } from 'os';
 /**
  * group service
  */
 export class GroupService {
 
+    childModels = [{name:"member",ref:"GroupMember",localField:"_id", foreignField:"groupId"} ] ;
+
     private queryService= new ModelQueryService() ;
     constructor() {
+       
     }
 
 
     async getGroupMembers(docs: DocumentType<Group> []){
+        let objList = docs.map(x=>x.toObject());
 
-        const ids = docs.map(x=>x._id) ;
+        for(const element of this.childModels){
+            const {name, ref, localField, foreignField } = element ;
+            const childModel = model(ref) ;
+            const values = docs.map(x=>x.get(localField)) ;
 
-        const pms = await GroupMemberModel.find({}).where('groupId').in(ids).exec() ;
+            const childList = await childModel.find().where(foreignField).in(values).exec() ;
 
-        const convert = (groups:DocumentType<Group> [],members:DocumentType<GroupMember>[])=>{
-            return docs.map(x=>{
-                const memberList = members.filter(y=>y.groupId==x.id)                
-                                        .map(z=>{
-                                            return z.toJSON() ;                        
-                                        }) ;
-                    
-                return {
-                    ... x.toJSON(),
-                    members:memberList 
-                };       
-            });
+            for(const obj of objList){
+                let localValue = obj[localField] ;
+               
+                obj[name] = childList
+                        .filter(x=> localValue?.equals ? localValue?.equals(x.get(foreignField)) : x.get(foreignField)==localValue)
+                        .map(z=>z.toObject()) ;
+            }
         };
+        
+        return objList ;
+        // const ids = docs.map(x=>x._id) ;
 
-        return convert(docs,pms) ;        
+        // const pms = await GroupMemberModel.find({}).where('groupId').in(ids).exec() ;
+
+        // const convert = (groups:DocumentType<Group> [],members:DocumentType<GroupMember>[])=>{
+        //     return docs.map(x=>{
+        //         const memberList = members.filter(y=>y.groupId==x.id)                
+        //                                 .map(z=>{
+        //                                     return z.toJSON() ;                        
+        //                                 }) ;
+                    
+        //         return {
+        //             ... x.toJSON(),
+        //             members:memberList 
+        //         };       
+        //     });
+        // };
+
+        // return convert(docs,pms) ;        
     }
 
     async getGroupMember(doc: DocumentType<Group>){
@@ -92,11 +115,58 @@ export class GroupService {
     }
 
     /**
+     *  child model query
+     * @param query 
+     */
+    async listMember(id:string){        
+        return await GroupMemberModel.find({groupId:id}).populate("userId").exec();
+    }
+        
+
+    /**
+     *  child model create
+     */ 
+    async appendMember(id:string,dto){
+        const group = await GroupModel.findById(id).exec() ;
+        if( ! group ) return null;
+
+        const groupId= group._id ;
+        const {email,groupRole} = dto
+        const user = await UserModel.findOne({email}).exec();
+        const groupMember = await GroupMemberModel.findOneAndUpdate(
+            { groupId,email },
+            { groupId,email, groupRole, userId:user?._id },
+            { upsert:true, new:true },
+            ).exec();
+
+        return groupMember ;
+
+    }
+
+    /**
+     *  child model delete
+     */
+    async deleteMember(id:string,dto){
+
+        const {email} = dto
+
+        const groupMember = await GroupMemberModel.findOne({groupId:id,email}).exec();
+
+        if(groupMember){
+            await groupMember.remove();
+        }
+        return groupMember ;
+    }
+
+    /**
      * get by id
      * @param id 
      */
     async getById(id:string){
-        return await GroupModel.findById(id).exec() ;
+        const group = await GroupModel.findById(id).exec() ;
+        if(group){
+            return await this.getGroupMember(group) ;
+        }
     }
 
     /**
@@ -105,12 +175,12 @@ export class GroupService {
      * @param dto 
      */
     async update(id:string,dto:any){
-        const doc = await this.getById(id) ;
+        let doc = await this.getById(id) ;
         if(doc){
-            return UserModel.findByIdAndUpdate(id,dto,{new:true}).exec() ;            
+            doc = GroupModel.findByIdAndUpdate(id,dto,{new:true}).exec() ;  
+            
+            return doc ; 
         }
-
-        return null ;
     }
 
     /**
@@ -119,7 +189,7 @@ export class GroupService {
      * @param dto 
      */
     async delete(id){
-        const doc = await this.getById(id) ;
+        const doc =  await GroupModel.findById(id).exec() ; ;
         if(doc){
             doc.deleted = true ;
             return await doc.save() ;

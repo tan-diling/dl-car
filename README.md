@@ -6,13 +6,14 @@ this project design for backend framework
 ### packages
 - core
 - mongoose
-- ai
-- calendar
-- chat
+- web
 - mail
 
 ### project structure
 - src/    # source code dir
+  - model/ # mongo model define dir
+  - controller/ # wep api controller dir
+  - subscriber/ # event subscriber dir 
 - packages/ # module dir
   - core/ # core module
   - login/ # login module, for JWT token 
@@ -47,9 +48,15 @@ postman
 setsebool -P httpd_can_network_connect 1
 ```
 
+### develop server
+- https://dev.onwards.ai
 
-
-#### cicd
+### cicd server
+- https://cicd.dev.onwards.ai
+#### build
+- build api 
+  > https://cicd.dev.onwards.ai/job/test01/build?token=gest_client_portal_backend
+#### account info
 ```
 cicd.dev.intime.ai
 tan

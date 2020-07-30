@@ -19,12 +19,18 @@ export class GroupCreateDto {
 }
 
 
-export class GroupMemberDto {
+export class CreateGroupMemberDto {
     @IsEmail()    
     email: string;
 
     @IsEnum(GroupRole)
     groupRole: string;
+}
+
+export class DeleteGroupMemberDto {
+    @IsEmail()    
+    email: string;
+
 }
 
 
@@ -35,11 +41,11 @@ export class GroupUpdateDto {
 
     @IsString()
     @IsOptional()
-    description: string;
+    description?: string;
 
-    @ValidateNested()    
-    @Type(()=>GroupMemberDto)
-    @IsOptional()
-    members?: GroupMemberDto[]
+    // @ValidateNested()    
+    // @Type(()=>GroupMemberDto)
+    // @IsOptional()
+    // members?: GroupMemberDto[]
    
 }

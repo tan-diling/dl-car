@@ -1,3 +1,6 @@
+/**
+ * mail subscriber
+ */
 import { UserModel, Operation } from '@packages/mongoose';
 
 import { sendMail } from '@packages/mail';

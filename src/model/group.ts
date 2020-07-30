@@ -1,6 +1,7 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
+import { GroupMemberStatus } from '../controllers/constant';
 
 export class Group  {
 
@@ -31,7 +32,7 @@ export class GroupMember {
   @prop({ required: true })
   groupRole :string;
   
-  @prop()
+  @prop( { default: GroupMemberStatus.Invited } )
   status: string ;
 }
 

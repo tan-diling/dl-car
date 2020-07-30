@@ -1,3 +1,6 @@
+/**
+ * program main entrance
+ */
 require('module-alias/register') ;
 
 import {BackendServer } from '@packages/web';

@@ -1,6 +1,7 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
+import { ProjectMemberStatus } from '../controllers/constant';
 
 export class Resource {
 
@@ -55,7 +56,7 @@ export class ProjectMember {
   @prop({ required: true })
   projectRole :string;
 
-  @prop( )
+  @prop( { default: ProjectMemberStatus.Invited } )
   status? :string;
 }
 
