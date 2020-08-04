@@ -1,6 +1,8 @@
-import { UserModel, Operation, ModelQueryService  } from '@packages/mongoose';
+import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
+import { UserModel } from '../../models/user';
+import { RepoOperation } from '../constant';
 
 /**
  * user service
@@ -39,7 +41,7 @@ export class UserService {
         if(! user.password) user.password = randToken.uid(8) ;
 
         await user.save() ;
-        UserModel.emit(Operation.Created, user) ;
+        UserModel.emit(RepoOperation.Created, user) ;
         return user;
     }
 

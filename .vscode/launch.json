@@ -4,6 +4,23 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+   
+        {
+            "name": "Debug",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/dist/src/index.js",
+            "args": [
+                ""
+            ],
+            "env":{
+                "DEBUG":"express:*"            
+            },
+            "cwd": "${workspaceRoot}",
+            "outputCapture": "std",
+            "protocol": "inspector"
+            
+        },
         {
             "name": "Debug ts",
             "type": "node",
@@ -33,6 +50,6 @@
             },
             "cwd": "${workspaceRoot}",
             "protocol": "inspector"
-        },
+        }
     ]
 }

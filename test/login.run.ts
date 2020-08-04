@@ -2,11 +2,11 @@
 
 require('module-alias/register');
 
-import { db_startup } from '@packages/mongoose';
+// import { db_startup } from '@app/modules/query';
 
-import { BackendServer } from '@packages/web';
+import { BackendServer } from 'src/modules/web';
 
-import { LoginController } from '@packages/login';
+import { LoginController } from 'src/modules/login';
 
 async function run() {
   

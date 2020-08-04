@@ -3,9 +3,9 @@
 require('module-alias/register');
 import * as request from 'supertest';
 
-import { BackendServer } from '@packages/web';
+import { BackendServer } from 'src/modules/web';
 
-import { LoginController } from '@packages/login';
+import { LoginController } from 'src/modules/login';
 import { assert } from 'chai';
 
 describe('login module ', () => {

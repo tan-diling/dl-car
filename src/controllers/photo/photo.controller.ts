@@ -4,11 +4,11 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { PhotoDto } from './dto/photo.dto';
-import { UserModel } from '@packages/mongoose';
+import { UserModel } from '../../models/user';
 import * as util from 'util';
-import { config_get } from '@packages/core';
+import { PHOTO_BASE_PATH } from '@app/config';
 import * as moment from 'moment';
-import { PhotoModel } from '../../model/photo';
+import { PhotoModel } from '../../models/photo';
 
 const allowedFileExtNameList =[".jpg",".gif",".png"] ;
 
@@ -20,8 +20,7 @@ export const fileUploadOptions =  {
     }
 };
 
-const photo_base_path:string = config_get("photo.path","../upload") ;
-export const PHOTO_BASE_PATH = photo_base_path.startsWith("/") ? photo_base_path : path.join(process.cwd(),photo_base_path) ;
+
 
 @JsonController('/image')
 export class PhotoController{

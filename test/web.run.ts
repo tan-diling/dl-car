@@ -7,7 +7,7 @@
 
 require('module-alias/register') ;
 
-import {BackendServer } from '@packages/web';
+import {BackendServer } from 'src/modules/web';
 import { JsonController, Get } from 'routing-controllers';
 
 const server = BackendServer.getInstance() ;

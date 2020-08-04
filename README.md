@@ -11,15 +11,26 @@ this project design for backend framework
 
 ### project structure
 - src/    # source code dir
-  - model/ # mongo model define dir
-  - controller/ # wep api controller dir
+  - config/ # config file dir
+  - loaders/ # 
+  - routes/ # global route define dir
+  - models/ # mongo model define dir
+  - controllers/ # wep api controller dir
+    - index.ts # export controllers fro route
+    - user/ # user controller dir
+      - dto/ 
+        - user.dto.ts # user data transmit object, used for request data validation 
+      - user.controller.ts # user controller file ,for route
+      - user.service.ts  # 
+    - group/
+    - resource/
+    - photo/
   - subscriber/ # event subscriber dir 
-- packages/ # module dir
-  - core/ # core module
-  - login/ # login module, for JWT token 
-  - mail/ # mail module, 
-  - mongoose/ # mongoose module, for mongoose schema and init connection
-  - web/ # web module ,integrate with express,routing-controllers provide base web function
+  - modules/ # module dir
+    - login/ # login module, for JWT token 
+    - mail/ # mail module, 
+    - query/ # mongoose query module, for mongoose schema and init connection
+    - web/ # web module ,integrate with express,routing-controllers provide base web function
 - draft/ # design dir 
 - test/ # test dir
 - config/ # config dir

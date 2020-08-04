@@ -1,10 +1,11 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface } from './dto/types';
 import { ResourceType, ProjectRole } from '../constant';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../../model/project';
-import { ModelQueryService, UserModel } from '@packages/mongoose';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../../models/project';
+import { ModelQueryService  } from '../../modules/query';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
+import { UserModel } from '@app/models/user';
 
 // function createRepoService<T extends Document>(
 //     model: Model<T>,

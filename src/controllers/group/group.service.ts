@@ -1,10 +1,10 @@
-import { UserModel, Operation, ModelQueryService  } from '@packages/mongoose';
+import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
-import { GroupModel, Group, GroupMemberModel, GroupMember } from '../../model/group';
+import { GroupModel, Group, GroupMemberModel, GroupMember } from '../../models/group';
 import { GroupRole, GroupMemberStatus } from '../constant';
 import { model, Types } from 'mongoose';
-import { type } from 'os';
+import { UserModel } from '../../models/user';
 /**
  * group service
  */

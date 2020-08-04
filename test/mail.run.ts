@@ -7,7 +7,7 @@
 
 require('module-alias/register') ;
 
-import {sendMail } from '@packages/mail';
+import {sendMail } from 'src/modules/mail';
 
 
 async function run() {

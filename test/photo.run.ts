@@ -7,7 +7,7 @@
 
 require('module-alias/register') ;
 
-import {BackendServer } from '@packages/web';
+import {BackendServer } from 'src/modules/web';
 import { JsonController, Get, Post, UploadedFile, Body } from 'routing-controllers';
 import bodyParser = require('body-parser');
 import { IsString, IsOptional } from 'class-validator';

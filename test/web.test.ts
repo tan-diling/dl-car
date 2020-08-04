@@ -7,7 +7,7 @@
 
 require('module-alias/register');
 
-import { BackendServer } from '@packages/web';
+import { BackendServer } from 'src/modules/web';
 import * as request from 'supertest';
 // const request = require('supertest');
 // @JsonController('User')

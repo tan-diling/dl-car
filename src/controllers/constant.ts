@@ -51,3 +51,10 @@ export enum ProjectMemberStatus{
     Refused = "refused",
     Confirmed = "confirmed"
 }
+
+export enum RepoOperation {
+    Created = "created",
+    Retrieve = "retrieve",
+    Updated = "updated",
+    Deleted = "deleted",    
+}

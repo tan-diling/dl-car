@@ -1,18 +1,18 @@
 /**
  * mail subscriber
  */
-import { UserModel, Operation } from '@packages/mongoose';
 
-import { sendMail } from '@packages/mail';
-import { config_get } from '@packages/core';
+import { sendMail } from '@app/modules/mail';
+import { WebServer } from '@app/config';
+import { UserModel } from '../models/user';
 
 export default () => {
     console.log("mail subscriber...");
     /**
      * user info create send an email to user mail;
      */
-    UserModel.on(Operation.Created, (doc) => {
-        const webServer = config_get('webServer') || "http://localhost:3000/api";
+    UserModel.on("created", (doc) => {
+        const webServer = WebServer ;
         const { subject, text } = {
             "subject": "Please confirm your Email to complete the GCP sign-up",
             "text": `
