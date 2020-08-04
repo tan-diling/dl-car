@@ -1,6 +1,6 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, MaxLength, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
-import { GroupRole } from '../../constant';
+import { GroupRole, MemberStatus } from '@app/defines';
 
 
 export class GroupCreateDto {
@@ -31,6 +31,14 @@ export class DeleteGroupMemberDto {
     @IsEmail()    
     email: string;
 
+}
+
+export class GroupMemberInvitedResponseDto {
+    @IsMongoId()
+    id: string;
+
+    @IsEnum(MemberStatus)
+    status:string ;
 }
 
 

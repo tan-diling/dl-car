@@ -1,6 +1,6 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface } from './dto/types';
-import { ResourceType, ProjectRole } from '../constant';
+import { ResourceType, ProjectRole } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../../models/project';
 import { ModelQueryService  } from '../../modules/query';
 import { ReturnModelType } from '@typegoose/typegoose';

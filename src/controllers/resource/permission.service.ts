@@ -1,6 +1,6 @@
 import { RequestContext, Operation } from './dto/types';
 import { MethodNotAllowedError, InternalServerError } from 'routing-controllers';
-import { SiteRole, ResourceType } from '../constant';
+import { SiteRole, ResourceType } from '@app/defines';
 
 export class PermissionService {
     

@@ -1,7 +1,7 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
-import { ProjectMemberStatus } from '../controllers/constant';
+import { ProjectMemberStatus } from '@app/defines';
 
 export class Resource {
 

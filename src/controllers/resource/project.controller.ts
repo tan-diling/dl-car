@@ -4,7 +4,7 @@ import { AbstractResourceController } from './abstractResource.controller';
 import { createResourceRepoService } from './resource.service';
 import { Operation, IUser } from './dto/types';
 import { ProjectCreateDto, ProjectUpdateDto } from './dto/project.dto';
-import { ResourceType } from '../constant';
+import { ResourceType } from '@app/defines';
 
 @Authorized()
 @JsonController('/resource/project')

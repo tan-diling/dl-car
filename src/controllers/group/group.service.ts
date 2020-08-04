@@ -1,8 +1,8 @@
 import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
-import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
+import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
 import { GroupModel, Group, GroupMemberModel, GroupMember } from '../../models/group';
-import { GroupRole, GroupMemberStatus } from '../constant';
+import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole } from '@app/defines';
 import { model, Types } from 'mongoose';
 import { UserModel } from '../../models/user';
 /**
@@ -17,6 +17,53 @@ export class GroupService {
        
     }
 
+
+    async checkPermission(ctx: RequestContext) {
+        if (ctx.user?.role == SiteRole.Admin)
+            return;
+
+
+        switch (ctx.method) {
+            case RequestOperation.CREATE:
+                if(ctx.resourceId){
+                    if( await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                        throw new MethodNotAllowedError('permission check: member');
+                    }
+
+                }
+                break;
+            case RequestOperation.RETRIEVE:
+                
+                if (ctx.user?.id != ctx.filter?.memberUserId)
+                    throw new MethodNotAllowedError('permission check: member');
+
+                break;
+            case RequestOperation.UPDATE:
+                
+                // // other site_user can update his/her self information
+                // if (ctx.user?.id != ctx.filter?.owner)
+                //     throw new MethodNotAllowedError('permission check error');
+
+                // // user info:"role" , "defaultContact" maintained by 'admin'
+                // if (ctx.dto?.role != null || ctx.dto?.defaultContact != null)
+                //     throw new MethodNotAllowedError('permission check error');
+                break;
+            case RequestOperation.DELETE:
+                if( await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                    throw new MethodNotAllowedError('permission check: member');
+                }
+                break;
+            default:
+                throw new MethodNotAllowedError('permission check: server');
+        }
+    }
+
+    private async checkGroupMemberPermission(groupId,userId,update=false){
+        const gm = await GroupMemberModel.findOne({userId,groupId}).exec() ;
+        if (gm){
+            return update?gm.groupRole==GroupRole.Manager:true ;
+        }        
+    }
 
     async getGroupMembers(docs: DocumentType<Group> []){
         let objList = docs.map(x=>x.toObject());
@@ -109,7 +156,15 @@ export class GroupService {
      * @param query 
      */
     async list(query:any){
-        const groupList =  await this.queryService.list(GroupModel,query) ;
+        let { memberUserId, ...filter } = query ;
+        if(memberUserId){
+            const pms = await GroupMemberModel.find({userId:memberUserId}).exec() ;
+            if(pms.length==0) 
+                return [] ;
+            const ids = pms.map(x=>String(x.groupId)) ;
+            filter = {...filter,_id:ids};
+        }
+        const groupList =  await this.queryService.list(GroupModel,filter) ;
 
         return await this.getGroupMembers(groupList as  DocumentType<Group>[]) ;
     }

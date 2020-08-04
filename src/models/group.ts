@@ -1,7 +1,7 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
-import { GroupMemberStatus } from '../controllers/constant';
+import { GroupMemberStatus } from '@app/defines';
 
 export class Group  {
 

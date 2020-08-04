@@ -2,7 +2,7 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel } from '../../models/user';
-import { RepoOperation } from '../constant';
+import { RepoOperation } from '@app/defines';
 
 /**
  * user service

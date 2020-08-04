@@ -4,7 +4,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as moment from 'moment';
 import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
 import { UserService } from './user.service';
-import { SiteRole } from '../constant';
+import { SiteRole } from '@app/defines';
 
 enum Operation{
     CREATE,

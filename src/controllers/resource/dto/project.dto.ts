@@ -1,5 +1,5 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, IsAlphanumeric, IsUppercase, MinLength, MaxLength } from 'class-validator';
-import { ProjectRole } from '../../constant';
+import { ProjectRole } from '@app/defines';
 import { Type } from 'class-transformer';
 export class ProjectCreateDto {    
     @IsString()
