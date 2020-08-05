@@ -4,7 +4,7 @@ require('module-alias/register');
 
 // import { db_startup } from '@app/modules/query';
 
-import { BackendServer } from 'src/modules/web';
+import { BackendServer } from '@app/loaders/server';
 
 import { LoginController } from 'src/modules/login';
 

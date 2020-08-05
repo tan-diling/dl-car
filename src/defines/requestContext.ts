@@ -15,9 +15,9 @@ export interface IRequestUser{
 
 export interface RequestContext{
     request:Request,
-    method:RequestOperation,
-    resourceType:String,
-    resourceId?:String, 
+    method:RequestOperation | string,
+    resourceType:string,
+    resourceId?:string, 
 
     user?:IRequestUser;
     filter?:any;  

@@ -3,8 +3,8 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 
 import * as moment from 'moment';
 import { Inject } from 'typedi';
-import { RequestContext, RepoCRUDInterface, Operation, IUser } from './dto/types';
-import { PermissionService } from './permission.service';
+import {  RepoCRUDInterface, RequestContext, RepoOperation, RequestOperation, IRequestUser } from '@app/defines';
+import { ProjectPermissionService } from '@app/services/projectPermission.service';
 
 // const resourceType = 'project' ;
 // @Authorized()
@@ -13,7 +13,7 @@ export class AbstractResourceController {
     resourceType:string ='';
 
     @Inject()
-    permissionService:PermissionService ;
+    permissionService:ProjectPermissionService ;
 
     repoService:RepoCRUDInterface ;
 
@@ -24,28 +24,28 @@ export class AbstractResourceController {
     async processRequest(ctx:RequestContext){
        
         switch(ctx.method){
-            case Operation.CREATE:
+            case RequestOperation.CREATE:
                 return await this.repoService.create(ctx.dto) ;
                 break ;
-            case Operation.RETRIEVE:
+            case RequestOperation.RETRIEVE:
                 return await this.repoService.list(ctx.filter) ;
                 break ;
-            case Operation.DELETE:
+            case RequestOperation.DELETE:
                 return await this.repoService.delete(ctx.resourceId) ;
                 break ;
-            case Operation.UPDATE:
+            case RequestOperation.UPDATE:
                 return await this.repoService.update(ctx.resourceId,ctx.dto) ;
                 break ;                
         }
     }
 
     async process(request:Request,ctx:Partial<RequestContext> ){
-        const requestContext =  {
+        const requestContext :RequestContext =  {
             request,
             resourceType:this.resourceType,
             resourceId:String(request.query?.id) ,
-            method:Operation.RETRIEVE,
-            user:request.user as IUser,
+            method:RequestOperation.RETRIEVE,
+            user: request.user as IRequestUser,
             filter:request.query,
             dto : request.body ,
             ...ctx,

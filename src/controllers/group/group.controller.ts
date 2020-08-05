@@ -3,7 +3,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 
 import * as moment from 'moment';
 import { GroupUpdateDto, GroupCreateDto, CreateGroupMemberDto, DeleteGroupMemberDto, GroupMemberInvitedResponseDto } from './dto/group.dto';
-import { GroupService } from './group.service';
+import { GroupService } from '../../services/group.service';
 import { SiteRole, RequestContext, RequestOperation } from '@app/defines';
 
 
@@ -195,10 +195,11 @@ export class GroupController {
 
     }
 
-    @Post('/invite_response')
-    async inviteResponse( @Body() dto:GroupMemberInvitedResponseDto,@CurrentUser() currentUser)
+    @Authorized("NONE")
+    @Get('/member/confirm')
+    async memberConfig( @QueryParams() dto:GroupMemberInvitedResponseDto)
     {
-        return await this.service.responseInvited({...dto,email:currentUser.email})
+        return await this.service.memberConfirm(dto)
     }
-
+    
 }

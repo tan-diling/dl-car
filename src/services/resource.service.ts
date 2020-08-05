@@ -1,8 +1,8 @@
 import { Model, Document, Types } from 'mongoose';
-import { RepoCRUDInterface } from './dto/types';
-import { ResourceType, ProjectRole } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../../models/project';
-import { ModelQueryService  } from '../../modules/query';
+import { RepoCRUDInterface } from '@app/defines';
+import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../models/project';
+import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
@@ -87,6 +87,13 @@ class ResourceService<T > implements RepoCRUDInterface {
 
         return null ;
     };
+
+    // async execute(method:string,dto){
+    //     const func :()=>{} = this[method]  ;
+    //     if(func){
+    //         return await func.bind(this)(dto) ;
+    //     }
+    // }
 }  
 
 
@@ -110,10 +117,10 @@ class ProjectResourceService extends ResourceService<Project>{
 
         const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).exec() ;
 
-        const convert = (projects:(Project&Document) [],members:(ProjectMember&Document)[])=>{
+        const convert = (projects:(Project&Document) [],member:(ProjectMember&Document)[])=>{
             return projects.map(x=>{
                 return {... x.toJSON(),
-                    members:members
+                    member:member
                         .filter(y=>y.projectId==x.id)
                         .map(z=>{
                             return {"userId":z.userId,"projectRole":z.projectRole};
@@ -141,6 +148,7 @@ class ProjectResourceService extends ResourceService<Project>{
 
         if(memberUserId){
             const pmList = await ProjectMemberModel.find({userId:memberUserId}).exec() ;
+            if (pmList.length == 0) return [] ;
             const projectIds = pmList.map(x=>x.projectId) ;
             query = {...query,_id:projectIds};
         }
@@ -154,30 +162,30 @@ class ProjectResourceService extends ResourceService<Project>{
     /**
      * config project members
      * @param project project document
-     * @param members members
+     * @param member members
      */
-    async setProjectMember(project:Project&Document,members:{userId,projectRole}[]){
+    async setProjectMember(project:Project&Document,member:{userId,projectRole}[]){
 
         // check user validate
-        const userIds = members.map(x=>Types.ObjectId(x.userId)) ;
-        if (members.length != await UserModel.find({}).where('_id').in(userIds).countDocuments().exec()){
+        const userIds = member.map(x=>Types.ObjectId(x.userId)) ;
+        if (member.length != await UserModel.find({}).where('_id').in(userIds).countDocuments().exec()){
             throw new NotAcceptableError('member_invalid');
         }
 
         // make sure project.creator is project manager
         const id = project._id ;
-        if (null == members.find(x=>Types.ObjectId(x.userId) == project.creator)){
-            members.push({userId:project.creator,projectRole:ProjectRole.ProjectManager})
+        if (null == member.find(x=>Types.ObjectId(x.userId) == project.creator)){
+            member.push({userId:project.creator,projectRole:ProjectRole.ProjectManager})
         }
         // remove project member
         for(const pm  of await ProjectMemberModel.find({projectId:id})) {
-            if(null == members.find(x=>x.userId==pm.userId)){
+            if(null == member.find(x=>x.userId==pm.userId)){
                 await pm.remove() ;
             }
         };
 
         // append or insert
-        for(const projectMember of members ){
+        for(const projectMember of member ){
             const projectMemberFilter = {projectId:id,userId:projectMember.userId} ;
             const pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
             if(pm) {
@@ -186,7 +194,9 @@ class ProjectResourceService extends ResourceService<Project>{
             }
             else
             {
-                await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
+                const pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
+
+                ProjectMemberModel.emit(RepoOperation.Created, pm) ;
             }
         }        
 
@@ -207,12 +217,12 @@ class ProjectResourceService extends ResourceService<Project>{
 
     /** update project info */
     async update(id,dto) {
-        const {members,...projectDto} = dto ;
+        const {member,...projectDto} = dto ;
         const project = await super.update(id,projectDto) ;
 
-        if (members){
+        if (member){
 
-            await this.setProjectMember(project, members);
+            await this.setProjectMember(project, member);
            
         }
        

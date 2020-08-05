@@ -1,12 +1,13 @@
-import { RequestContext, Operation } from './dto/types';
 import { MethodNotAllowedError, InternalServerError } from 'routing-controllers';
-import { SiteRole, ResourceType } from '@app/defines';
+import { SiteRole, ResourceType, RequestContext, RequestOperation } from '@app/defines';
+import { PermissionPolicyModel } from '@app/models/permission';
+import { ProjectMemberModel } from '@app/models/project';
 
-export class PermissionService {
+export class ProjectPermissionService {
     
     async checkPermission(ctx:RequestContext){
 
-        const checkMethodList = [this.checkSiteAdminPolicy,this.checkProjectCreatePolicy,this.checkCurrentCURDPolicy] ;
+        const checkMethodList = [this.checkSiteAdminPolicy,this.checkProjectCreatePolicy,this.checkProjectRetrievePolicy,this.checkCurrentCURDPolicy] ;
 
         let checkResult = false ;
         for(const func of checkMethodList){
@@ -52,13 +53,31 @@ export class PermissionService {
 
     async checkProjectCreatePolicy(ctx:RequestContext){
 
-        if(ctx.resourceType != ResourceType.Project) 
+        if(ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.CREATE) {
+            return ctx.user.role != SiteRole.Visitor ;        
+        }
+    }
 
-            return ctx.user.role != SiteRole.Visitor ;
+
+    async checkProjectRetrievePolicy(ctx:RequestContext){
+
+        if(ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.RETRIEVE) {
+            return ctx.filter.memberUserId==ctx.user.id ;        
+        }      
+    }
+
+    async queryPolicy(ctx:RequestContext){
+        const projectId :any = ctx.resourceId ;
+        const pm = await ProjectMemberModel.findOne({projectId,userId:ctx.user.id}) ;
+        if(pm){
+            return await PermissionPolicyModel.findOne({resource: ctx.resourceType,role:pm.projectRole}).exec();
+        }
         
     }
  
     async checkCurrentCURDPolicy(ctx:RequestContext){
+
+        const permissionPolicy = await this.queryPolicy(ctx) ;
         
         return false ;
         

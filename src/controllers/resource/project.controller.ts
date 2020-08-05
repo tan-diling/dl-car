@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 import { AbstractResourceController } from './abstractResource.controller';
-import { createResourceRepoService } from './resource.service';
-import { Operation, IUser } from './dto/types';
-import { ProjectCreateDto, ProjectUpdateDto } from './dto/project.dto';
-import { ResourceType } from '@app/defines';
+import { createResourceRepoService } from '../../services/resource.service';
+import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto } from './dto/project.dto';
+import { ResourceType, RequestOperation } from '@app/defines';
 
 @Authorized()
 @JsonController('/resource/project')
@@ -23,7 +22,7 @@ export class ProjectController extends AbstractResourceController{
     async create(@Body() dto:ProjectCreateDto, @Req() request) {  
         const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
-            method:Operation.CREATE,
+            method:RequestOperation.CREATE,
             dto:obj,
         }) ;
     }
@@ -32,7 +31,7 @@ export class ProjectController extends AbstractResourceController{
     async list(@QueryParams() query:any, @Req() request) {
         
         return await this.process(request,{       
-            method:Operation.RETRIEVE,
+            method:RequestOperation.RETRIEVE,
             filter:query,
             // dto
         }) ;
@@ -42,8 +41,9 @@ export class ProjectController extends AbstractResourceController{
         
     @Get('/:id([0-9a-f]{24})')
     async getById(@Param('id') id:string, @Req() request) {
-        return await this.process(request,{       
-            method:Operation.RETRIEVE,
+        return await this.process(request,{ 
+            resourceId: id,      
+            method:RequestOperation.RETRIEVE,
             filter:{_id:id},
             // dto
         }) ;
@@ -55,7 +55,7 @@ export class ProjectController extends AbstractResourceController{
     async update(@Param('id') id:string, @Body() dto:ProjectUpdateDto, @Req() request, ) {
         return await this.process(request,{         
             resourceId: id,
-            method:Operation.UPDATE,    
+            method:RequestOperation.UPDATE,    
             dto        
         }) ;
     }
@@ -65,8 +65,20 @@ export class ProjectController extends AbstractResourceController{
     async delete(@Param('id') id:string,@Req() request,) {
         return await this.process(request,{           
             resourceId: id,
-            method:Operation.DELETE,            
+            method:RequestOperation.DELETE,            
         }) ;
     }
+
+    // @Authorized("NONE")
+    // @Get('/member/confirm') 
+    // async memberConfirm( @QueryParams() dto:ProjectMemberConfirmDto)
+    // {
+    //     //return await this.service.(dto)  
+    //     return await this.process(request,{           
+    //         resourceId: id,
+    //         method:Operation.DELETE,            
+    //     }) ;  
+
+    // }
 
 }

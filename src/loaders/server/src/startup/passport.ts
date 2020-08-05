@@ -44,9 +44,15 @@ export const initPassport = (app) => {
 export const userCheck = (action: { request, response, next }, roles: string[]) => new Promise<boolean>(
     (resolve, reject) => {
         passport.authenticate('jwt',{ session: false, failWithError: true }, (err, user ,info) => {
-            if (err) {
+            if (err) {     
+                         
                 return reject(err);
             }
+
+            if(roles.length==1 && roles[0] === "NONE") {
+                return resolve(true) ;
+            } 
+
             if (!user) {
                 const jwtError = new UnauthorizedError(info?.message || "jwt error") ;
                 jwtError.name = "jwt_error" ;                

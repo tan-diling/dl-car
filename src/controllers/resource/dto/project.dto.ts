@@ -37,6 +37,7 @@ export class ProjectUpdateDto {
     @IsUppercase()
     @MinLength(2)
     @MaxLength(8)
+    @IsOptional()
     key?:string;
 
     @IsString()
@@ -63,5 +64,18 @@ export class ProjectUpdateDto {
     @ValidateNested()    
     @Type(()=>ProjectMemberDto)
     @IsOptional()
-    members?: ProjectMemberDto[]
+    member?: ProjectMemberDto[]
 }
+
+export class ProjectMemberConfirmDto {
+    @IsMongoId()
+    id: string;
+
+    @IsEmail()    
+    userId: string;
+
+    @IsString()
+    @IsOptional()
+    status?:string ;
+}
+

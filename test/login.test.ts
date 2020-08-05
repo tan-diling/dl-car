@@ -3,7 +3,7 @@
 require('module-alias/register');
 import * as request from 'supertest';
 
-import { BackendServer } from 'src/modules/web';
+import { BackendServer } from '@app/loaders/server';
 
 import { LoginController } from 'src/modules/login';
 import { assert } from 'chai';

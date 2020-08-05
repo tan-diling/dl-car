@@ -1,7 +1,8 @@
+import { DocumentType } from '@typegoose/typegoose' ;
 import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
-import { UserModel } from '../../models/user';
+import { UserModel, User } from '../models/user';
 import { RepoOperation } from '@app/defines';
 
 /**
@@ -82,7 +83,7 @@ export class UserService {
      * @param id user id
      * @param dto 
      */
-    async update(id:string,dto:any){
+    async update(id:string, dto: DocumentType<User>){
         const doc = await this.getById(id) ;
         if(doc){
             return UserModel.findByIdAndUpdate(id,dto,{new:true}).exec() ;            

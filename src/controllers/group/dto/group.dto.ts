@@ -37,8 +37,12 @@ export class GroupMemberInvitedResponseDto {
     @IsMongoId()
     id: string;
 
-    @IsEnum(MemberStatus)
-    status:string ;
+    @IsEmail()    
+    email: string;
+
+    @IsString()
+    @IsOptional()
+    status?:string ;
 }
 
 

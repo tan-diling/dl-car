@@ -1,4 +1,4 @@
-import {BackendServer } from '@app/modules/web';
+import {BackendServer } from '@app/loaders/server';
 
 import {controllers } from '@app/routes';
 

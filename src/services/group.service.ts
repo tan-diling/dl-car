@@ -1,10 +1,10 @@
 import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
-import { GroupModel, Group, GroupMemberModel, GroupMember } from '../../models/group';
-import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole } from '@app/defines';
+import { GroupModel, Group, GroupMemberModel, GroupMember } from '../models/group';
+import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus } from '@app/defines';
 import { model, Types } from 'mongoose';
-import { UserModel } from '../../models/user';
+import { UserModel } from '../models/user';
 /**
  * group service
  */
@@ -26,16 +26,21 @@ export class GroupService {
         switch (ctx.method) {
             case RequestOperation.CREATE:
                 if(ctx.resourceId){
-                    if( await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                    if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
                         throw new MethodNotAllowedError('permission check: member');
                     }
 
                 }
                 break;
             case RequestOperation.RETRIEVE:
-                
-                if (ctx.user?.id != ctx.filter?.memberUserId)
+                if(ctx.resourceId){
+                    if(! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id)) {
+                        throw new MethodNotAllowedError('permission check: member');
+                    }
+
+                }else if (ctx.user?.id != ctx.filter?.memberUserId){
                     throw new MethodNotAllowedError('permission check: member');
+                }
 
                 break;
             case RequestOperation.UPDATE:
@@ -49,7 +54,7 @@ export class GroupService {
                 //     throw new MethodNotAllowedError('permission check error');
                 break;
             case RequestOperation.DELETE:
-                if( await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
                     throw new MethodNotAllowedError('permission check: member');
                 }
                 break;
@@ -136,22 +141,6 @@ export class GroupService {
     }
 
     /**
-     * user handle group invited, action accept or reject
-     * @param dto 
-     */
-    async responseInvited( dto:{email:string, id:string, status?:string }) {
-
-        // let user = await this.getById(dto.id) ;
-        // if (user != null &&  user.email == dto.email ) {
-        //     user.emailValidated = true ;
-        //     await user.save() ;
-        //     return ;
-        // }
-
-        // throw new NotAcceptableError('user id or email error') ;        
-    }    
-
-    /**
      *  list
      * @param query 
      */
@@ -169,49 +158,7 @@ export class GroupService {
         return await this.getGroupMembers(groupList as  DocumentType<Group>[]) ;
     }
 
-    /**
-     *  child model query
-     * @param query 
-     */
-    async listMember(id:string){        
-        return await GroupMemberModel.find({groupId:id}).populate("userId").exec();
-    }
-        
 
-    /**
-     *  child model create
-     */ 
-    async appendMember(id:string,dto){
-        const group = await GroupModel.findById(id).exec() ;
-        if( ! group ) return null;
-
-        const groupId= group._id ;
-        const {email,groupRole} = dto
-        const user = await UserModel.findOne({email}).exec();
-        const groupMember = await GroupMemberModel.findOneAndUpdate(
-            { groupId,email },
-            { groupId,email, groupRole, userId:user?._id },
-            { upsert:true, new:true },
-            ).exec();
-
-        return groupMember ;
-
-    }
-
-    /**
-     *  child model delete
-     */
-    async deleteMember(id:string,dto){
-
-        const {email} = dto
-
-        const groupMember = await GroupMemberModel.findOne({groupId:id,email}).exec();
-
-        if(groupMember){
-            await groupMember.remove();
-        }
-        return groupMember ;
-    }
 
     /**
      * get by id
@@ -229,7 +176,7 @@ export class GroupService {
      * @param id  id
      * @param dto 
      */
-    async update(id:string,dto:any){
+    async update(id:string,dto: DocumentType<Group>){
         let doc = await this.getById(id) ;
         if(doc){
             doc = GroupModel.findByIdAndUpdate(id,dto,{new:true}).exec() ;  
@@ -243,7 +190,7 @@ export class GroupService {
      * @param id 
      * @param dto 
      */
-    async delete(id){
+    async delete(id:string){
         const doc =  await GroupModel.findById(id).exec() ; ;
         if(doc){
             doc.deleted = true ;
@@ -252,6 +199,73 @@ export class GroupService {
 
         return null ;
     }
+
+
+        /**
+     *  child model query
+     * @param query 
+     */
+    async listMember(id:string){        
+        return await GroupMemberModel.find({groupId:id}).populate("userId").exec();
+    }
+        
+
+    /**
+     *  child model create
+     */ 
+    async appendMember(id:string,dto:{email,groupRole}){
+        const group = await GroupModel.findById(id).exec() ;
+        if( ! group ) return null;
+
+        const groupId= group._id ;
+        const {email,groupRole} = dto
+        const user = await UserModel.findOne({email}).exec();
+        const groupMember = await GroupMemberModel.findOneAndUpdate(
+            { groupId,email },
+            { groupId,email, groupRole, userId:user?._id },
+            { upsert:true, new:true },
+            ).exec();
+
+        GroupMemberModel.emit(RepoOperation.Created,GroupMember) ;
+
+        return groupMember ;
+
+    }
+
+    /**
+     *  child model delete
+     */
+    async deleteMember(id:string, dto:{email}){
+
+        const {email} = dto
+
+        const groupMember = await GroupMemberModel.findOne({groupId:id,email}).exec();
+
+        if(groupMember){
+            await groupMember.remove();
+        }
+        return groupMember ;
+    }
+
+
+    /**
+     * user handle group invited, action accept or reject
+     * @param dto 
+     */
+    async memberConfirm( dto:{email:string, id:string, status?:string }) {
+
+        const gm = await GroupMemberModel.findOne({groupId:dto.id,email:dto.email}).exec() ;
+
+        if(gm){
+            gm.status = dto.status == MemberStatus.Refused ? MemberStatus.Refused: MemberStatus.Confirmed  ;
+
+            await gm.save() ;
+
+            return {result:"status updated"} ;
+        }
+        
+        throw new NotFoundError('group_member');
+    }    
 
  
 }
