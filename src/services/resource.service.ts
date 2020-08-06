@@ -115,7 +115,7 @@ class ProjectResourceService extends ResourceService<Project>{
 
         const ids = docs.map(x=>x._id) ;
 
-        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).exec() ;
+        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId').exec() ;
 
         const convert = (projects:(Project&Document) [],member:(ProjectMember&Document)[])=>{
             return projects.map(x=>{
@@ -123,7 +123,11 @@ class ProjectResourceService extends ResourceService<Project>{
                     member:member
                         .filter(y=>y.projectId==x.id)
                         .map(z=>{
-                            return {"userId":z.userId,"projectRole":z.projectRole};
+                            return {
+                                "user":z.userId,
+                                "projectRole":z.projectRole,
+                                "status":z.status,
+                            };
                         })
                 };
                 }) ;      

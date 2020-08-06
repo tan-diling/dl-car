@@ -12,6 +12,6 @@ export const AppError = {
 }
 
 export function errorMessage(errorCode:string){
-    config_get(`error.${errorCode}`,errorCode.replace('_',' ')) ;
+    return config_get(`error.${errorCode}`,errorCode.replace('_',' ')) ;
 }
 

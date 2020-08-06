@@ -6,6 +6,7 @@
   "description": "client portal",
   "scripts": {
     "lint": "tslint -p tsconfig.json -c tslint.json \"packages/**/*.ts\" -e \"*.spec.ts\"",
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "doc:api": "ts-node ./draft/doc.ts ",
     "run:login": "ts-node test/login.run.ts",

@@ -5,7 +5,7 @@ import * as request from 'supertest';
 
 import { BackendServer } from '@app/loaders/server';
 
-import { LoginController } from 'src/modules/login';
+import { LoginController } from '@app/modules/auth';
 import { assert } from 'chai';
 
 describe('login module ', () => {

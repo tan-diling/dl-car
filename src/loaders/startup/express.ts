@@ -9,7 +9,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { useExpressServer, Action ,useContainer } from 'routing-controllers';
 import { ErrorMiddleware } from './errorMiddleware';
-import { BackendServer } from '../index';
+import { BackendServer } from '../server';
 import * as jwt from 'jsonwebtoken' ;
 import {Container} from "typedi";
 import { userCheck, initPassport } from './passport';

@@ -8,9 +8,14 @@ export class Resource {
   @prop({ required: true } )
   creator?: Types.ObjectId ;
 
+  @prop()
+  type?: string ;
 
   @prop()
-  parentId?: Types.ObjectId ;
+  parent?: Types.ObjectId[] ;
+
+  @prop()
+  assignee?: Types.ObjectId[] ;
 
   @prop({ default: false})
   deleted?: boolean ;
@@ -61,7 +66,8 @@ export class ProjectMember {
 }
 
 
+export const ResourceModel = getModelForClass(Resource,{schemaOptions:{timestamps:true}});
 
-export const ProjectModel = getModelForClass(Project,{schemaOptions:{timestamps:true}});
+export const ProjectModel = getDiscriminatorModelForClass(ResourceModel,Project);
 
 export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});

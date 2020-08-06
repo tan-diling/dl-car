@@ -3,10 +3,9 @@
 
 this project design for backend framework 
 
-### packages
-- core
-- mongoose
-- web
+### module
+- query
+- auth
 - mail
 
 ### project structure

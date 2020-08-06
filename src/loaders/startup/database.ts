@@ -18,7 +18,7 @@ async function init_db(db:Db){
     for(const d of db_init){
         const {table, dataArray} = d
         if(table && dataArray) {
-            console.log(`init ${table} `);
+            console.log(`init_db: ${table} `);
             for( const data of dataArray){
                 const {key,doc} = data ;
                 const _doc = await db.collection(table).findOne(key) ;

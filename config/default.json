@@ -24,7 +24,8 @@
     },
     "webServer":"https://dev.onwards.ai/api",
     "error":{        
-        "account_invalid":"email or password not valid", 
+        "account_invalid":"Invalid email", 
+        "password_invalid":"Invalid password", 
         "account_forbidden":"this account is not allowed to login.",
         "password_check_error":"email or password check invalid",
         "refresh_invalid": "refresh token is invalid",

@@ -7,6 +7,6 @@ export enum PermissionOperation {
 
     CRUD = 0x0f,
 
-    Current = 0x10, 
+    Assign = 0x10, 
     Inherit = 0x80, 
 }

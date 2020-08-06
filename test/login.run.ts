@@ -6,7 +6,7 @@ require('module-alias/register');
 
 import { BackendServer } from '@app/loaders/server';
 
-import { LoginController } from 'src/modules/login';
+import { LoginController } from '@app/modules/auth';
 
 async function run() {
   

@@ -39,8 +39,11 @@ export class IdentityService implements IIdentityService {
 
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
         const user = await this.UserModel.findOne({ email: dto.email }).exec();
-        if (user == null || user.password != dto.password) {
+        if (user == null ) {
             throw new UnauthorizedError('account_invalid');
+        }
+        if (user.password != dto.password) {
+            throw new UnauthorizedError('password_invalid');
         }
         if (! user.isNormal()) {
             throw new UnauthorizedError('account_forbidden');

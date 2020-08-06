@@ -15,7 +15,7 @@ import {logger as Logger} from '@app/config';
 
 import expressLoader from './express';
 
-import { BackendServer } from '../index';
+import { BackendServer } from '../server';
 //We have to import at least all the events once so they can be triggered
 // import './events';
 
