@@ -3,6 +3,6 @@
  * group role ,define model 'GroupMember' , field 'groupRole'
  */
 export enum GroupRole{
-    Manager = "group_manager",
+    Admin = "group_admin",
     Member = "group_member"
 }

@@ -66,7 +66,7 @@ export class GroupService {
     private async checkGroupMemberPermission(groupId,userId,update=false){
         const gm = await GroupMemberModel.findOne({userId,groupId}).exec() ;
         if (gm){
-            return update?gm.groupRole==GroupRole.Manager:true ;
+            return update?gm.groupRole==GroupRole.Admin:true ;
         }        
     }
 
@@ -132,7 +132,7 @@ export class GroupService {
             groupId:group._id,
             userId: group.owner,
             email: dto.email,
-            groupRole: GroupRole.Manager,
+            groupRole: GroupRole.Admin,
             status: GroupMemberStatus.Confirmed,
         }) ;
 

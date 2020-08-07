@@ -30,7 +30,7 @@ export class UserService {
      * create an new user
      * @param dto 
      */
-    async create(dto: {email:string, name:string, password?:string, role?:string }) {
+    async create(dto: Partial<User>) {
 
         let user = await UserModel.findOne({ email: dto.email }).exec();
         if (user != null ) {

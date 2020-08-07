@@ -9,8 +9,12 @@ const permissionPolicy = {
     "table": "permissionpolicies",
     "dataArray":[
         {
-            key:{ resource:ResourceType.Project, role:ProjectRole.ProjectManager },
+            key:{ resource:ResourceType.Project, role:ProjectRole.ProjectAdmin },
             doc:{ scope:PermissionOperation.CRUD, }
+        },
+        {
+            key:{ resource:ResourceType.Project, role:ProjectRole.ProjectManager },
+            doc:{ scope:PermissionOperation.Retrieve + PermissionOperation.Update , }
         },
         {
             key:{ resource:ResourceType.Project, role:ProjectRole.Developer },

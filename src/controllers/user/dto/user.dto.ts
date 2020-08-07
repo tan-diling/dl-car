@@ -32,6 +32,14 @@ export class VisitorUserCreateDto {
     @Matches(RULE_PASSWORD_REGEX)
     password: string;
 
+    @IsString()
+    @IsOptional()
+    company?: string;
+
+    @IsString()
+    @IsOptional()
+    job?: string;
+
 }
 
 export class ChangePasswordDto {
@@ -64,6 +72,10 @@ export class UserCreateDto  {
     @IsEnum(UserCreateRole)
     @IsOptional()
     role?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    defaultContact?: boolean;
 }
 
 

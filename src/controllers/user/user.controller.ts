@@ -79,7 +79,8 @@ export class UserController {
 
     @Post('/sign_up')
     async signUp(@Body() dto:VisitorUserCreateDto) {
-        return await this.service.create(dto) ;
+        await this.service.create(dto) ;
+        return {result:`${dto.email} sign success`} ;
     }
 
     @Authorized(SiteRole.Admin)
