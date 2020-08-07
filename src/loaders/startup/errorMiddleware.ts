@@ -11,7 +11,7 @@ export class ErrorMiddleware implements ExpressErrorMiddlewareInterface {
         const validErrors = error?.errors;
         if (typeof (validErrors) == typeof ([]) && validErrors[0] instanceof ValidationError) {
             response.status(400)
-                .json({ errorCode: 'input_invalid', message: `input invalid, check '${validErrors[0].property}' property ` })
+                .json({ errorCode: 'input_invalid', message: `Invalid input, check '${validErrors[0].property}' property ` })
                 .end();
 
         } else if (error instanceof HttpError) {

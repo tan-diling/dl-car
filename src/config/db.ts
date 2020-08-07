@@ -6,7 +6,7 @@ export const MONGODB_URL : string = config_get('mongodb.url') || 'mongodb://loca
 
 
 const permissionPolicy = {
-    "table": "permissionpolicys",
+    "table": "permissionpolicies",
     "dataArray":[
         {
             key:{ resource:ResourceType.Project, role:ProjectRole.ProjectManager },

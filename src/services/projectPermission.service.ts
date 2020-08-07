@@ -74,7 +74,7 @@ export class ProjectPermissionService {
 
     async validateInputField(ctx: RequestContext, policy: PermissionPolicy) {
         let checkResult = true;
-        if (ctx.dto != null && policy.fields != null) {
+        if (ctx.dto  &&  policy.fields?.length ) {
             const op: number = Number(ctx.method);
             const allowFields = policy.fields.filter(x => (x.policy & op) == op).map(x => x.name);
             for (const fieldName in Object.keys(ctx.dto)) {
