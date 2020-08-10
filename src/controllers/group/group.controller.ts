@@ -55,7 +55,7 @@ export class GroupController {
     async processRequest(ctx: RequestContext) {
         await this.service.checkPermission(ctx) ;
 
-        if (ctx.request.path.endsWith('member')) {            
+        if (ctx.request.path.endsWith('/member')) {            
             switch (ctx.method) {
                 case RequestOperation.CREATE:
                     return await this.service.appendMember(ctx.filter.id, ctx.dto);
