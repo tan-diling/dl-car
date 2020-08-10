@@ -122,6 +122,19 @@ export class GroupController {
 
     }
 
+    @Get('/by_member')
+    async listByMember(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
+        return await this.processRequest({
+            resourceType,
+            request,
+            method: RequestOperation.RETRIEVE,
+            user: currentUser,
+            filter: {...query,memberUserId:currentUser.id},
+            // dto
+        });
+
+    }
+
 
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: GroupUpdateDto, @Req() request, @CurrentUser() currentUser) {

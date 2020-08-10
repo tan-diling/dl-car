@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 import { AbstractResourceController } from './abstractResource.controller';
 import { createResourceRepoService } from '../../services/resource.service';
-import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto } from './dto/project.dto';
+import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto, ProjectMemberDto } from './dto/project.dto';
 import { ResourceType, RequestOperation } from '@app/defines';
 
 @Authorized()
@@ -38,6 +38,17 @@ export class ProjectController extends AbstractResourceController{
 
     }
 
+    @Get('/by_member')
+    async listByMember(@QueryParams() query:any, @Req() request) {
+        
+        return await this.process(request,{       
+            method:RequestOperation.RETRIEVE,
+            filter:{...query,memberUserId:request.user.id},
+            // dto
+        }) ;
+
+    }
+
         
     @Get('/:id([0-9a-f]{24})')
     async getById(@Param('id') id:string, @Req() request) {
@@ -57,6 +68,15 @@ export class ProjectController extends AbstractResourceController{
             resourceId: id,
             method:RequestOperation.UPDATE,    
             dto        
+        }) ;
+    }
+
+    @Patch('/:id([0-9a-f]{24})/member')
+    async updateMember(@Param('id') id:string, @Body() dto:ProjectMemberDto[], @Req() request, ) {
+        return await this.process(request,{         
+            resourceId: id,
+            method:RequestOperation.UPDATE,    
+            dto:{member:dto}
         }) ;
     }
 

@@ -80,7 +80,7 @@ export class UserController {
     @Post('/sign_up')
     async signUp(@Body() dto:VisitorUserCreateDto) {
         await this.service.create(dto) ;
-        return {result:`${dto.email} sign success`} ;
+        return {result:`${dto.email} signed up successfully`} ;
     }
 
     @Authorized(SiteRole.Admin)
@@ -110,7 +110,7 @@ export class UserController {
         return await this.service.changePassword(dto) ;            
     }
 
-    @Authorized()
+    @Authorized(SiteRole.Admin)
     @Get('/user')
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser:IUser) {
         return await this.processRequest({
@@ -120,6 +120,56 @@ export class UserController {
             filter:query,
             // dto
         }) ;
+        
+        // return await this.service.list(query) ;
+    }
+
+    @Authorized()
+    @Get('/user/default')
+    async listDefault(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser:IUser) {
+        return await this.processRequest({
+            request,
+            method:Operation.RETRIEVE,
+            user:currentUser,
+            filter:{...query,defaultContact:true},
+            // dto
+        }) ;
+        
+        // return await this.service.list(query) ;
+    }
+
+    @Authorized()
+    @Get('/user/profile')
+    async getProfile(@Req() request,@CurrentUser() currentUser:IUser) {
+        return await this.service.getById(currentUser.id) ;
+        // return await this.processRequest({
+        //     request,
+        //     method:Operation.RETRIEVE,
+        //     user:currentUser,
+        //     filter:{_id:currentUser.id},
+        //     // dto
+        // }) ;
+        
+        // return await this.service.list(query) ;
+    }
+
+    @Authorized()
+    @Patch('/user/profile')
+    async setProfile(@Req() request, @Body() dto:UserUpdateDto, @CurrentUser() currentUser:IUser) {
+        return await this.processRequest({
+            request,
+            method:Operation.UPDATE,
+            user:currentUser,
+            filter:{id:currentUser.id},
+            dto
+        }) ;
+        // return await this.processRequest({
+        //     request,
+        //     method:Operation.RETRIEVE,
+        //     user:currentUser,
+        //     filter:{_id:currentUser.id},
+        //     // dto
+        // }) ;
         
         // return await this.service.list(query) ;
     }

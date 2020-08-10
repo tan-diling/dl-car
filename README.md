@@ -54,8 +54,12 @@ postman
 #### nginx selinux config
 
 ```
-#nginx log:connect() to 127.0.0.1:3000 failed (13: Permission denied)
+# nginx log:connect() to 127.0.0.1:3000 failed (13: Permission denied)
 setsebool -P httpd_can_network_connect 1
+# nginx: stat() failed (13: permission denied) 
+setsebool -P httpd_enable_homedirs 1
+
+chcon -R -t httpd_sys_content_t /www/public_html/onwards.ai/private/gcp-frontend/
 ```
 
 ### develop server

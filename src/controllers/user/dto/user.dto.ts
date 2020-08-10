@@ -87,6 +87,35 @@ export class EmailExistDto {
     email: string;
 }
 
+export class UserProfileUpdateDto {
+    @IsString()
+    @Matches(RULE_USER_NAME_REGEX)
+    @MaxLength(24)
+    @IsOptional()
+    name?: string;
+
+    @IsString()
+    @IsOptional()
+    image?: string;
+
+    @IsString()
+    @IsOptional()
+    company?: string;
+
+    @IsString()
+    @IsOptional()
+    job?: string;
+
+    @IsString()
+    @IsOptional()
+    @Matches(RULE_PHONE_REGEX)
+    phone?: string;
+
+    @IsString()
+    @IsOptional()
+    department?: string;
+}
+
 export class UserUpdateDto {
     @IsString()
     @Matches(RULE_USER_NAME_REGEX)

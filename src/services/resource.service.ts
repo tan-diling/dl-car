@@ -192,7 +192,7 @@ class ProjectResourceService extends ResourceService<Project>{
         for(const projectMember of member ){
             const projectMemberFilter = {projectId:id,userId:projectMember.userId} ;
             const pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
-            if(pm) {
+            if(pm && pm.projectRole != projectMember.projectRole) {
                 pm.projectRole = projectMember.projectRole ;                
                 await pm.save();
             }
@@ -222,12 +222,11 @@ class ProjectResourceService extends ResourceService<Project>{
     /** update project info */
     async update(id,dto) {
         const {member,...projectDto} = dto ;
+
         const project = await super.update(id,projectDto) ;
 
         if (member){
-
-            await this.setProjectMember(project, member);
-           
+            await this.setProjectMember(project, member);           
         }
        
         return await this.getProjectMember(project)  ;
