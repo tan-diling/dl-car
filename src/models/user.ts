@@ -1,6 +1,7 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
+import { SiteRole } from '@app/defines';
 
 // enum UserRole {
 //   admin ='admin',
@@ -19,7 +20,7 @@ export class User {
   email: string;    
 
   // @prop({default:UserRole.client, enum: UserRole })
-  @prop()
+  @prop({default:SiteRole.Client})
   role?: string;
 
   @prop()

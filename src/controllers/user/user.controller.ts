@@ -79,7 +79,7 @@ export class UserController {
 
     @Post('/sign_up')
     async signUp(@Body() dto:VisitorUserCreateDto) {
-        await this.service.create(dto) ;
+        await this.service.create({...dto,role:SiteRole.Client}) ;
         return {result:`${dto.email} signed up successfully`} ;
     }
 
