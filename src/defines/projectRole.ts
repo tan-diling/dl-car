@@ -3,7 +3,7 @@
  * project role ,define model 'ProjectMember' , field 'projectRole'
  */
 export enum ProjectRole {
-    ProjectAdmin = 'project_admin',
+    ProjectOwner = 'project_owner',
     ProjectManager = 'project_manager',
     QualityAssurance ='project_qa',
     Developer = 'project_developer',

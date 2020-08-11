@@ -68,10 +68,7 @@ export class ProjectUpdateDto {
 }
 
 export class ProjectMemberConfirmDto {
-    @IsMongoId()
-    id: string;
-
-    @IsEmail()    
+    @IsMongoId()    
     userId: string;
 
     @IsString()

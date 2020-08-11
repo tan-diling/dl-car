@@ -22,6 +22,12 @@ export class AbstractResourceController {
     }
 
     async processRequest(ctx:RequestContext){
+        if(typeof(ctx.method) == typeof('') ){
+            const func = this.repoService[ctx.method] ;
+            if(func){
+                return await func.bind(this.repoService)({id:ctx.resourceId,...(ctx.dto)}) ;
+            }    
+        }
        
         switch(ctx.method){
             case RequestOperation.CREATE:
@@ -51,11 +57,11 @@ export class AbstractResourceController {
             ...ctx,
         };
 
-        if(true !== await this.checkPermission(requestContext))
+        if(true !== await this.checkPermission(requestContext)){
             throw new ForbiddenError('resource_permission_forbidden') ;
+        }
 
         return await this.processRequest(requestContext) ;
-    }
 
- 
+    } 
 }

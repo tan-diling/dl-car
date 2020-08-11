@@ -208,11 +208,11 @@ export class GroupController {
 
     }
 
-    @Authorized("NONE")
-    @Get('/member/confirm')
-    async memberConfig( @QueryParams() dto:GroupMemberInvitedResponseDto)
+    // @Authorized("NONE")
+    @Patch('/:id([0-9a-f]{24})/member_confirm')
+    async memberConfirm(@Param('id') id: string, @QueryParams() dto:GroupMemberInvitedResponseDto)
     {
-        return await this.service.memberConfirm(dto)
+        return await this.service.memberConfirm({id,...dto})
     }
     
 }

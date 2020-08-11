@@ -35,7 +35,7 @@ export class DeleteGroupMemberDto {
 
 export class GroupMemberInvitedResponseDto {
     @IsMongoId()
-    id: string;
+    id?: string;
 
     @IsEmail()    
     email: string;

@@ -26,7 +26,7 @@ export class GroupService {
         switch (ctx.method) {
             case RequestOperation.CREATE:
                 if(ctx.resourceId){
-                    if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                    if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,GroupRole.Admin)) {
                         throw new MethodNotAllowedError('permission check: member');
                     }
 
@@ -54,7 +54,7 @@ export class GroupService {
                 //     throw new MethodNotAllowedError('permission check error');
                 break;
             case RequestOperation.DELETE:
-                if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,true)) {
+                if( ! await this.checkGroupMemberPermission(ctx.resourceId,ctx.user.id,GroupRole.Admin)) {
                     throw new MethodNotAllowedError('permission check: member');
                 }
                 break;
@@ -63,11 +63,16 @@ export class GroupService {
         }
     }
 
-    private async checkGroupMemberPermission(groupId,userId,update=false){
+    async checkGroupMemberPermission(groupId, userId, ...groupRoles:string[]){
         const gm = await GroupMemberModel.findOne({userId,groupId}).exec() ;
         if (gm){
-            return update?gm.groupRole==GroupRole.Admin:true ;
-        }        
+            if(groupRoles.length>0)
+                return groupRoles.includes(gm.groupRole) ;
+            
+            return true ;
+        }   
+        
+        return false ;
     }
 
     async getGroupMembers(docs: DocumentType<Group> []){

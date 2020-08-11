@@ -1,11 +1,12 @@
 import { Model, Document, Types } from 'mongoose';
-import { RepoCRUDInterface } from '@app/defines';
+import { RepoCRUDInterface, MemberStatus } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../models/project';
 import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
+import { IdentityService } from '@app/modules/auth/src/controller/identity.service';
 
 // function createRepoService<T extends Document>(
 //     model: Model<T>,
@@ -87,13 +88,7 @@ class ResourceService<T > implements RepoCRUDInterface {
 
         return null ;
     };
-
-    // async execute(method:string,dto){
-    //     const func :()=>{} = this[method]  ;
-    //     if(func){
-    //         return await func.bind(this)(dto) ;
-    //     }
-    // }
+  
 }  
 
 
@@ -225,12 +220,24 @@ class ProjectResourceService extends ResourceService<Project>{
 
         const project = await super.update(id,projectDto) ;
 
-        if (member){
-            await this.setProjectMember(project, member);           
+        if (project && member){
+            await this.setProjectMember(project, member);   
+            
+            return await this.getProjectMember(project)  ;
         }
-       
-        return await this.getProjectMember(project)  ;
+               
     };
+
+    async memberConfirm(dto:{id:string,userId:string,status}){
+        const pm = await ProjectMemberModel.findOne({projectId:dto.id, userId:dto.userId}).exec() ;
+        if(pm ){
+            pm.status = dto.status || MemberStatus.Confirmed ;
+            await pm.save() ;
+
+            return pm ;
+        }
+
+    }
 }
 
 

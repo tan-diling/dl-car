@@ -71,8 +71,17 @@ export class ProjectController extends AbstractResourceController{
         }) ;
     }
 
+    @Delete('/:id([0-9a-f]{24})')
+    async delete(@Param('id') id:string, @Req() request,) {
+        return await this.process(request,{           
+            resourceId: id,
+            method:RequestOperation.DELETE,            
+        }) ;
+    }
+
+
     @Patch('/:id([0-9a-f]{24})/member')
-    async updateMember(@Param('id') id:string, @Body() dto:ProjectMemberDto[], @Req() request, ) {
+    async updateMember(@Param('id') id:string, @Body({ type: ProjectMemberDto }) dto:ProjectMemberDto[], @Req() request, ) {
         return await this.process(request,{         
             resourceId: id,
             method:RequestOperation.UPDATE,    
@@ -81,24 +90,16 @@ export class ProjectController extends AbstractResourceController{
     }
 
 
-    @Delete('/:id([0-9a-f]{24})')
-    async delete(@Param('id') id:string,@Req() request,) {
+    @Patch('/:id([0-9a-f]{24})/member_confirm')
+    async memberConfirm(@Param('id') id:string, @Req() request, @Body() dto:ProjectMemberConfirmDto)
+    {
+        
         return await this.process(request,{           
             resourceId: id,
-            method:RequestOperation.DELETE,            
-        }) ;
+            method:"memberConfirm",            
+            dto
+        }) ;  
+
     }
-
-    // @Authorized("NONE")
-    // @Get('/member/confirm') 
-    // async memberConfirm( @QueryParams() dto:ProjectMemberConfirmDto)
-    // {
-    //     //return await this.service.(dto)  
-    //     return await this.process(request,{           
-    //         resourceId: id,
-    //         method:Operation.DELETE,            
-    //     }) ;  
-
-    // }
 
 }
