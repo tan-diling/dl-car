@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 import { AbstractResourceController } from './abstractResource.controller';
-import { createResourceRepoService } from '../../services/resource.service';
+import { ProjectResourceService } from '../../services/project.resource.service';
 import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto, ProjectMemberDto } from './dto/project.dto';
 import { ResourceType, RequestOperation } from '@app/defines';
+import { Container } from 'typedi' ;
 
 @Authorized()
 @JsonController('/resource/project')
@@ -15,7 +16,7 @@ export class ProjectController extends AbstractResourceController{
     constructor() {
         super();
         this.resourceType = ResourceType.Project;
-        this.repoService = createResourceRepoService(this.resourceType) ;       
+        this.repoService = Container.get(ProjectResourceService) ;
     }
  
     @Post()

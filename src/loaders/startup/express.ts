@@ -6,6 +6,7 @@
  */
 
 import * as express from 'express';
+import * as httpContext from 'express-http-context' ;
 import * as bodyParser from 'body-parser';
 import { useExpressServer, Action ,useContainer } from 'routing-controllers';
 import { ErrorMiddleware } from './errorMiddleware';
@@ -23,6 +24,9 @@ export default (server: BackendServer) => {
   useContainer(Container) ;
 
   const app = server.expressApp ;
+
+  app.use(httpContext.middleware);
+
   app.get('/status', (req, res) => {
     res.status(200).end();
   });
@@ -52,7 +56,7 @@ export default (server: BackendServer) => {
 
 
 require('class-transformer')['classToPlain'] = function (obj: object)  {
-    return JSON.parse(JSON.stringify(obj))
+    return obj == null ? "" : JSON.parse(JSON.stringify(obj))
 };
 
 useExpressServer(app, { // register created express server in routing-controllers

@@ -4,8 +4,15 @@ import { PermissionPolicyModel, PermissionPolicy } from '@app/models/permission'
 import { ProjectMemberModel, ResourceModel } from '@app/models/project';
 import { Types } from 'mongoose';
 
+/**
+ * Project Permission Service
+ */
 export class ProjectPermissionService {
 
+    /**
+     * project role permission check
+     * @param ctx 
+     */
     async checkPermission(ctx: RequestContext) {
 
         const checkMethodList = [this.checkSiteAdminPolicy, this.checkProjectCreatePolicy, this.checkProjectRetrievePolicy, this.checkCurrentCURDPolicy];
@@ -46,12 +53,20 @@ export class ProjectPermissionService {
         // }
     }
 
+    /**
+     * check for site_role "admin"
+     * @param ctx 
+     */
     async checkSiteAdminPolicy(ctx: RequestContext) {
 
         if (ctx.user.role == SiteRole.Admin) return true;
 
     }
 
+    /**
+     * check for project create 
+     * @param ctx 
+     */
     async checkProjectCreatePolicy(ctx: RequestContext) {
 
         if (ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.CREATE) {
@@ -59,7 +74,10 @@ export class ProjectPermissionService {
         }
     }
 
-
+    /**
+     * check for project retrieve 
+     * @param ctx 
+     */
     async checkProjectRetrievePolicy(ctx: RequestContext) {
 
         if (ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.RETRIEVE) {
@@ -67,11 +85,20 @@ export class ProjectPermissionService {
         }
     }
 
+    /**
+     * query policy by resource and project_role
+     * @param filter 
+     */
     async queryPolicy(filter: { resource, role }) {
 
         return await PermissionPolicyModel.findOne(filter).exec();
     }
 
+    /**
+     * check input valid
+     * @param ctx 
+     * @param policy 
+     */
     async validateInputField(ctx: RequestContext, policy: PermissionPolicy) {
         let checkResult = true;
         if (ctx.dto  &&  policy.fields?.length ) {
@@ -88,6 +115,11 @@ export class ProjectPermissionService {
 
     }
 
+    /**
+     * check request operation is allowed
+     * @param ctx 
+     * @param policy 
+     */
     async checkPolicyScope(ctx: RequestContext, policy: PermissionPolicy) {
         if (policy == null) return false;
 
@@ -101,6 +133,10 @@ export class ProjectPermissionService {
         }
     }
 
+    /**
+     * check current 
+     * @param ctx 
+     */
     async checkCurrentCURDPolicy(ctx: RequestContext) {
         if (ctx.resourceId) {
             //check current

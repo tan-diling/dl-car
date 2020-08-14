@@ -62,7 +62,7 @@ export const userCheck = (action: { request, response, next }, roles: string[]) 
 
                 return resolve(false);
             }
-            action.request.user = user;
+            // action.request.user = user;
             if (roles.length == 0) return resolve(true);
 
             const currentRole: string = user?.permission || user?.role;

@@ -8,8 +8,11 @@ export enum RepoOperation {
 
 
 export interface RepoCRUDInterface{
-    create(dto) ;
-    list(filter) ;
-    delete(id) ;
-    update(id,dto) ;
+    create(dto:any):Promise<any> ;
+    list(filter:any):Promise<any> ;
+    
+    delete(id:string):Promise<any> ;
+    update(id:string, dto:any):Promise<any> ;
+
+    execute(method:string, dto: any):Promise<any> ;
 }
