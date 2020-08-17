@@ -77,7 +77,7 @@ Thank you for joining us!
 function buildMailOfGroupMemberConfirm(doc: any): { subject: string; text: string; } {
     const webServer = WebServer ;
     return {
-        "subject": "Please confirm the invitation ",
+        "subject": "Please confirm the group invitation ",
         "text": `
 Hi Sir/Madam,
 
@@ -96,7 +96,7 @@ Thank you for joining us!
 function buildMailOfProjectMemberConfirm(doc: any): { subject: string; text: string; } {
     const webServer = WebServer ;
     return {
-        "subject": "Please confirm the invitation ",
+        "subject": "Please confirm the project invitation ",
         "text": `
 Hi Sir/Madam,
 

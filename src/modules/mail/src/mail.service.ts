@@ -2,10 +2,10 @@
  * mail service 
  * @packageDocumentation
  */
-import { createTransport, TransportOptions} from 'nodemailer';
+import { createTransport, TransportOptions } from 'nodemailer';
 import { logger } from '@app/config';
 
-import {Mail_Server_Host ,Mail_Server_User ,Mail_Server_Password} from '@app/config'  ;
+import { Mail_Server_Host, Mail_Server_User, Mail_Server_Password } from '@app/config';
 
 
 
@@ -21,12 +21,12 @@ const transportOption = {
   // port: 465,
   // secure: true, // true for 465, false for other ports
   auth: {
-    user: Mail_Server_User, 
+    user: Mail_Server_User,
     pass: Mail_Server_Password,
   },
-  debug: true ,
-  log : true ,
-  transactionLog: true ,
+  debug: true,
+  log: true,
+  transactionLog: true,
 };
 
 logger.info(transportOption);
@@ -51,10 +51,10 @@ logger.info(transportOption);
  * @param subject mail title
  * @param html mail detail
  */
-export async function sendMail(email: string, html: string,  subject: string = 'NOREPLY' ) {
+export async function sendMail(email: string, html: string, subject: string = 'NOREPLY') {
 
   // create reusable transporter object using the default SMTP transport
-  const transporter = createTransport( transportOption );
+  const transporter = createTransport(transportOption);
 
   const mailOptions = {
     from: transportOption.auth.user, // sender
@@ -64,17 +64,15 @@ export async function sendMail(email: string, html: string,  subject: string = '
     // html,
   };
 
-  try 
-  {
-    const mailResult = await transporter.sendMail(mailOptions) ;
-    return mailResult ;
+  try {
+    const mailResult = await transporter.sendMail(mailOptions);
+    return mailResult;
   }
-  catch(err)
-  {
-    console.error(`mail send error ${err}`) ;
-    return  {error:err} ;
+  catch (err) {
+    console.error(`mail send error ${err}`);
+    return { error: err };
   }
-  
 
-  
+
+
 }

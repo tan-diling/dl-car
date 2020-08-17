@@ -220,7 +220,7 @@ export class GroupService {
      */ 
     async appendMember(id:string,dto:{email,groupRole}){
         const group = await GroupModel.findById(id).exec() ;
-        if( ! group ) return null;
+        if( ! group ) return ;
 
         const groupId= group._id ;
         const {email,groupRole} = dto
@@ -231,7 +231,7 @@ export class GroupService {
             { upsert:true, new:true },
             ).exec();
 
-        GroupMemberModel.emit(RepoOperation.Created,GroupMember) ;
+        GroupMemberModel.emit(RepoOperation.Created,groupMember) ;
 
         return groupMember ;
 
@@ -264,12 +264,17 @@ export class GroupService {
         if(gm){
             gm.status = dto.status == MemberStatus.Refused ? MemberStatus.Refused: MemberStatus.Confirmed  ;
 
+            if(! gm.userId) {
+                const user = await UserModel.findOne({email:gm.email}).exec() ;                
+                gm.userId = user._id ;
+            }
+
             await gm.save() ;
 
-            return {result:"status updated"} ;
+            return {result:"Invitation confirmed "} ;
         }
         
-        throw new NotFoundError('group_member');
+        throw new NotFoundError('param_error');
     }    
 
  

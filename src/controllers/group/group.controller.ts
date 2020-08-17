@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, OnNull } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, OnNull, OnUndefined } from 'routing-controllers';
 
 import * as moment from 'moment';
 import { GroupUpdateDto, GroupCreateDto, CreateGroupMemberDto, DeleteGroupMemberDto, GroupMemberInvitedResponseDto } from './dto/group.dto';
@@ -196,6 +196,7 @@ export class GroupController {
     }
 
     @Post('/:id([0-9a-f]{24})/member')
+    @OnUndefined(400)
     async createMember(@Param('id') id: string, @Body() dto: CreateGroupMemberDto, @Req() request, @CurrentUser() currentUser) {
         return await this.processRequest({
             resourceType,
@@ -211,7 +212,7 @@ export class GroupController {
 
     // @Authorized("NONE")
     @Patch('/:id([0-9a-f]{24})/member_confirm')
-    async memberConfirm(@Param('id') id: string, @QueryParams() dto:GroupMemberInvitedResponseDto)
+    async memberConfirm(@Param('id') id: string, @Body() dto:GroupMemberInvitedResponseDto)
     {
         return await this.service.memberConfirm({id,...dto}) ;
     }
