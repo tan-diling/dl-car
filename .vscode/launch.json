@@ -27,6 +27,8 @@
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
             "args": [
+                "-r",
+                "tsconfig-paths/register",
                 "src/index.ts"
             ],
             "env":{

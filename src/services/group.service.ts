@@ -225,6 +225,13 @@ export class GroupService {
         const groupId= group._id ;
         const {email,groupRole} = dto
         const user = await UserModel.findOne({email}).exec();
+
+        if(group.owner == user?._id) {
+
+            throw new MethodNotAllowedError("not_allowed");
+
+        }
+
         const groupMember = await GroupMemberModel.findOneAndUpdate(
             { groupId,email },
             { groupId,email, groupRole, userId:user?._id },
@@ -244,9 +251,15 @@ export class GroupService {
 
         const {email} = dto
 
+        const group = await GroupModel.findById(id).exec();
+
         const groupMember = await GroupMemberModel.findOne({groupId:id,email}).exec();
 
         if(groupMember){
+            if(group && group.owner!=groupMember._id){
+                throw new MethodNotAllowedError("not_allowed");                
+            }   
+            
             await groupMember.remove();
         }
         return groupMember ;

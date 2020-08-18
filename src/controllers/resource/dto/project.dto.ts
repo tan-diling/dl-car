@@ -68,8 +68,8 @@ export class ProjectUpdateDto {
 }
 
 export class ProjectMemberConfirmDto {
-    @IsMongoId()    
-    userId: string;
+    // @IsMongoId()    
+    // userId: string;
 
     @IsString()
     @IsOptional()

@@ -98,7 +98,7 @@ export class ProjectController extends AbstractResourceController{
         return await this.process(request,{           
             resourceId: id,
             method:"memberConfirm",            
-            dto
+            dto: {userId:request.user.id , ...dto}
         }) ;  
 
     }

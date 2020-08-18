@@ -212,9 +212,9 @@ export class GroupController {
 
     // @Authorized("NONE")
     @Patch('/:id([0-9a-f]{24})/member_confirm')
-    async memberConfirm(@Param('id') id: string, @Body() dto:GroupMemberInvitedResponseDto)
+    async memberConfirm(@Param('id') id: string, @Body() dto:GroupMemberInvitedResponseDto, @CurrentUser() currentUser)
     {
-        return await this.service.memberConfirm({id,...dto}) ;
+        return await this.service.memberConfirm({id, email:currentUser.email, ...dto}) ;
     }
     
 }
