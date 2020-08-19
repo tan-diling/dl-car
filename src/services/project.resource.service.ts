@@ -100,7 +100,7 @@ export class ProjectResourceService extends ResourceService<Project>{
             
         }
         // remove project member
-        for(const pm  of await ProjectMemberModel.find({projectId:id})) {
+        for(const pm  of await ProjectMemberModel.find({projectId:id}).exec()) {
             if(null == member.find(x=>x.userId==pm.userId)){
                 await pm.remove() ;
             }

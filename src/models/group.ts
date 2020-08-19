@@ -1,4 +1,4 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
 import { GroupMemberStatus } from '@app/defines';
@@ -18,6 +18,7 @@ export class Group  {
   deleted?: boolean ;
 }
 
+@index({  groupId: 1, userId: 1 }, { unique: true })
 export class GroupMember {
   @prop({ ref: Group, required: true })
   groupId: Ref<Group>;;

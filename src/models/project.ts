@@ -1,4 +1,4 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { User } from './user';
 import { ProjectMemberStatus } from '@app/defines';
@@ -50,6 +50,8 @@ export class Project extends Resource {
   deadline? :Date;
 }
 
+
+@index({  projectId: 1, userId: 1 }, { unique: true })
 export class ProjectMember {
 
   @prop({ ref: User, required: true })
