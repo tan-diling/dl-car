@@ -3,7 +3,7 @@ import { RepoCRUDInterface, MemberStatus } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../models/project';
 import { ModelQueryService  } from '../modules/query';
-import { ReturnModelType } from '@typegoose/typegoose';
+import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
 import { ResourceService } from './resource.service';
@@ -83,50 +83,48 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         // check user validate
         const userIds = member.map(x=>Types.ObjectId(x.userId)) ;
+        
         if (member.length != await UserModel.find({}).where('_id').in(userIds).countDocuments().exec()){
             throw new NotAcceptableError('member_invalid');
         }
 
-        // make sure project.creator is project manager
-        const id = project._id ;
-        {
-            let projectOwnerMember = member.find(x=>Types.ObjectId(x.userId) == project.creator) ;
-            if (null == projectOwnerMember ){
-                projectOwnerMember =　{ userId:project.creator, projectRole:ProjectRole.ProjectManager}　;
-                member.push(projectOwnerMember) ;
+        // make sure project.creator is project manager        
+            {
+                member.push({
+                    userId:project.creator, 
+                    projectRole:ProjectRole.ProjectManager,
+                }) ;
             } 
-            
-            projectOwnerMember.projectRole = ProjectRole.ProjectManager ;
-            
-        }
-        // remove project member
-        for(const pm  of await ProjectMemberModel.find({projectId:id}).exec()) {
-            if(null == member.find(x=>Types.ObjectId(x.userId)==pm.userId)){
-                await pm.remove() ;
-            }
+
+            userIds.push(project.creator) ;
+                
+        // remove project member        
+        for(const pm  of await ProjectMemberModel.find({projectId:project._id}).where('userId').nin(userIds).exec()) {            
+            await pm.remove() ;            
         };
 
         // append or insert
         for(const projectMember of member ){
-            const projectMemberFilter = {projectId:id,userId:projectMember.userId} ;
-            const pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
-            if(pm && pm.projectRole != projectMember.projectRole) {
-                pm.projectRole = projectMember.projectRole ;                
-                await pm.save();
-            }
-            else
-            {
+            const projectMemberFilter = {projectId:project._id,userId:projectMember.userId} ;
+            let pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
+
+            if(pm) {
+                if(pm.projectRole != projectMember.projectRole) {                
+                    pm.projectRole = projectMember.projectRole ;                
+                    await pm.save();
+                }
+            }else{
 
                 const pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
-
-                if(pm.userId == project.creator){
-                    pm.status = MemberStatus.Confirmed ;
-                    // pm.projectRole = ProjectRole.ProjectOwner ;
-                    await pm.save() ;
-                }
-
+            
                 ProjectMemberModel.emit(RepoOperation.Created, pm) ;
             }
+
+            if(pm.userId == project.creator && pm.status!=MemberStatus.Confirmed ){
+                pm.status = MemberStatus.Confirmed ;
+                await pm.save() ;                
+            }
+            
         }        
 
     }    

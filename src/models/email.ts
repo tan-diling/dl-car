@@ -13,14 +13,14 @@ export class Candidate {
   @prop({ required: true })
   lastName: string;  
 
-  // @prop()
-  // note?: string ;
+  @prop()
+  note?: string ;
 
-  // @prop()
-  // prefix?: string ;
+  @prop()
+  prefix?: string ;
 
-  // @prop()
-  // tags: string[] ;
+  @prop()
+  tags: string[] ;
 
   @prop({ default: false})
   replied?: boolean ;
@@ -37,20 +37,23 @@ export class Candidate {
 }
 
 
-// export class CandidateList {
-//   @prop()
-//   title: string;
+export class CandidateList {
+  @prop()
+  title: string;
 
-//   @prop({ ref: Candidate })
-//   candidates: Ref<Candidate>[];  
+  @prop({ ref: Candidate })
+  batch: Ref<Candidate>[];  
 
-//   @prop()
-//   createdAt?: Date;
+  @prop({ ref: Candidate })
+  candidates: Ref<Candidate>[];  
 
-//   @prop()
-//   updatedAt?: Date;
+  @prop()
+  createdAt?: Date;
+
+  @prop()
+  updatedAt?: Date;
   
-// }
+}
 
 
 export class EmailBatch {
