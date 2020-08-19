@@ -89,8 +89,15 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         // make sure project.creator is project manager
         const id = project._id ;
-        if (null == member.find(x=>Types.ObjectId(x.userId) == project.creator)){
-            member.push({userId:project.creator,projectRole:ProjectRole.ProjectManager})
+        {
+            let projectOwnerMember = member.find(x=>Types.ObjectId(x.userId) == project.creator) ;
+            if (null == projectOwnerMember ){
+                projectOwnerMember =　{ userId:project.creator, projectRole:ProjectRole.ProjectManager}　;
+                member.push(projectOwnerMember) ;
+            } 
+            
+            projectOwnerMember.projectRole = ProjectRole.ProjectManager ;
+            
         }
         // remove project member
         for(const pm  of await ProjectMemberModel.find({projectId:id})) {
@@ -109,7 +116,14 @@ export class ProjectResourceService extends ResourceService<Project>{
             }
             else
             {
+
                 const pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
+
+                if(pm.userId == project.creator){
+                    pm.status = MemberStatus.Confirmed ;
+                    // pm.projectRole = ProjectRole.ProjectOwner ;
+                    await pm.save() ;
+                }
 
                 ProjectMemberModel.emit(RepoOperation.Created, pm) ;
             }
@@ -122,7 +136,7 @@ export class ProjectResourceService extends ResourceService<Project>{
     async create(dto){
         const project = await super.create(dto) ;
 
-        const members = [{userId:project.creator,projectRole:ProjectRole.ProjectManager}];
+        const members = [];
 
         await this.setProjectMember(project,members);
 

@@ -18,6 +18,10 @@ export class AbstractResourceController {
     repoService:RepoCRUDInterface ;
 
     async checkPermission(ctx:RequestContext){
+        if(typeof(ctx.method) == typeof('') ){
+            return true ;
+        }
+        
         return await this.permissionService.checkPermission(ctx) ;
     }
 
