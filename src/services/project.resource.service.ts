@@ -115,7 +115,7 @@ export class ProjectResourceService extends ResourceService<Project>{
                 }
             }else{
 
-                const pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
+                pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
             
                 ProjectMemberModel.emit(RepoOperation.Created, pm) ;
             }
