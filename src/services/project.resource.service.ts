@@ -152,6 +152,8 @@ export class ProjectResourceService extends ResourceService<Project>{
             await this.setProjectMember(project, member);   
             
             return await this.getProjectMember(project)  ;
+        } else {
+            return project ;
         }
                
     };

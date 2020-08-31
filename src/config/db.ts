@@ -4,13 +4,35 @@ import { ResourceType,PermissionOperation,ProjectRole } from '@app/defines';
 
 export const MONGODB_URL : string = config_get('mongodb.url') || 'mongodb://localhost:27017/dealing' ;
 
+const  dbInitData = [] ;
 
-const permissionPolicy = {
+//init user data
+dbInitData.push({
+    "table": "users",
+    "dataArray": [
+        {
+            "key": {
+                "email": "admin@admin.com"
+            },
+            "doc": {
+                "name": "admin",
+                "email": "admin@admin.com",
+                "password": "12345678",
+                "emailValidated": true,
+                "role": "admin"
+            }
+        }
+    ]
+}) ;
+
+
+// init permissionPolicy
+dbInitData.push({    
     "table": "permissionpolicies",
     "dataArray":[
         {
             key:{ resource:ResourceType.Project, role:ProjectRole.ProjectOwner },
-            doc:{ scope:PermissionOperation.Retrieve, }
+            doc:{ scope:PermissionOperation.CRUD, }
         },
         {
             key:{ resource:ResourceType.Project, role:ProjectRole.ProjectManager },
@@ -29,14 +51,7 @@ const permissionPolicy = {
             doc:{ scope:PermissionOperation.Retrieve + PermissionOperation.Update , }
         },
     ]
-};
+});
 
-
-let db_data =Array(config_get('init') || []) ;
-
-// const DB_DATA_INIT:any[] = config_get('init') || [] ;
-
-db_data.push(permissionPolicy) ;
-
-export const DB_DATA_INIT = db_data ;
+export const DB_DATA_INIT = dbInitData ;
 
