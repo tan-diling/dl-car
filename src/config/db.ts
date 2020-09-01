@@ -17,7 +17,7 @@ dbInitData.push({
             "doc": {
                 "name": "admin",
                 "email": "admin@admin.com",
-                "password": "12345678",
+                "password": "Dealing.123",
                 "emailValidated": true,
                 "role": "admin"
             }

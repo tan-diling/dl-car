@@ -5,15 +5,7 @@
     },
     "webServer":"https://dev.onwards.ai/api",
     "error":{        
-        "account_invalid":"Couldn't find your Gestalter Account", 
-        "password_invalid":"Invalid password", 
-        "account_forbidden":"this account is not allowed to login.",
-        "password_check_error":"email or password check invalid",
-        "refresh_invalid": "refresh token is invalid",
-        "refresh_expired": "refresh token expired",
-        "file_invalid":"Invalid file format",
-        "jwt_expires":"jwt token expires",
-        "jwt_invalid":"jwt token invalid"
+
     }
 
 }
