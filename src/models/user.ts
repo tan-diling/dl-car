@@ -24,9 +24,9 @@ export class User {
   role?: string;
 
   @prop()
-  password : string ;
+  password: string ;
 
-  @prop()
+  @prop({default:""})
   image?: string;  
 
   @prop()

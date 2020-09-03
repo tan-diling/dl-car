@@ -50,11 +50,11 @@ export class ProjectResourceService extends ResourceService<Project>{
 
     /**
      * get one project with member
-     * @param docs project document
+     * @param doc project document
      * @return project document with members info
      */
-    async getProjectMember(docs:(Project&Document) ){
-        return (await this.getProjectMembers([docs]))[0] ;        
+    async getProjectMember(doc:(Project&Document) ){
+        return (await this.getProjectMembers([doc]))[0] ;        
     }
 
     /** list project info */
@@ -71,6 +71,16 @@ export class ProjectResourceService extends ResourceService<Project>{
         const l = await super.list(query) ;
 
         return await this.getProjectMembers(l) ;
+
+    }
+
+    /** get project info */
+    async get(filter) {
+   
+        const l = await super.get(filter) ;
+        if(l){
+            return await this.getProjectMember(l) ;
+        }
 
     }
 

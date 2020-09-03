@@ -53,6 +53,7 @@ export class ProjectController extends AbstractResourceController{
         
     @Get('/:id([0-9a-f]{24})')
     async getById(@Param('id') id:string, @Req() request) {
+        // return await this.repoService.get(id) ;
         return await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,

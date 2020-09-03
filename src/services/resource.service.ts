@@ -21,6 +21,11 @@ export class ResourceService<T > implements RepoCRUDInterface {
         return await queryService.list(this.model,filter) ;        
     }
 
+
+    async get(filter) {
+        return await queryService.get(this.model,filter) ;        
+    }
+
     async delete(id) {
         const m =  await this.model.findById(id).exec() ;
         if(m) {        

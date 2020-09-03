@@ -10,7 +10,7 @@ export enum RepoOperation {
 export interface RepoCRUDInterface{
     create(dto:any):Promise<any> ;
     list(filter:any):Promise<any> ;
-    
+    get(id:any):Promise<any> ;
     delete(id:string):Promise<any> ;
     update(id:string, dto:any):Promise<any> ;
 

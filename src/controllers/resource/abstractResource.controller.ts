@@ -38,7 +38,12 @@ export class AbstractResourceController {
                 return await this.repoService.create(ctx.dto) ;
                 break ;
             case RequestOperation.RETRIEVE:
-                return await this.repoService.list(ctx.filter) ;
+                if(ctx.resourceId){
+                    return await this.repoService.get(ctx.resourceId) ;
+                }else {
+                    return await this.repoService.list(ctx.filter) ;
+                }
+                
                 break ;
             case RequestOperation.DELETE:
                 return await this.repoService.delete(ctx.resourceId) ;
@@ -53,7 +58,7 @@ export class AbstractResourceController {
         const requestContext :RequestContext =  {
             request,
             resourceType:this.resourceType,
-            resourceId:String(request.query?.id) ,
+            resourceId:request.query?.id as string  ,
             method:RequestOperation.RETRIEVE,
             user: request.user as IRequestUser,
             filter:request.query,
