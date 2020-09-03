@@ -1,16 +1,30 @@
 import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
-import { GroupModel, Group, GroupMemberModel, GroupMember } from '../models/group';
+import { GroupModel, Group, GroupMemberModel, GroupMember } from '../models';
 import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus } from '@app/defines';
 import { model, Types } from 'mongoose';
-import { UserModel } from '../models/user';
+import { UserModel } from '../models';
 /**
  * group service
  */
 export class GroupService {
 
-    childModels = [{name:"member",ref:"GroupMember",localField:"_id", foreignField:"groupId"} ] ;
+    childModels = [
+        {
+            name:"members",
+            ref:"GroupMember",
+            localField:"_id",
+            foreignField:"groupId",
+            populate:{
+                path: "userId" ,                
+                options:{
+                    sort: "name" ,
+                    // perDocumentLimit:5,
+                },
+            },
+        },
+     ] ;
 
     private queryService= new ModelQueryService() ;
     constructor() {
@@ -79,18 +93,22 @@ export class GroupService {
         let objList = docs.map(x=>x.toObject());
 
         for(const element of this.childModels){
-            const {name, ref, localField, foreignField } = element ;
+            const {name, ref, localField, foreignField,populate } = element ;
             const childModel = model(ref) ;
             const values = docs.map(x=>x.get(localField)) ;
 
-            const childList = await childModel.find().where(foreignField).in(values).exec() ;
+            const modelQuery = childModel.find().where(foreignField).in(values) ;
+            if (populate){
+                modelQuery.populate(populate)
+            }
+            const childList = await modelQuery.exec() ;
 
             for(const obj of objList){
                 let localValue = obj[localField] ;
                
                 obj[name] = childList
                         .filter(x=> localValue?.equals ? localValue?.equals(x.get(foreignField)) : x.get(foreignField)==localValue)
-                        .map(z=>z.toObject()) ;
+                        .map(z=>z.toJSON()) ;
             }
         };
         
@@ -206,7 +224,7 @@ export class GroupService {
     }
 
 
-        /**
+    /**
      *  child model query
      * @param query 
      */

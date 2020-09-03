@@ -59,7 +59,7 @@ export class ProjectResourceService extends ResourceService<Project>{
 
     /** list project info */
     async list(filter) {
-        let {memberUserId,query} = filter ;
+        let {memberUserId,...query} = filter ;
 
         if(memberUserId){
             const pmList = await ProjectMemberModel.find({userId:memberUserId}).exec() ;

@@ -65,11 +65,11 @@ Before you can log into Gestalter Client Portal, you must confirm your email add
 
 ${webServer}/user/email_validate?email=${doc.email}&id=${doc.id}
 
-password: ${doc.password}
+Password: ${doc.password}
 
 Thank you for joining us!
 
--Gestalter`
+- Gestalter`
     };
 }
 
@@ -81,13 +81,13 @@ function buildMailOfGroupMemberConfirm(doc: any): { subject: string; text: strin
         "text": `
 Hi Sir/Madam,
 
-You have been invited to join a group, please click the below link to view .
+You have been invited to join a group, please click the below link to view.
 
 URL: ${webServer}/group/confirm/${doc.groupId}
 
 Thank you for joining us!
 
--Gestalter`
+- Gestalter`
     };
 }
 
@@ -100,13 +100,13 @@ function buildMailOfProjectMemberConfirm(doc: any): { subject: string; text: str
         "text": `
 Hi Sir/Madam,
 
-You have been invited to join a project, please click the below link to view .
+You have been invited to join a project, please click the below link to view.
 
 URL: ${webServer}/project/confirm/${doc.projectId}
 
 Thank you for joining us!
 
--Gestalter`
+- Gestalter`
     };
 }
 
