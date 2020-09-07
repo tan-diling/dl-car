@@ -15,7 +15,7 @@ export class Resource {
   parent?: Types.ObjectId[] ;
 
   @prop()
-  assignee?: Types.ObjectId[] ;
+  assignees?: Types.ObjectId[] ;
 
   @prop({ default: false})
   deleted?: boolean ;

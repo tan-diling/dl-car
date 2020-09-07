@@ -224,6 +224,99 @@ export class GroupService {
     }
 
 
+        /**
+     *  child model query
+     * @param query 
+     */
+    async relatedMember(dto:{userId:string,q?:string}){        
+        const userId = Types.ObjectId(dto.userId) ;
+        // const userGroupList = await GroupMemberModel.find({userId}).exec();
+        
+        // const userList = await GroupMemberModel.find({}).in('groupId',userGroupList.map(x=>x.groupId)).exec() ;
+
+        // await UserModel.find({}).in('_id',userList.map(x=>x.userId).filter(x=>x != userId ))
+
+        const query :any[]= [
+            {
+              '$match': {
+                'userId': userId
+              }
+            }, {
+              '$lookup': {
+                'from': 'groupmembers', 
+                'localField': 'groupId', 
+                'foreignField': 'groupId', 
+                'as': 'members'
+              }
+            }, {
+              '$unwind': {
+                'path': '$members', 
+                'preserveNullAndEmptyArrays': true
+              }
+            }, {
+              '$group': {
+                '_id': '$members.userId', 
+                'groupId': {
+                  '$push': '$members.groupId'
+                }
+              }
+            }, {
+              '$lookup': {
+                'from': 'users', 
+                'localField': '_id', 
+                'foreignField': '_id', 
+                'as': 'user'
+              }
+            }, {
+              '$lookup': {
+                'from': 'groups', 
+                'localField': 'groupId', 
+                'foreignField': '_id', 
+                'as': 'groups'
+              }
+            }, {
+              '$replaceRoot': {
+                'newRoot': {
+                  '$mergeObjects': [
+                    {
+                      '$arrayElemAt': [
+                        '$user', 0
+                      ]
+                    }, '$$ROOT'
+                  ]
+                }
+              }
+            }, {
+              '$project': {
+                'name': 1, 
+                'email': 1, 
+                'deleted': 1, 
+                'groups': 1
+              }
+            },{
+                '$match': {
+                  '_id': { $ne: userId }
+                }
+              }
+          ];
+
+        if(dto.q){
+            const regexMatch ={ "$regex": dto.q , "$options": 'i' } ;
+            query.push( {                
+                '$match': {
+                    "$or":[
+                        {'name': regexMatch},
+                        {'email': regexMatch},
+                    ]
+                  }
+            });
+            // query.push(where);
+        }
+
+        return await GroupMemberModel.aggregate(query).exec() ;
+    }
+
+
     /**
      *  child model query
      * @param query 

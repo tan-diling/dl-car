@@ -135,6 +135,20 @@ export class GroupController {
 
     }
 
+    @Get('/related_member')
+    async relatedMember(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser:any) {
+        return  await this.service.relatedMember({userId: currentUser.id as string,q:query.q}) ;
+        // return await this.processRequest({
+        //     resourceType,
+        //     request,
+        //     method: "relatedMember",
+        //     user: currentUser,
+        //     filter: {userId:currentUser.id},
+        //     // dto: {}
+        // });
+
+    }
+
 
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: GroupUpdateDto, @Req() request, @CurrentUser() currentUser) {

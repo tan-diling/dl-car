@@ -81,7 +81,11 @@ export class ProjectPermissionService {
     async checkProjectRetrievePolicy(ctx: RequestContext) {
 
         if (ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.RETRIEVE) {
-            return ctx.filter.memberUserId == ctx.user.id;
+            if(ctx.resourceId){
+                return true ;
+            } else {            
+                return ctx.filter.memberUserId == ctx.user.id;
+            }
         }
     }
 
@@ -162,7 +166,7 @@ export class ProjectPermissionService {
             if (policy.scope & PermissionOperation.Assign) {
                 const where = { _id: ctx.resourceId, assignee: Types.ObjectId(ctx.user.id) };
 
-                if (resource.assignee?.find( x => Types.ObjectId(ctx.user.id).equals(x) ) ) {
+                if (resource.assignees?.find( x => Types.ObjectId(ctx.user.id).equals(x) ) ) {
 
                     const policy = await this.queryPolicy({ resource: ctx.resourceType, role: "assign" });
 
