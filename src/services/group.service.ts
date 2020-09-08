@@ -90,7 +90,7 @@ export class GroupService {
     }
 
     async getGroupMembers(docs: DocumentType<Group> []){
-        let objList = docs.map(x=>x.toObject());
+        let objList = docs.map(x=>x.toJSON());
 
         for(const element of this.childModels){
             const {name, ref, localField, foreignField,populate } = element ;
@@ -135,8 +135,9 @@ export class GroupService {
     }
 
     async getGroupMember(doc: DocumentType<Group>){
+        const docsWithMember = await this.getGroupMembers([doc]) ;
 
-        return (await this.getGroupMembers([doc])) [0] ;
+        return docsWithMember[0] ;
     }
     
 
@@ -190,7 +191,9 @@ export class GroupService {
     async getById(id:string){
         const group = await GroupModel.findById(id).exec() ;
         if(group){
-            return await this.getGroupMember(group) ;
+            const doc = await this.getGroupMember(group) ;
+
+            return doc ;
         }
     }
 

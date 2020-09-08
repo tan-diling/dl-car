@@ -81,8 +81,11 @@ export class GroupController {
                     return await this.service.create(ctx.dto);
                     break;
                 case RequestOperation.RETRIEVE:
-              
-                    return await this.service.list(ctx.filter);
+                    if (ctx.resourceId){
+                        return await this.service.getById(ctx.resourceId) ;
+                    } else {
+                        return await this.service.list(ctx.filter);
+                    }
                     break;
                 case RequestOperation.DELETE:
 
@@ -147,6 +150,21 @@ export class GroupController {
         //     // dto: {}
         // });
 
+    }
+
+    @Get('/:id([0-9a-f]{24})')
+    async byId(@Param('id') id: string, @Req() request, @CurrentUser() currentUser) {
+        // return await this.service.getById(id) ;
+        const doc = await this.processRequest({
+            resourceType,
+            request,
+            method: RequestOperation.RETRIEVE,
+            user: currentUser,
+            resourceId: id,
+            filter: { id },
+        });
+
+        return doc ;
     }
 
 
