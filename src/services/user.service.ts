@@ -3,7 +3,7 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation } from '@app/defines';
+import { RepoOperation, SiteRole } from '@app/defines';
 
 /**
  * user service
@@ -100,6 +100,7 @@ export class UserService {
     async delete(id){
         const doc = await this.getById(id) ;
         if(doc){
+            if(doc.role == SiteRole.Admin) return ;
             doc.deleted = true ;
             return await doc.save() ;
         }

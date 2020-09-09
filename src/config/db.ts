@@ -15,10 +15,11 @@ dbInitData.push({
                 "email": "admin@admin.com"
             },
             "doc": {
-                "name": "admin",
+                "name": "Site Admin",
                 "email": "admin@admin.com",
                 "password": "Dealing.123",
                 "emailValidated": true,
+                "company": "Gestalter",
                 "role": "admin"
             }
         }

@@ -73,6 +73,10 @@ export class UserCreateDto  {
     @IsOptional()
     role?: string;
 
+    @IsString()
+    @IsOptional()
+    company?: string;
+
     @IsBoolean()
     @IsOptional()
     defaultContact?: boolean;

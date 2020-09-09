@@ -1,4 +1,4 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
 import { SiteRole } from '@app/defines';
@@ -11,6 +11,7 @@ import { SiteRole } from '@app/defines';
 
 // }
 
+@index({ name: "text", email: "text",})
 @plugin(mongooseHidden({ defaultHidden: {  password: true } }))
 export class User {
   @prop()
