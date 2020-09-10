@@ -20,7 +20,7 @@ export class UserService {
             user.password = dto.newPassword ;
             await user.save() ;
 
-            return { result:"password updated"};
+            return { result:"Your password has been changed successfully."};
         }
 
         throw new UnauthorizedError("password_check_error") ;
