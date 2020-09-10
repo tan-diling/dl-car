@@ -33,13 +33,13 @@ export class User {
   @prop()
   company?: string;
   
-  @prop()
+  @prop({default:""})
   job?: string;    
 
-  @prop()
+  @prop({default:""})
   phone?: string;  
   
-  @prop()
+  @prop({default:""})
   department?: string;
   
   @prop()
