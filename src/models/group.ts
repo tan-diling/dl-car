@@ -18,7 +18,7 @@ export class Group  {
   deleted?: boolean ;
 }
 
-@index({  groupId: 1, userId: 1 }, { unique: true })
+@index({  groupId: 1, email: 1 }, { unique: true })
 export class GroupMember {
   @prop({ ref: Group, required: true })
   groupId: Ref<Group>;;

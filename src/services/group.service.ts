@@ -370,7 +370,7 @@ export class GroupService {
         const groupMember = await GroupMemberModel.findOne({groupId:id,email}).exec();
 
         if(groupMember){
-            if(group && group.owner!=groupMember._id){
+            if(group && group.owner==groupMember._id){
                 throw new MethodNotAllowedError("not_allowed");                
             }   
             
