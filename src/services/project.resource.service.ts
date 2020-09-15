@@ -6,7 +6,7 @@ import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
-import { ResourceService } from './resource.service';
+import { ResourceService } from './resource/resource.service';
 
 export class ProjectResourceService extends ResourceService<Project>{
     /**

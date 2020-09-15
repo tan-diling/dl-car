@@ -3,25 +3,25 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import { AbstractResourceController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi' ;
-import { GoalResourceService } from '@app/services/resource/goal.resource.service';
-import { GoalCreateDto, GoalUpdateDto } from './dto/goal.dto';
+import { RequirementCreateDto, RequirementUpdateDto, DeliverableCreateDto, DeliverableUpdateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
+import { DeliverableResourceService } from '@app/services/resource';
 
-const type = 'goal' ;
+const type = ResourceType.Deliverable ;
 @Authorized()
 @JsonController('/resource')
-export class GoalController extends AbstractResourceController{
+export class DeliverableController extends AbstractResourceController{
     /**
      *
      */
     constructor() {
         super();
-        this.resourceType = ResourceType.Goal;
-        this.repoService = Container.get(GoalResourceService) ;
+        this.resourceType = ResourceType.Deliverable;
+        this.repoService = Container.get(DeliverableResourceService) ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)
-    async create(@Param('parent') parent:string, @Body() dto:GoalCreateDto, @Req() request) {  
+    async create(@Param('parent') parent:string, @Body() dto:DeliverableCreateDto, @Req() request) {  
         const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
             method:RequestOperation.CREATE,
@@ -56,7 +56,7 @@ export class GoalController extends AbstractResourceController{
 
     
     @Patch(`/${type}/:id([0-9a-f]{24})`)
-    async update(@Param('id') id:string, @Body() dto:GoalUpdateDto, @Req() request, ) {
+    async update(@Param('id') id:string, @Body() dto:DeliverableUpdateDto, @Req() request, ) {
         return await this.process(request,{         
             resourceId: id,
             method:RequestOperation.UPDATE,    

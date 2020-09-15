@@ -43,6 +43,12 @@ export class Resource {
   deleted: boolean ;
 
   @prop()
+  estimate?: number;
+
+  @prop()
+  deadline?: Date;
+
+  @prop()
   createdAt?: Date;
 
   @prop()
@@ -69,6 +75,10 @@ export class Resource {
   async getMembers(this: DocumentType<Resource>) {
     const projectId = this.parents.length==0? this._id: this.parents[0] ;
     return await ProjectMemberModel.find({projectId}).exec() ;    
+  }
+
+  async getChildren(this: DocumentType<Resource>) {    
+    return await ResourceModel.find({parents:this._id}).exec() ;    
   }
 
   async getMemberProjectRole(this: DocumentType<Resource>,userId:string|Types.ObjectId) {
@@ -109,6 +119,9 @@ export class Deliverable extends Resource {
 
   @prop()
   priority? :number;  
+
+  @prop()
+  tags? :string[]; 
 
   @prop()
   steps? :string; 

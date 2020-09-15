@@ -4,15 +4,20 @@ import { PhotoController, ImageController } from './photo/photo.controller';
 import { ProjectController } from './resource/project.controller';
 import { GroupController } from './group/group.controller';
 import { GoalController } from './resource/goal.controller';
+import { RequirementController } from './resource/requirement.controller';
+import { TaskController } from './resource/task.controller';
+import { DeliverableController } from './resource/deliverable.controller';
 
 export const controllers = [
     LoginController,
     UserController,
     PhotoController,
     ImageController,
-
-    GroupController,
-    
+    GroupController,    
     ProjectController,
     GoalController,
+    RequirementController,
+    DeliverableController,
+    TaskController,
+
 ] ;

@@ -3,25 +3,25 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import { AbstractResourceController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi' ;
-import { GoalResourceService } from '@app/services/resource/goal.resource.service';
-import { GoalCreateDto, GoalUpdateDto } from './dto/goal.dto';
+import { RequirementResourceService } from '@app/services/resource';
+import { RequirementCreateDto, RequirementUpdateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
 
-const type = 'goal' ;
+const type = 'requirement' ;
 @Authorized()
 @JsonController('/resource')
-export class GoalController extends AbstractResourceController{
+export class RequirementController extends AbstractResourceController{
     /**
      *
      */
     constructor() {
         super();
-        this.resourceType = ResourceType.Goal;
-        this.repoService = Container.get(GoalResourceService) ;
+        this.resourceType = ResourceType.Requirement;
+        this.repoService = Container.get(RequirementResourceService) ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)
-    async create(@Param('parent') parent:string, @Body() dto:GoalCreateDto, @Req() request) {  
+    async create(@Param('parent') parent:string, @Body() dto:RequirementCreateDto, @Req() request) {  
         const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
             method:RequestOperation.CREATE,
@@ -56,7 +56,7 @@ export class GoalController extends AbstractResourceController{
 
     
     @Patch(`/${type}/:id([0-9a-f]{24})`)
-    async update(@Param('id') id:string, @Body() dto:GoalUpdateDto, @Req() request, ) {
+    async update(@Param('id') id:string, @Body() dto:RequirementUpdateDto, @Req() request, ) {
         return await this.process(request,{         
             resourceId: id,
             method:RequestOperation.UPDATE,    

@@ -5,30 +5,40 @@ import { types } from '@typegoose/typegoose';
 import { BaseCreateDto, BaseUpdateDto } from './base.dto';
 import { ProjectStatus } from '@app/defines/projectStatus';
 
-export class GoalCreateDto extends BaseCreateDto {        
+export class DeliverableCreateDto extends BaseCreateDto {        
 
-    @IsString()
-    @IsOptional()
-    notes?:string;
-    
-   
     @IsNumber()
     @Max(10)
     @Min(0)
     @IsOptional()
-    roi?: number
+    severity? :number;
+  
+    @IsNumber()
+    @Max(10)
+    @Min(0)
+    @IsOptional()
+    priority? :number;  
+  
+    @IsString({each:true})
+    @IsOptional()
+    tags? :string[]; 
 }
 
-export class GoalUpdateDto extends BaseUpdateDto {    
+export class DeliverableUpdateDto extends BaseUpdateDto {    
 
-    @IsString()
-    @IsOptional()
-    notes?:string;
-    
-   
     @IsNumber()
     @Max(10)
     @Min(0)
     @IsOptional()
-    roi?: number;
+    severity? :number;
+  
+    @IsNumber()
+    @Max(10)
+    @Min(0)
+    @IsOptional()
+    priority? :number;  
+  
+    @IsString({each:true})
+    @IsOptional()
+    tags? :string[]; 
 }

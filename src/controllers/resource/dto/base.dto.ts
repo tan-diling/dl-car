@@ -28,5 +28,6 @@ export class BaseUpdateDto extends BaseCreateDto {
 
     @IsMongoId({each:true})
     @IsOptional()
-    assignee?: string[]
+    assignees?: string[]
+
 }

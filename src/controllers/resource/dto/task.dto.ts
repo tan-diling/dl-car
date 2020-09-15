@@ -5,7 +5,7 @@ import { types } from '@typegoose/typegoose';
 import { BaseCreateDto, BaseUpdateDto } from './base.dto';
 import { ProjectStatus } from '@app/defines/projectStatus';
 
-export class GoalCreateDto extends BaseCreateDto {        
+export class TaskCreateDto extends BaseCreateDto {        
 
     @IsString()
     @IsOptional()
@@ -19,7 +19,7 @@ export class GoalCreateDto extends BaseCreateDto {
     roi?: number
 }
 
-export class GoalUpdateDto extends BaseUpdateDto {    
+export class TaskUpdateDto extends BaseUpdateDto {    
 
     @IsString()
     @IsOptional()
@@ -31,4 +31,9 @@ export class GoalUpdateDto extends BaseUpdateDto {
     @Min(0)
     @IsOptional()
     roi?: number;
+
+
+    @IsMongoId({each:true})    
+    @IsOptional()
+    assignees?: string[];
 }

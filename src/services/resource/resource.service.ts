@@ -1,14 +1,15 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel } from '../models/project';
-import { ModelQueryService } from '../modules/query';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel } from '../../models/project';
+import { ModelQueryService } from '../../modules/query';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
 import { IdentityService } from '@app/modules/auth/src/controller/identity.service';
 import { StatusHandlers } from '@app/defines/projectStatus';
 import { stringify } from 'querystring';
+import { DbService } from '../db.service';
 
 const queryService = new ModelQueryService();
 export class ResourceService<T> implements RepoCRUDInterface {
@@ -33,7 +34,8 @@ export class ResourceService<T> implements RepoCRUDInterface {
     }
 
     async list(filter) {
-        return await queryService.list(this.model, filter);
+        // return await queryService.list(this.model, filter);
+        return await DbService.list(this.model, filter);
     }
 
 
@@ -44,6 +46,10 @@ export class ResourceService<T> implements RepoCRUDInterface {
     async delete(id) {
         const m = await this.model.findById(id).exec();
         if (m) {
+            const childCount = await DbService.count(ResourceModel,{parents:m._id,deleted:false}) ;
+            if (childCount>0){
+                throw new NotAcceptableError('child exists') ;
+            }
             if (this.model.schema.path('deleted')) {
                 m.set('deleted', true);
                 await m.save();
