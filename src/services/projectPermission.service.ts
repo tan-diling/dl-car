@@ -145,7 +145,7 @@ export class ProjectPermissionService {
         if (ctx.resourceId) {
             //check current
             const resource = await ResourceModel.findById(ctx.resourceId).exec();
-            const projectId = resource?.parent?.[0] || resource?._id;
+            const projectId = resource?.parents?.[0] || resource?._id;
             const pm = await ProjectMemberModel.findOne({ projectId, userId: ctx.user.id }).exec();
 
             if (pm == null) return;
@@ -164,9 +164,10 @@ export class ProjectPermissionService {
 
             // check assign
             if (policy.scope & PermissionOperation.Assign) {
+                const userObjectId = new Types.ObjectId(ctx.user.id) ;
                 const where = { _id: ctx.resourceId, assignee: Types.ObjectId(ctx.user.id) };
 
-                if (resource.assignees?.find( x => Types.ObjectId(ctx.user.id).equals(x) ) ) {
+                if (resource.assignees?.find( x => userObjectId==x ) ) {
 
                     const policy = await this.queryPolicy({ resource: ctx.resourceType, role: "assign" });
 
@@ -180,7 +181,7 @@ export class ProjectPermissionService {
 
             // check inherit
             if (policy.scope & PermissionOperation.Inherit ) {
-                const parentId = Array(...(resource.parent)).pop() ;
+                const parentId = Array(...(resource.parents)).pop() ;
 
                 if (parentId) {
                     // const parentResource = await ResourceModel.findById(ctx.resourceId).exec();

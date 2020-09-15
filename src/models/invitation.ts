@@ -4,17 +4,25 @@ import { User } from './user';
 
 export class Invitation {
   @prop()
-  invitee: string;
+  email?: string;
+
+  @prop()
+  invitee?: Ref<User>;
 
   @prop({ref: User})
   inviter: Ref<User>;
-      
-  @prop()
-  type: string; //enum:group user project
 
   @prop()
-  message: any;
+  userType:string;  //enum:external, internal ,
+
+  @prop()
+  inviteType: string; //enum:group，contact, project ,
+
+  @prop()
+  data: any;
   
+  @prop()
+  responseStatus?:string; //enum(pending,accept,reject)
 }
 
 

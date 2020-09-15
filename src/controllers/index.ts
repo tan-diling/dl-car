@@ -3,6 +3,7 @@ import {UserController} from './user/user.controller';
 import { PhotoController, ImageController } from './photo/photo.controller';
 import { ProjectController } from './resource/project.controller';
 import { GroupController } from './group/group.controller';
+import { GoalController } from './resource/goal.controller';
 
 export const controllers = [
     LoginController,
@@ -13,4 +14,5 @@ export const controllers = [
     GroupController,
     
     ProjectController,
+    GoalController,
 ] ;

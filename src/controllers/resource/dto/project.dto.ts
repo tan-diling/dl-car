@@ -1,6 +1,7 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, IsAlphanumeric, IsUppercase, MinLength, MaxLength } from 'class-validator';
 import { ProjectRole } from '@app/defines';
 import { Type } from 'class-transformer';
+import { ProjectStatus } from '@app/defines/projectStatus';
 export class ProjectCreateDto {    
     @IsString()
     @IsAlphanumeric()
@@ -74,5 +75,11 @@ export class ProjectMemberConfirmDto {
     @IsString()
     @IsOptional()
     status?:string ;
+}
+
+
+export class StatusDto {   
+    @IsEnum(ProjectStatus)     
+    status: ProjectStatus;
 }
 

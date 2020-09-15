@@ -23,7 +23,7 @@ export class UserService {
             return { result:"Your password has been changed successfully."};
         }
 
-        throw new UnauthorizedError("password_check_error") ;
+        throw new NotAcceptableError("password_check_error") ;
     }
 
     /**

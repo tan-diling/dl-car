@@ -8,3 +8,5 @@ export * from './project' ;
 export * from './permission' ;
 export * from './photo' ;
 
+export * from './invitation' ;
+

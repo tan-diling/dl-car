@@ -5,6 +5,7 @@ export const  virtualToJSON= {
       transform:(doc,ret,options)=>{ 
         delete ret.id;
         delete ret.__v;
+        delete ret.__t;
         for(const key of Object.keys(ret)) {
           const obj = ret[key] ;
           if (doc.populated(key) && key.endsWith("Id") && obj?._id){
