@@ -1,7 +1,7 @@
 import { MethodNotAllowedError, InternalServerError } from 'routing-controllers';
 import { SiteRole, ResourceType, RequestContext, RequestOperation, PermissionOperation } from '@app/defines';
 import { PermissionPolicyModel, PermissionPolicy } from '@app/models/permission';
-import { ProjectMemberModel, ResourceModel } from '@app/models/project';
+import { ProjectMemberModel, ResourceModel } from '@app/models';
 import { Types } from 'mongoose';
 
 /**

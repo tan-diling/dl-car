@@ -5,9 +5,9 @@
 import { sendMail } from '@app/modules/mail';
 import { WebServer } from '@app/config';
 import { UserModel, User } from '../models/user';
-import { GroupMemberModel, GroupMember } from '@app/models/group';
+import { GroupMemberModel, GroupMember } from '@app/models';
 import { RepoOperation } from '@app/defines';
-import { ProjectMember, ProjectMemberModel } from '@app/models/project';
+import { ProjectMember, ProjectMemberModel } from '@app/models';
 
 export default () => {
     console.log("mail subscriber...");

@@ -7,33 +7,10 @@ import { ProjectStatus } from '@app/defines/projectStatus';
 
 export class TaskCreateDto extends BaseCreateDto {        
 
-    @IsString()
-    @IsOptional()
-    notes?:string;
-    
-   
-    @IsNumber()
-    @Max(10)
-    @Min(0)
-    @IsOptional()
-    roi?: number
+ 
 }
 
 export class TaskUpdateDto extends BaseUpdateDto {    
 
-    @IsString()
-    @IsOptional()
-    notes?:string;
-    
-   
-    @IsNumber()
-    @Max(10)
-    @Min(0)
-    @IsOptional()
-    roi?: number;
 
-
-    @IsMongoId({each:true})    
-    @IsOptional()
-    assignees?: string[];
 }

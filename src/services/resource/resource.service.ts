@@ -1,22 +1,14 @@
-import { Model, Document, Types } from 'mongoose';
+import { Model, Document, Types, } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus } from '@app/defines';
-import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel } from '../../models/project';
-import { ModelQueryService } from '../../modules/query';
-import { ReturnModelType } from '@typegoose/typegoose';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource } from '@app/models';
+import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
-import { UserModel } from '@app/models/user';
-import { IdentityService } from '@app/modules/auth/src/controller/identity.service';
 import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
-import { stringify } from 'querystring';
 import { DbService } from '../db.service';
 
-const queryService = new ModelQueryService();
-export class ResourceService<T> implements RepoCRUDInterface {
+export class ResourceService<T extends Resource> implements RepoCRUDInterface {
 
     model: Model<T & Document>;
-
-
 
     async create(dto) {
         let { parent, ...obj } = dto;
@@ -40,7 +32,7 @@ export class ResourceService<T> implements RepoCRUDInterface {
 
 
     async get(filter) {
-        return await queryService.get(this.model, filter);
+        return await DbService.get(this.model, filter);
     }
 
     async delete(id) {
@@ -62,10 +54,26 @@ export class ResourceService<T> implements RepoCRUDInterface {
         return m;
     }
 
+    private async validateAssignees(doc: DocumentType<Resource>, assignees:string[]){
+        
+        if(assignees){
+            const members = await doc.getMembers();
+
+            for(const uid of assignees){
+                const member = members.find(x=>x.userId == Types.ObjectId(uid)) ;
+                if(null == member ){
+                    throw new NotAcceptableError('assignees_error') ;
+                }
+            }
+        }
+    }
+
     async update(id, dto) {
         const doc = await this.model.findById(id).exec();
-        if (doc)
+        if (doc ){  
+            await this.validateAssignees(doc as any,dto.assignees) ;
             return await this.model.findByIdAndUpdate(id, dto, { new: true });
+        }
 
         return null;
     };
