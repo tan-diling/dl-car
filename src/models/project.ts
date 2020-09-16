@@ -58,7 +58,7 @@ export class Resource {
   completedAt?: Date;
 
   @prop({ default: ProjectStatus.Draft })
-  status?: string ;
+  status?: number ;
 
   @prop({
     default:0,
@@ -113,6 +113,7 @@ export class Goal extends Resource {
 export class Requirement extends Resource {
 }
 
+
 export class Deliverable extends Resource {
   @prop()
   severity? :number;
@@ -123,11 +124,11 @@ export class Deliverable extends Resource {
   @prop()
   tags? :string[]; 
 
-  @prop()
-  steps? :string; 
+  // @prop()
+  // steps? :string; 
 
-  @prop()
-  result? :string; 
+  // @prop()
+  // result? :string; 
 }
 
 export class Task extends Resource {
@@ -166,3 +167,43 @@ export const DeliverableModel = getDiscriminatorModelForClass(ResourceModel,Deli
 export const TaskModel = getDiscriminatorModelForClass(ResourceModel,Task);
 
 export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});
+
+class RelatedResource{
+  @prop({ref:()=>Resource})
+  resourceId: Ref<Resource>;
+  
+
+  @prop()
+  createdAt?: Date;
+
+  @prop()
+  updatedAt?: Date;
+
+}
+
+export class CheckList extends RelatedResource {
+
+  @prop()
+  title :string; 
+
+  @prop()
+  description  :string;
+
+  @prop()
+  done? :boolean; 
+
+}
+
+// export class Comment extends RelatedResource {
+
+//   @prop()
+//   title :string; 
+
+//   @prop()
+//   description  :string;
+
+//   @prop()
+//   done? :boolean; 
+
+// }
+

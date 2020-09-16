@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, IsAlphanumeric, IsUppercase, MinLength, MaxLength } from 'class-validator';
+import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, IsAlphanumeric, IsUppercase, MinLength, MaxLength, IsNumber } from 'class-validator';
 import { ProjectRole } from '@app/defines';
 import { Type } from 'class-transformer';
 import { ProjectStatus } from '@app/defines/projectStatus';
@@ -79,7 +79,8 @@ export class ProjectMemberConfirmDto {
 
 
 export class StatusDto {   
-    @IsEnum(ProjectStatus)     
+    @IsEnum(ProjectStatus) 
+    // @IsNumber()   
     status: ProjectStatus;
 }
 

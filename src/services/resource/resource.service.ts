@@ -7,7 +7,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
 import { IdentityService } from '@app/modules/auth/src/controller/identity.service';
-import { StatusHandlers } from '@app/defines/projectStatus';
+import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
 import { stringify } from 'querystring';
 import { DbService } from '../db.service';
 
@@ -70,7 +70,7 @@ export class ResourceService<T> implements RepoCRUDInterface {
         return null;
     };
 
-    async status(dto: { id: string, status: string, userId: string }) {
+    async status(dto: { id: string, status: ProjectStatus, userId: string }) {
         const resource = await ResourceModel.findById(dto.id).exec();
         if (resource) {
             const resourceType = resource.type;
@@ -109,7 +109,7 @@ export class ResourceService<T> implements RepoCRUDInterface {
             }
             let checkerFunction = targetHandler.checker;
             if (checkerFunction) {
-                if (! await checkerFunction(resource, status)) {
+                if (! await checkerFunction(resource, dto.status)) {
                     throw new NotAcceptableError('status_check_error');
                 }
             }

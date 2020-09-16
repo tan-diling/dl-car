@@ -2,8 +2,7 @@
 import { ProjectRole } from "./projectRole";
 import { ResourceType } from './resourceType';
 
-
-export enum ResourceStatus {
+export enum ProjectStatus {
     Analysis = 0, 
     Development = 10, 
     Support=100 ,
@@ -25,48 +24,50 @@ export enum ResourceStatus {
 }
 
 
-export enum ProjectStatus {
-    Analysis="Analysis", 
-    Development="Development", 
-    Support="Support" ,
 
-    Draft="Draft", 
-    PendingApproval="PendingApproval", 
-    InProgress="InProgress", 
-    InReview="InReview", 
-    Completed="Completed", 
-    Canceled="Canceled",
+// export enum ProjectStatus {
+//     Analysis="Analysis", 
+//     Development="Development", 
+//     Support="Support" ,
 
-    // Draft="Draft", 
-    // PendingApproval="PendingApproval", 
-    PendingFulfillment="PendingFulfillment", 
-    // InReview="InReview", 
-    // Completed="Completed", 
-    // Canceled="Canceled",
+//     Draft="Draft", 
+//     PendingApproval="PendingApproval", 
+//     InProgress="InProgress", 
+//     InReview="InReview", 
+//     Completed="Completed", 
+//     Canceled="Canceled",
 
-}
+//     // Draft="Draft", 
+//     // PendingApproval="PendingApproval", 
+//     PendingFulfillment="PendingFulfillment", 
+//     // InReview="InReview", 
+//     // Completed="Completed", 
+//     // Canceled="Canceled",
 
-const Status = ProjectStatus;
+// }
+
+
 
 interface checkerFunction {
-    (doc, status:string|ProjectStatus): Promise<boolean>|boolean;
+    (doc, status:ProjectStatus): Promise<boolean>|boolean;
 }
 
-async function checkerChildrenFunction(doc, targetStatus:string| ProjectStatus) {
+async function checkerChildrenFunction(doc, targetStatus:ProjectStatus) {
     const children:Array<{deleted:boolean,status}> = await doc.getChildren() ;
     const notFinishedChild = children.find(x =>(x.deleted == false )&&  (x.status in [Status.Completed, Status.Canceled]));
     return notFinishedChild == null ;
 }
 
 interface StatusHandler {
-    from:string,
+    from:ProjectStatus,
     handlers:Array<{
-        to:string,
+        to:ProjectStatus,
         projectRoles:Array<string>,
         checker?:checkerFunction
     }>
 }
 
+const Status = ProjectStatus;
 
 const projectStatusHandlers: Array<StatusHandler> = [{
     from: Status.Analysis,
@@ -270,9 +271,6 @@ const taskStatusHandlers:Array<StatusHandler> = [{
     }]
 }
 ];
-
-
-
 
 export const StatusHandlers = new Map<string,Array<StatusHandler>>() ;
 
