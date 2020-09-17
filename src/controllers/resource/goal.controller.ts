@@ -48,7 +48,7 @@ export class GoalController extends AbstractResourceController{
         return await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,
-            filter:{_id:id, memberUserId:request.user.id},
+            filter:{_id:id, memberUserId:request.user.id,populate:'children'},
             // dto
         }) ;
 

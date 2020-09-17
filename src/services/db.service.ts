@@ -39,12 +39,9 @@ export class DbService {
 
     static
     async get<T extends Document>(model:Model<T>, query: string|any, options?) {
-        if(isValidObjectId(query)){
-            return await model.findById(query).exec() ;
-        }
-
+        
         const { filter, projection, population } = aqp(query, options || AQP_OPTIONS);
-        const documentQuery =   model.findOne(filter) ;
+        const documentQuery = isValidObjectId(query)? model.findById(query) :  model.findOne(filter) ;
 
         if ( projection ) 
             documentQuery.select(projection);

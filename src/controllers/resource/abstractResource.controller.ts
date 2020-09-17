@@ -39,6 +39,10 @@ export class AbstractResourceController {
                 break ;
             case RequestOperation.RETRIEVE:
                 if(ctx.resourceId){
+                    const {populate} = ctx.filter ;
+                    if(populate){
+                        return await this.repoService.get({_id:ctx.resourceId,populate}) ;
+                    }
                     return await this.repoService.get(ctx.resourceId) ;
                 }else {
                     return await this.repoService.list(ctx.filter) ;

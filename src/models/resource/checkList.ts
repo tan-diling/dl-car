@@ -3,19 +3,19 @@ import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, in
 import { User } from '../user';
 import { ProjectMemberStatus } from '@app/defines';
 import { ProjectStatus } from '@app/defines/projectStatus';
-import { Resource, ResourceModel } from './resource';
+import { Resource, ResourceModel, ResourceRelatedBase } from './resource';
 
-
-export class Goal extends Resource {
-
-  @prop()
-  roi?: number;
+export class CheckList extends ResourceRelatedBase {
 
   @prop()
-  notes?: string;  
+  title:string;
 
   @prop()
-  approvedAt?: Date;  
+  content:string;
+
+  @prop()
+  done:boolean;  
+
 }
 
-export const GoalModel = getDiscriminatorModelForClass(ResourceModel,Goal);
+export const CheckListModel = getModelForClass(CheckList,{schemaOptions:{ timestamps:true }});

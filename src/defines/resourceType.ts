@@ -8,5 +8,8 @@ export enum ResourceType {
     Requirement = 'requirement', 
     Deliverable = 'deliverable',
     Task= 'task' ,
-    WorkLog = 'workLog',
+    //
+    Effort = 'effort',
+    Comment = 'comment',
+    CheckList = 'checklist',
 }

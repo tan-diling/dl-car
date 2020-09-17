@@ -72,13 +72,34 @@ export class Resource {
   @prop({ default:0 })
   totalEffort: number;
 
+
+  @prop({ 
+    ref:()=>Resource,
+    localField:"_id",
+    foreignField:"parents",
+    match:(doc)=>{ 
+      const index = doc.parents.length ;
+      const key  = `parents.${index}`;
+      const filter = {
+        parents:{$size:index+1},
+        deleted:false,
+      } ; 
+      filter[key] = doc._id ;
+      return filter;
+    },
+  })
+  children: Resource[];
+
   async getMembers(this: DocumentType<Resource>) {
     const projectId = this.parents.length==0? this._id: this.parents[0] ;
     return await ProjectMemberModel.find({projectId}).exec() ;    
   }
 
   async getChildren(this: DocumentType<Resource>) {    
-    return await ResourceModel.find({parents:this._id}).exec() ;    
+    const index = this.parents.length ;
+    const key  = `parents.${index}`;
+    const query = {} ; query[key] = this._id ;
+    return await ResourceModel.find(query).exec() ;    
   }
 
   async getMemberProjectRole(this: DocumentType<Resource>,userId:string|Types.ObjectId) {
@@ -110,3 +131,20 @@ export const ResourceModel = getModelForClass(Resource,{schemaOptions:{ timestam
 
 export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});
 
+export class ResourceRelatedBase{
+  @prop({required: true, ref:()=>Resource})
+  parent: Ref<Resource>;
+  
+  @prop({ required: true } )
+  creator: Types.ObjectId ;
+
+
+  @prop()
+  deleted?: boolean;
+
+  @prop()
+  createdAt?: Date;
+
+  @prop()
+  updatedAt?: Date;
+}

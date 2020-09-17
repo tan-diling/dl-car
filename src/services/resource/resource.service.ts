@@ -1,12 +1,12 @@
 import { Model, Document, Types, } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource } from '@app/models';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource, ResourceRelatedBase } from '@app/models';
 import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
 import { DbService } from '../db.service';
 
-export class ResourceService<T extends Resource> implements RepoCRUDInterface {
+export class ResourceService<T extends Resource | ResourceRelatedBase> implements RepoCRUDInterface {
 
     model: Model<T & Document>;
 
@@ -16,7 +16,13 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
             const parentResource = await ResourceModel.findById(parent).exec();
             if (parentResource) {
                 const p = parentResource.parents;
-                obj = { ...obj, parents: [...p, parentResource._id] };
+                if(this.model.schema.path('parents')){
+                    obj = { ...obj, parents: [...p, parentResource._id] };
+                }
+
+                if(this.model.schema.path('parent')){
+                    obj = { ...obj, parent: parentResource._id };
+                }
             } else {
                 throw new NotAcceptableError('parent error');
             }
@@ -38,9 +44,11 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
     async delete(id) {
         const m = await this.model.findById(id).exec();
         if (m) {
-            const childCount = await DbService.count(ResourceModel,{parents:m._id,deleted:false}) ;
-            if (childCount>0){
-                throw new NotAcceptableError('child exists') ;
+            if (this.model.schema.path('parents')) {
+                const childCount = await DbService.count(ResourceModel, { parents: m._id, deleted: false });
+                if (childCount > 0) {
+                    throw new NotAcceptableError('child exists');
+                }
             }
             if (this.model.schema.path('deleted')) {
                 m.set('deleted', true);
@@ -54,15 +62,18 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
         return m;
     }
 
-    private async validateAssignees(doc: DocumentType<Resource>, assignees:string[]){
-        
-        if(assignees){
+    private async validateAssignees(doc: DocumentType<Resource>, assignees: string[]) {
+        if (!this.model.schema.path('assignees')) {
+            return;
+        }
+
+        if (assignees) {
             const members = await doc.getMembers();
 
-            for(const uid of assignees){
-                const member = members.find(x=>x.userId == Types.ObjectId(uid)) ;
-                if(null == member ){
-                    throw new NotAcceptableError('assignees_error') ;
+            for (const uid of assignees) {
+                const member = members.find(x => x.userId == Types.ObjectId(uid));
+                if (null == member) {
+                    throw new NotAcceptableError('assignees_error');
                 }
             }
         }
@@ -70,8 +81,8 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
 
     async update(id, dto) {
         const doc = await this.model.findById(id).exec();
-        if (doc ){  
-            await this.validateAssignees(doc as any,dto.assignees) ;
+        if (doc) {
+            await this.validateAssignees(doc as any, dto.assignees);
             return await this.model.findByIdAndUpdate(id, dto, { new: true });
         }
 
@@ -83,15 +94,15 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
         if (resource) {
             const resourceType = resource.type;
 
-            let key:string =null
-            for(const k of StatusHandlers.keys()){
-                if ( resourceType.toLowerCase() == k.toLowerCase()){
-                    key = k ;
-                    break ;
+            let key: string = null
+            for (const k of StatusHandlers.keys()) {
+                if (resourceType.toLowerCase() == k.toLowerCase()) {
+                    key = k;
+                    break;
                 }
             }
 
-            if (key == null){
+            if (key == null) {
                 throw new Error('status_type_error');
             }
 
@@ -99,18 +110,18 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
 
             const fromHandler = maps.find(x => x.from == resource.status);
 
-            if (fromHandler == null){
+            if (fromHandler == null) {
                 throw new NotAcceptableError('status_error');
             }
 
             const targetHandler = fromHandler.handlers.find(x => x.to == dto.status);
 
-            if (targetHandler == null){
+            if (targetHandler == null) {
                 throw new NotAcceptableError('status_target_error');
             }
 
 
-            const projectRole = await resource.getMemberProjectRole(dto.userId) ;
+            const projectRole = await resource.getMemberProjectRole(dto.userId);
 
             if (!targetHandler.projectRoles.includes(projectRole)) {
                 throw new NotAcceptableError('status_role_error');
@@ -123,7 +134,7 @@ export class ResourceService<T extends Resource> implements RepoCRUDInterface {
             }
             resource.status = dto.status;
             await resource.save();
-            return resource ;
+            return resource;
         }
 
         return null;

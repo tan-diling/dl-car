@@ -3,25 +3,25 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import { AbstractResourceController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi' ;
-import { RequirementCreateDto, RequirementUpdateDto, DeliverableCreateDto, DeliverableUpdateDto } from './dto';
+import { RequirementCreateDto, RequirementUpdateDto, DeliverableCreateDto, DeliverableUpdateDto, TaskCreateDto, TaskUpdateDto, EffortCreateDto, EffortUpdateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
-import { DeliverableResourceService } from '@app/services/resource';
+import { DeliverableResourceService, TaskResourceService, EffortResourceService } from '@app/services/resource';
 
-const type = ResourceType.Deliverable ;
+const type = ResourceType.Effort ;
 @Authorized()
 @JsonController('/resource')
-export class DeliverableController extends AbstractResourceController{
+export class EffortController extends AbstractResourceController{
     /**
      *
      */
     constructor() {
         super();
-        this.resourceType = ResourceType.Deliverable;
-        this.repoService = Container.get(DeliverableResourceService) ;
+        this.resourceType = type;
+        this.repoService = Container.get(EffortResourceService) ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)
-    async create(@Param('parent') parent:string, @Body() dto:DeliverableCreateDto, @Req() request) {  
+    async create(@Param('parent') parent:string, @Body() dto:EffortCreateDto, @Req() request) {  
         const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
             method:RequestOperation.CREATE,
@@ -34,13 +34,11 @@ export class DeliverableController extends AbstractResourceController{
         
         return await this.process(request,{       
             method:RequestOperation.RETRIEVE,
-            filter:{...query,parents:parent},
+            filter:{...query,parent:parent},
             // dto
         }) ;
 
     }
-
-  
         
     @Get(`/${type}/:id([0-9a-f]{24})`)
     async getById(@Param('id') id:string, @Req() request) {
@@ -48,19 +46,14 @@ export class DeliverableController extends AbstractResourceController{
         return await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,
-            filter:{
-                _id:id, 
-                memberUserId:request.user.id,
-                populate:'children',
-            },
+            filter:{_id:id, memberUserId:request.user.id},
             // dto
         }) ;
 
     }
-
     
     @Patch(`/${type}/:id([0-9a-f]{24})`)
-    async update(@Param('id') id:string, @Body() dto:DeliverableUpdateDto, @Req() request, ) {
+    async update(@Param('id') id:string, @Body() dto:EffortUpdateDto, @Req() request, ) {
         return await this.process(request,{         
             resourceId: id,
             method:RequestOperation.UPDATE,    
@@ -68,14 +61,6 @@ export class DeliverableController extends AbstractResourceController{
         }) ;
     }
 
-    @Patch(`/${type}/:id([0-9a-f]{24})/status`)
-    async status(@Param('id') id:string, @Body() dto:StatusDto, @Req() request, ) {
-        return await this.process(request,{         
-            resourceId: id,
-            method:'status',    
-            dto :{...dto,userId:request.user.id}       
-        }) ;
-    }
 
     @Delete(`/${type}/:id([0-9a-f]{24})`)
     async delete(@Param('id') id:string, @Req() request,) {
