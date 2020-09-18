@@ -69,7 +69,7 @@ export class Resource {
   // @prop({ref:()=>Resource,type:[Types.ObjectId]})
   // children: Ref<Resource>[] ;
 
-  @prop({ default:0 })
+  @prop({ default:-1 })
   totalEffort: number;
 
 
@@ -107,6 +107,8 @@ export class Resource {
     const pm = await ProjectMemberModel.findOne({projectId,userId}).exec() ;    
     return pm?.projectRole ;
   }
+
+
 }
 
 

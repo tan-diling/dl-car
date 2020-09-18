@@ -9,17 +9,24 @@ export enum ProjectStatus {
 
     Draft=0, 
     PendingApproval=1, 
+    UpdatePending=2,
     InProgress=10, 
-    InReview=11, 
+    InReview=11,
+    ReworkPending=12, 
     Completed=100, 
     Canceled=101,
 
     // Draft="Draft", 
     // PendingApproval="PendingApproval", 
     PendingFulfillment=10, 
-    // InReview="InReview", 
+    QAInProgress=11, 
     // Completed="Completed", 
     // Canceled="Canceled",
+
+
+    TaskOpen=1, 
+    TaskPlanned=4, 
+    FixPending=11,
 
 }
 
@@ -97,7 +104,7 @@ const goalStatusHandlers:Array<StatusHandler> = [{
 }, {
     from: Status.PendingApproval,
     handlers: [{
-        to: Status.Draft,
+        to: Status.UpdatePending,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.InProgress,
@@ -106,6 +113,16 @@ const goalStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.UpdatePending,
+    handlers: [{
+        to: Status.PendingApproval,
+        projectRoles: [ProjectRole.ProjectManager],
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]
+
 }, {
     from: Status.InProgress,
     handlers: [{
@@ -118,7 +135,7 @@ const goalStatusHandlers:Array<StatusHandler> = [{
 }, {
     from: Status.InReview,
     handlers: [{
-        to: Status.InProgress,
+        to: Status.ReworkPending,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.Completed,
@@ -128,6 +145,15 @@ const goalStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.ReworkPending,
+    handlers: [{
+        to: Status.InReview,
+        projectRoles: [ProjectRole.ProjectManager],
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]    
 }
 ];
 
@@ -143,7 +169,7 @@ const requirementStatusHandlers:Array<StatusHandler> = [{
 }, {
     from: Status.PendingApproval,
     handlers: [{
-        to: Status.Draft,
+        to: Status.UpdatePending,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.PendingFulfillment,
@@ -152,6 +178,15 @@ const requirementStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.UpdatePending,
+    handlers: [{
+        to: Status.PendingApproval,
+        projectRoles: [ProjectRole.ProjectManager],
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]    
 }, {
     from: Status.PendingFulfillment,
     handlers: [{
@@ -161,10 +196,11 @@ const requirementStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+ 
 }, {
     from: Status.InReview,
     handlers: [{
-        to: Status.PendingFulfillment,
+        to: Status.ReworkPending,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.Completed,
@@ -174,6 +210,15 @@ const requirementStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.ReworkPending,
+    handlers: [{
+        to: Status.InReview,
+        projectRoles: [ProjectRole.ProjectManager],
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]       
 }
 ];
 
@@ -190,7 +235,7 @@ const deliverableStatusHandlers:Array<StatusHandler> = [{
 }, {
     from: Status.PendingApproval,
     handlers: [{
-        to: Status.Draft,
+        to: Status.UpdatePending,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.PendingFulfillment,
@@ -199,6 +244,16 @@ const deliverableStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.UpdatePending,
+    handlers: [{
+        to: Status.PendingApproval,
+        projectRoles: [ProjectRole.ProjectManager],
+
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]    
 }, {
     from: Status.PendingFulfillment,
     handlers: [{
@@ -229,42 +284,60 @@ const deliverableStatusHandlers:Array<StatusHandler> = [{
 const taskStatusHandlers:Array<StatusHandler> = [{
     from: Status.Draft,
     handlers: [{
-        to: Status.PendingApproval,
+        to: Status.TaskOpen,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.Developer,ProjectRole.QualityAssurance],
     }, {
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
 }, {
-    from: Status.PendingApproval,
+    from: Status.TaskOpen,
     handlers: [{
-        to: Status.Draft,
+        to: Status.UpdatePending,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.QualityAssurance],
     }, {
-        to: Status.PendingFulfillment,
+        to: Status.TaskPlanned,
         projectRoles: [ProjectRole.ProjectManager],
     }, {
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
 }, {
-    from: Status.PendingFulfillment,
+    from: Status.UpdatePending,
     handlers: [{
-        to: Status.InReview,
+        to: Status.TaskOpen,
+        projectRoles: [ProjectRole.ProjectManager],
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]    
+}, {
+    from: Status.TaskPlanned,
+    handlers: [{
+        to: Status.InProgress,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.Developer,ProjectRole.QualityAssurance],
     }, {
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
 }, {
-    from: Status.InReview,
+    from: Status.InProgress,
     handlers: [{
-        to: Status.PendingFulfillment,
+        to: Status.FixPending,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.Developer,ProjectRole.QualityAssurance],
     }, {
         to: Status.Completed,
         projectRoles: [ProjectRole.ProjectManager],
         // checker: checkerChildrenFunction
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]
+}, {
+    from: Status.FixPending,
+    handlers: [{
+        to: Status.InProgress,
+        projectRoles: [ProjectRole.ProjectManager,ProjectRole.Developer,ProjectRole.QualityAssurance],
     }, {
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],

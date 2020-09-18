@@ -74,7 +74,9 @@ export class AbstractResourceController {
             throw new ForbiddenError('resource_permission_forbidden') ;
         }
 
-        return await this.processRequest(requestContext) ;
+        const result = await this.processRequest(requestContext) ;
+        request.res.locals = {result} ;
+        return result ;
 
     } 
 }
