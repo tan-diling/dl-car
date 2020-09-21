@@ -21,52 +21,57 @@ export class Effort extends ResourceRelatedBase {
   @prop()
   effort: number;
 
-  static async syncResourceTotalEffort(resourceId:Types.ObjectId) {
+  static async getTotalEffort(resourceId: Types.ObjectId) {
     const resource = await ResourceModel.findById(resourceId).exec();
-    const agg = [
-      {
-        '$match': {          
-          $or:[{
-            parents:resource._id,
-          },{
-            _id:resource._id,
-          }]
-          
-        }
-      },
-      {
-        '$lookup': {
-          'from': 'efforts',
-          'localField': '_id',
-          'foreignField': 'parent',
-          'as': 'efforts'
-        }
-      }, {
-        '$unwind': {
-          'path': '$efforts'
-        }
-      }, {
-        '$group': {
-          '_id': null,
-          'totalEffort': {
-            '$sum': '$efforts.effort'
+
+    if (resource.totalEffort < 0) {
+      const agg = [
+        {
+          '$match': {
+            $or: [{
+              parents: resource._id,
+            }, {
+              _id: resource._id,
+            }]
+
+          }
+        },
+        {
+          '$lookup': {
+            'from': 'efforts',
+            'localField': '_id',
+            'foreignField': 'parent',
+            'as': 'efforts'
+          }
+        }, {
+          '$unwind': {
+            'path': '$efforts'
+          }
+        }, {
+          '$group': {
+            '_id': null,
+            'totalEffort': {
+              '$sum': '$efforts.effort'
+            }
           }
         }
-      }
-    ];
+      ];
 
-    const docs = await ResourceModel.aggregate<{ _id: any, totalEffort: number }>(agg).exec();
+      const docs = await ResourceModel.aggregate<{ _id: any, totalEffort: number }>(agg).exec();
 
-    resource.totalEffort = docs[0].totalEffort;
-    await resource.save();
-
-    if(resource.parents.length>0){
-
+      resource.totalEffort = docs[0].totalEffort;
+      await resource.save();
     }
-
-    return resource.totalEffort ;
+    return resource.totalEffort;
   }
 
+  static async setTotalEffortInvalid(resourceId: string | Types.ObjectId) {
+    const resource = await ResourceModel.findById(resourceId).exec();
+    if (resource) {
+      await ResourceModel.updateMany({ _id: [...resource.parents, resource._id] }, { totalEffort: -1 }).exec();
+    }
+
+  }
 }
 
 export const EffortModel = getModelForClass(Effort, { schemaOptions: { timestamps: true } });

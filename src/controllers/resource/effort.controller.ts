@@ -17,7 +17,7 @@ function effortMiddleware(request: Request, response: Response, next?: NextFunct
     if(effort.schema === EffortModel.schema ){
         console.log("effort + "+httpMethod);
         const pid :any = effort.parent ;
-        Effort.syncResourceTotalEffort(pid)
+        Effort.setTotalEffortInvalid(pid)
             .then(()=>next())
             .catch((err)=>{next(err)});
     }

@@ -108,6 +108,13 @@ export class Resource {
   }
 
 
+  static async setEffortChanged(resourceId:string|Types.ObjectId) {
+    const resource = await ResourceModel.findById(resourceId).exec() ;
+    if( resource) {
+      await ResourceModel.updateMany({_id:[...resource.parents,resource._id]},{totalEffort:-1}).exec();
+    }
+    
+  }
 
 }
 
@@ -141,7 +148,7 @@ export class ResourceRelatedBase{
   creator: Types.ObjectId ;
 
 
-  @prop()
+  @prop({default:false})
   deleted?: boolean;
 
   @prop()

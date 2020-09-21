@@ -6,11 +6,19 @@ import { Inject } from 'typedi';
 import {  RepoCRUDInterface, RequestContext, RepoOperation, RequestOperation, IRequestUser } from '@app/defines';
 import { ProjectPermissionService } from '@app/services/projectPermission.service';
 
+interface QueryOptionInterface {
+    populate?: string,
+    limit?: number,
+    offset?: number,
+    sort?:string,
+}
 // const resourceType = 'project' ;
 // @Authorized()
 // @JsonController('/resource/'+resourceType)
 export class AbstractResourceController {
     resourceType:string ='';
+
+    queryOptions:{get?:QueryOptionInterface,list?:QueryOptionInterface}  = {};
 
     @Inject()
     permissionService:ProjectPermissionService ;
@@ -38,8 +46,10 @@ export class AbstractResourceController {
                 return await this.repoService.create(ctx.dto) ;
                 break ;
             case RequestOperation.RETRIEVE:
+                
                 if(ctx.resourceId){
-                    const {populate} = ctx.filter ;
+                    const queryOptions = {...this.queryOptions?.get,...ctx.filter} ;
+                    const {populate} = queryOptions ;
                     if(populate){
                         return await this.repoService.get({_id:ctx.resourceId,populate}) ;
                     }

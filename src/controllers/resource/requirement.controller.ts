@@ -18,6 +18,7 @@ export class RequirementController extends AbstractResourceController{
         super();
         this.resourceType = ResourceType.Requirement;
         this.repoService = Container.get(RequirementResourceService) ;
+        this.queryOptions = {get:{populate:"children,parents"}} ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)

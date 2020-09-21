@@ -18,6 +18,7 @@ export class GoalController extends AbstractResourceController{
         super();
         this.resourceType = ResourceType.Goal;
         this.repoService = Container.get(GoalResourceService) ;
+        this.queryOptions = {get:{populate:"children,parents"}} ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)
@@ -48,7 +49,7 @@ export class GoalController extends AbstractResourceController{
         return await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,
-            filter:{_id:id, memberUserId:request.user.id,populate:'children'},
+            filter:{_id:id, memberUserId:request.user.id},
             // dto
         }) ;
 
