@@ -52,7 +52,6 @@ export class DeliverableController extends AbstractResourceController{
             filter:{
                 _id:id, 
                 memberUserId:request.user.id,
-                populate:'children',
             },
             // dto
         }) ;

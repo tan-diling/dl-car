@@ -47,9 +47,9 @@ export class Event {
 }
 
 enum NotificationStatus{
-  init="",
-  read='read',
-  deleted='deleted'
+  Unread="unread",
+  Read='read',
+  Deleted='deleted'
 }
 
 export class Notification {  
@@ -62,9 +62,9 @@ export class Notification {
 
   @prop({})
   message: string;
-  
-  @prop({})
-  status:NotificationStatus;  //enum('', 'read','deleted'),
+
+  @prop({enum:NotificationStatus})
+  status:NotificationStatus;  //enum('unread', 'read','deleted'),
 
   @prop()
   createdAt?: Date;

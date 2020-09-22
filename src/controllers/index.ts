@@ -1,5 +1,5 @@
-import {LoginController} from '@app/modules/auth';
-import {UserController} from './user/user.controller';
+import { LoginController } from '@app/modules/auth';
+import { UserController } from './user/user.controller';
 import { PhotoController, ImageController } from './photo/photo.controller';
 import { ProjectController } from './resource/project.controller';
 import { GroupController } from './group/group.controller';
@@ -8,6 +8,8 @@ import { RequirementController } from './resource/requirement.controller';
 import { TaskController } from './resource/task.controller';
 import { DeliverableController } from './resource/deliverable.controller';
 import { EffortController } from './resource/effort.controller';
+import { CommentController } from './resource/comment.controller';
+import { CheckListController } from './resource/checkList.controller';
 
 export const controllers = [
     LoginController,
@@ -22,5 +24,7 @@ export const controllers = [
     TaskController,
 
     EffortController,
+    CommentController,
+    CheckListController,
 
 ] ;

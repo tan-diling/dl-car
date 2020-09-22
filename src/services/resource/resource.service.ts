@@ -1,6 +1,6 @@
 import { Model, Document, Types, } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource, ResourceRelatedBase } from '@app/models';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource, ResourceRelatedBase, EffortModel } from '@app/models';
 import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError, JsonController } from 'routing-controllers';
 import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
@@ -38,7 +38,14 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
 
 
     async get(filter) {
-        return await DbService.get(this.model, filter);
+        const doc = await DbService.get(this.model, filter);
+        const effortPath = 'totalEffort' ;
+        if(doc){
+            if (this.model.schema.path(effortPath)){
+                doc[effortPath] = await EffortModel.getTotalEffort(doc._id) ;
+            }
+        }
+        return doc
     }
 
     async delete(id) {

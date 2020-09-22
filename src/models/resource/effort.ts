@@ -59,7 +59,7 @@ export class Effort extends ResourceRelatedBase {
 
       const docs = await ResourceModel.aggregate<{ _id: any, totalEffort: number }>(agg).exec();
 
-      resource.totalEffort = docs[0].totalEffort;
+      resource.totalEffort = docs.length>0 ? docs[0].totalEffort : 0;
       await resource.save();
     }
     return resource.totalEffort;
