@@ -5,4 +5,4 @@ export * from './deliverable.resource.service' ;
 export * from './task.resource.service' ;
 
 export * from './effort.resource.service' ;
-// export * from './comment.resource.service' ;
+export * from './comment.resource.service' ;

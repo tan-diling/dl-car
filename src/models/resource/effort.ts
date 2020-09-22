@@ -22,7 +22,7 @@ export class Effort extends ResourceRelatedBase {
   effort: number;
 
   static async getTotalEffort(resourceId: Types.ObjectId) {
-    const resource = await ResourceModel.findById(resourceId).exec();
+    const resource = await ResourceModel.findById(resourceId).select({totalEffort:1}).exec();
 
     if (resource.totalEffort < 0) {
       const agg = [

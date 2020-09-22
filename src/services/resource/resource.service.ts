@@ -2,7 +2,7 @@ import { Model, Document, Types, } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource, ResourceRelatedBase } from '@app/models';
 import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
-import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
+import { ForbiddenError, NotAcceptableError, JsonController } from 'routing-controllers';
 import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
 import { DbService } from '../db.service';
 
@@ -45,7 +45,7 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
         const m = await this.model.findById(id).exec();
         if (m) {
             if (this.model.schema.path('parents')) {
-                const childCount = await DbService.count(ResourceModel, { parents: m._id, deleted: false });
+                const childCount = await DbService.count(ResourceModel, `parents:${m._id}&deleted=false`);
                 if (childCount > 0) {
                     throw new NotAcceptableError('child exists');
                 }
@@ -71,7 +71,9 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
             const members = await doc.getMembers();
 
             for (const uid of assignees) {
-                const member = members.find(x => x.userId == Types.ObjectId(uid));
+                // const userId =  Types.ObjectId(uid) ;
+                
+                const member = members.find(x => (x.userId as Types.ObjectId).equals(uid)); 
                 if (null == member) {
                     throw new NotAcceptableError('assignees_error');
                 }

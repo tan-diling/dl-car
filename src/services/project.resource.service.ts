@@ -26,7 +26,7 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         const ids = docs.map(x=>x._id) ;
 
-        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId','name email').exec() ;
+        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId','name email image').exec() ;
 
         const convert = (projects:(Project&Document) [],member:(ProjectMember&Document)[])=>{
             return projects.map(x=>{
