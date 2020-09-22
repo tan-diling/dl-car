@@ -7,11 +7,11 @@ import { Resource, ResourceModel, ResourceRelatedBase } from './resource';
 
 export class Comment extends ResourceRelatedBase {
 
-  @prop()
-  title:string;
+  // @prop()
+  // title:string;
 
   @prop()
-  content:string;  
+  description:string;  
 
 }
 

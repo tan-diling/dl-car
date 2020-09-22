@@ -10,7 +10,6 @@ export class CheckListCreateDto {
     @IsString()
     title: string;
     
-
     @IsString()
     @IsOptional()
     description?:string;

@@ -55,9 +55,9 @@ export class DbService {
     }
 
     static
-    async count<T extends Document>(model:Model<T>, query: string|any, options?) {
-        const { filter, skip, limit, sort, projection, population } = aqp(query, options || AQP_OPTIONS);
-        const documentQuery =   model.find(filter).countDocuments() ;
+    async count<T extends Document>(model:Model<T>, query: string|object, options?) {
+        const { filter} = typeof(query)==typeof({})?{filter:query}:aqp(query, options || AQP_OPTIONS);
+        const documentQuery =  model.find(filter).countDocuments() ;
 
         const doc = await documentQuery.exec();
 

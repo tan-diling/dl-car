@@ -5,17 +5,17 @@ import { ProjectMemberStatus } from '@app/defines';
 import { ProjectStatus } from '@app/defines/projectStatus';
 import { Resource, ResourceModel, ResourceRelatedBase } from './resource';
 
-export class CheckList extends ResourceRelatedBase {
+export class Attachment extends ResourceRelatedBase {
 
   // @prop()
   // title:string;
 
   @prop()
-  description:string;
+  filename:string;
 
   @prop()
-  done:boolean;  
+  data:Buffer;
 
 }
 
-export const CheckListModel = getModelForClass(CheckList,{schemaOptions:{ timestamps:true }});
+export const AttachmentModel = getModelForClass(Attachment,{schemaOptions:{ timestamps:true }});

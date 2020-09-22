@@ -12,4 +12,6 @@ export enum ResourceType {
     Effort = 'effort',
     Comment = 'comment',
     CheckList = 'checklist',
+
+    Attachment = 'attachment',
 }

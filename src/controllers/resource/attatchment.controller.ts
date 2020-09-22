@@ -8,7 +8,7 @@ import { StatusDto } from './dto/project.dto';
 import {  CommentResourceService } from '@app/services/resource';
 import { CheckListResourceService } from '@app/services/resource/checkList.resource.service';
 
-const type = ResourceType.CheckList ;
+const type = ResourceType.Attachment ;
 @Authorized()
 @JsonController('/resource')
 export class CheckListController extends AbstractResourceController{
@@ -30,16 +30,16 @@ export class CheckListController extends AbstractResourceController{
         }) ;
     }
     
-    @Get(`/:parent([0-9a-f]{24})/${type}`)
-    async list(@Param('parent') parent:string, @QueryParams() query:any, @Req() request) {
+    // @Get(`/:parent([0-9a-f]{24})/${type}`)
+    // async list(@Param('parent') parent:string, @QueryParams() query:any, @Req() request) {
         
-        return await this.process(request,{       
-            method:RequestOperation.RETRIEVE,
-            filter:{...query,parent:parent},
-            // dto
-        }) ;
+    //     return await this.process(request,{       
+    //         method:RequestOperation.RETRIEVE,
+    //         filter:{...query,parent:parent},
+    //         // dto
+    //     }) ;
 
-    }
+    // }
         
     @Get(`/${type}/:id([0-9a-f]{24})`)
     async getById(@Param('id') id:string, @Req() request) {
@@ -53,14 +53,14 @@ export class CheckListController extends AbstractResourceController{
 
     }
     
-    @Patch(`/${type}/:id([0-9a-f]{24})`)
-    async update(@Param('id') id:string, @Body() dto:CheckListUpdateDto, @Req() request, ) {
-        return await this.process(request,{         
-            resourceId: id,
-            method:RequestOperation.UPDATE,    
-            dto        
-        }) ;
-    }
+    // @Patch(`/${type}/:id([0-9a-f]{24})`)
+    // async update(@Param('id') id:string, @Body() dto:CheckListUpdateDto, @Req() request, ) {
+    //     return await this.process(request,{         
+    //         resourceId: id,
+    //         method:RequestOperation.UPDATE,    
+    //         dto        
+    //     }) ;
+    // }
 
     @Delete(`/${type}/:id([0-9a-f]{24})`)
     async delete(@Param('id') id:string, @Req() request,) {

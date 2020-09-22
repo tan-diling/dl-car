@@ -52,7 +52,8 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
         const m = await this.model.findById(id).exec();
         if (m) {
             if (this.model.schema.path('parents')) {
-                const childCount = await DbService.count(ResourceModel, `parents:${m._id}&deleted=false`);
+                
+                const childCount = await DbService.count(ResourceModel, { parents:m._id,deleted:false});
                 if (childCount > 0) {
                     throw new NotAcceptableError('child exists');
                 }

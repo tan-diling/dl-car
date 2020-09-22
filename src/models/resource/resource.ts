@@ -134,12 +134,14 @@ export const ResourceModel = getModelForClass(Resource,{schemaOptions:{ timestam
 export const ProjectMemberModel = getModelForClass(ProjectMember,{schemaOptions:{timestamps:true}});
 
 export class ResourceRelatedBase{
+  @prop({})
+  title: string;
+
   @prop({required: true, ref:()=>Resource})
   parent: Ref<Resource>;
   
   @prop({ required: true } )
   creator: Types.ObjectId ;
-
 
   @prop({default:false})
   deleted?: boolean;

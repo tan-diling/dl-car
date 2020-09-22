@@ -9,11 +9,8 @@ import { Types } from 'mongoose';
 
 export class Effort extends ResourceRelatedBase {
 
-  @prop()
-  title: string;
-
   // @prop()
-  // results:string;  
+  // title: string;
 
   @prop()
   startAt: Date;
