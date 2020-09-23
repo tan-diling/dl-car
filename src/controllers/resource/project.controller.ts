@@ -17,7 +17,7 @@ export class ProjectController extends AbstractResourceController{
         super();
         this.resourceType = ResourceType.Project;
         this.repoService = Container.get(ProjectResourceService) ;
-        this.queryOptions = {get:{populate:"children"}} ;
+        this.queryOptions = {get:{populate:"children,comments,attachments"}} ;
     }
  
     @Post()

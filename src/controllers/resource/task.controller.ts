@@ -19,7 +19,7 @@ export class TaskController extends AbstractResourceController{
         this.resourceType = type;
         this.repoService = Container.get(TaskResourceService) ;
 
-        this.queryOptions = {get:{populate:"parents"}} ;
+        this.queryOptions = {get:{populate:"parents,comments,attachments"}} ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)

@@ -8,6 +8,7 @@ export * from './task' ;
 export * from './comment' ;
 export * from './checkList' ;
 export * from './effort' ;
+export * from './attachment' ;
 
 
 export * from './resource' ;

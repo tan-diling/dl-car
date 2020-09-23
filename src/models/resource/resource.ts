@@ -4,6 +4,18 @@ import { User } from '../user';
 import { ProjectMemberStatus } from '@app/defines';
 import { ProjectStatus } from '@app/defines/projectStatus';
 
+function relatedList(ref:string){
+  return { 
+    ref,
+    localField:"_id",
+    foreignField:"parent",
+    match:{ deleted:false },
+    options:{
+      projection:{deleted:0},
+    },
+  }
+}
+
 @pre<Resource>('save', async function() { 
   if (this.isNew && this.parents.length>0) {
     const rootId = this.parents[0] ;
@@ -87,7 +99,44 @@ export class Resource {
       return filter;
     },
   })
-  children: Resource[];
+  children: Ref<Resource>[];
+
+  // @prop({ 
+  //   ref:'Comment',
+  //   localField:"_id",
+  //   foreignField:"parent",
+  //   match:{ deleted:false },
+  //   options:{
+  //     projection:{deleted:0},
+  //   },
+  // })
+  // comments: Ref<ResourceRelatedBase>[];
+
+  @prop(relatedList('Comment'))
+  comments: Ref<ResourceRelatedBase>[];
+
+
+  @prop({ 
+    ref:'CheckList',
+    localField:"_id",
+    foreignField:"parent",
+    match:{ 
+      deleted:false,      
+    },
+    
+  })
+  checklist: Ref<ResourceRelatedBase>[];
+
+  @prop({ 
+    ref:'Attachment',
+    localField:"_id",
+    foreignField:"parent",
+    match:{ 
+      deleted:false,    
+    },
+
+  })
+  attachments: Ref<ResourceRelatedBase>[];
 
   async getMembers(this: DocumentType<Resource>) {
     const projectId = this.parents.length==0? this._id: this.parents[0] ;

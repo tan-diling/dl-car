@@ -26,7 +26,7 @@ export enum ProjectStatus {
 
     TaskOpen=1, 
     TaskPlanned=4, 
-    FixPending=11,
+    FixPending=12,
 
 }
 
@@ -257,16 +257,16 @@ const deliverableStatusHandlers:Array<StatusHandler> = [{
 }, {
     from: Status.PendingFulfillment,
     handlers: [{
-        to: Status.InReview,
+        to: Status.QAInProgress,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.QualityAssurance],
     }, {
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
 }, {
-    from: Status.InReview,
+    from: Status.QAInProgress,
     handlers: [{
-        to: Status.PendingFulfillment,
+        to: Status.FixPending,
         projectRoles: [ProjectRole.ProjectManager,ProjectRole.QualityAssurance],
     }, {
         to: Status.Completed,
@@ -276,6 +276,15 @@ const deliverableStatusHandlers:Array<StatusHandler> = [{
         to: Status.Canceled,
         projectRoles: [ProjectRole.ProjectManager],
     }]
+}, {
+    from: Status.FixPending,
+    handlers: [{
+        to: Status.QAInProgress,
+        projectRoles: [ProjectRole.ProjectManager,ProjectRole.QualityAssurance],   
+    }, {
+        to: Status.Canceled,
+        projectRoles: [ProjectRole.ProjectManager],
+    }]    
 }
 ];
 

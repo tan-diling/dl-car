@@ -18,7 +18,7 @@ export class DeliverableController extends AbstractResourceController{
         super();
         this.resourceType = ResourceType.Deliverable;
         this.repoService = Container.get(DeliverableResourceService) ;
-        this.queryOptions = {get:{populate:"children,parents"}} ;
+        this.queryOptions = {get:{populate:"children,parents,comments,attachments,checklist"}} ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)

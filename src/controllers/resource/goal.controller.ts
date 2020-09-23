@@ -18,7 +18,7 @@ export class GoalController extends AbstractResourceController{
         super();
         this.resourceType = ResourceType.Goal;
         this.repoService = Container.get(GoalResourceService) ;
-        this.queryOptions = {get:{populate:"children,parents"}} ;
+        this.queryOptions = {get:{populate:"children,parents,comments,attachments"}} ;
     }
  
     @Post(`/:parent([0-9a-f]{24})/${type}`)

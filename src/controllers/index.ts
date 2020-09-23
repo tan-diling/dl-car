@@ -10,6 +10,7 @@ import { DeliverableController } from './resource/deliverable.controller';
 import { EffortController } from './resource/effort.controller';
 import { CommentController } from './resource/comment.controller';
 import { CheckListController } from './resource/checkList.controller';
+import { AttachmentController } from './resource/attachment.controller';
 
 export const controllers = [
     LoginController,
@@ -26,5 +27,6 @@ export const controllers = [
     EffortController,
     CommentController,
     CheckListController,
+    AttachmentController,
 
 ] ;

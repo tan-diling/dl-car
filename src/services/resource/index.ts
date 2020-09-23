@@ -6,3 +6,5 @@ export * from './task.resource.service' ;
 
 export * from './effort.resource.service' ;
 export * from './comment.resource.service' ;
+export * from './checkList.resource.service' ;
+export * from './attachment.resource.service' ;
