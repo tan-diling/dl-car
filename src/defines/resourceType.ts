@@ -15,3 +15,16 @@ export enum ResourceType {
 
     Attachment = 'attachment',
 }
+
+
+export function isBaseResourceType(type:string){
+    const resourceTypes:string[] = [
+        ResourceType.Project,
+        ResourceType.Goal,
+        ResourceType.Requirement,
+        ResourceType.Deliverable,
+        ResourceType.Task,
+    ];
+
+    return resourceTypes.find(x=>x.toLowerCase()==type.toLowerCase()) != null ;
+}

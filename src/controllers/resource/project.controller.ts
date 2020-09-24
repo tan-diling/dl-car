@@ -58,7 +58,7 @@ export class ProjectController extends AbstractResourceController{
         return await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,
-            filter:{_id:id, memberUserId:request.user.id, populate:'children'},
+            filter:{_id:id, memberUserId:request.user.id },
             // dto
         }) ;
 

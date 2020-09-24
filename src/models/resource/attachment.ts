@@ -7,14 +7,14 @@ import { Resource, ResourceModel, ResourceRelatedBase } from './resource';
 
 export class Attachment extends ResourceRelatedBase {
 
-  // @prop()
-  // title:string;
+  @prop()
+  ext:string;
 
   @prop()
-  filename:string;
+  path:string;
 
   @prop()
-  data:Buffer;
+  data?:Buffer;
 
 }
 

@@ -3,7 +3,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 
 import * as moment from 'moment';
 import { Inject } from 'typedi';
-import {  RepoCRUDInterface, RequestContext, RepoOperation, RequestOperation, IRequestUser } from '@app/defines';
+import {  RepoCRUDInterface, RequestContext, RepoOperation, RequestOperation, IRequestUser, ResourceType, isBaseResourceType } from '@app/defines';
 import { ProjectPermissionService } from '@app/services/projectPermission.service';
 
 interface QueryOptionInterface {
@@ -29,7 +29,7 @@ export class AbstractResourceController {
         if(typeof(ctx.method) == typeof('') ){
             return true ;
         }
-        
+
         return await this.permissionService.checkPermission(ctx) ;
     }
 
@@ -89,4 +89,46 @@ export class AbstractResourceController {
         return result ;
 
     } 
+}
+
+export class AbstractResourceRelatedController extends AbstractResourceController {
+
+    private async getResourceBaseInfo(id){
+        const resource = await this.repoService.get(id) ;
+        return { 
+            resourceId:resource._id,
+            resourceType:resource.type,
+        }
+    }
+
+    async checkPermission(ctx:RequestContext){
+        let _ctx:RequestContext ={...ctx,resourceId:undefined,resourceType:undefined} ;
+        switch(ctx.method) {
+            case RequestOperation.CREATE :
+                _ctx.resourceId = ctx.dto.parent ;
+                _ctx.method = RequestOperation.UPDATE ;            
+                break ;
+            case RequestOperation.UPDATE:
+            case RequestOperation.DELETE:
+                
+                const baseInfo = await this.getResourceBaseInfo(ctx.resourceId) ;
+                
+                _ctx= {..._ctx,...baseInfo,method: RequestOperation.UPDATE } ;            
+                break ;
+            case RequestOperation.RETRIEVE:  
+                _ctx.method = RequestOperation.RETRIEVE ;
+                if(ctx.dto.parent) {
+                    _ctx.resourceId = ctx.dto.parent ;
+                }
+
+                if(ctx.resourceId) {
+                    const baseInfo = await this.getResourceBaseInfo(ctx.resourceId) ;
+                    _ctx= {..._ctx,...baseInfo } ;
+                }
+                _ctx.method = RequestOperation.RETRIEVE ;            
+                break ;                
+        }
+       
+        return await this.permissionService.checkPermission(_ctx) ;
+    }
 }
