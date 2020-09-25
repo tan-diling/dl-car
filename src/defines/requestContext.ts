@@ -17,7 +17,8 @@ export interface RequestContext{
     request:Request,
     method:RequestOperation | string,
     resourceType:string,
-    resourceId?:string, 
+    resourceId?:string,
+    // projectId?:string, 
 
     user?:IRequestUser;
     filter?:any;  

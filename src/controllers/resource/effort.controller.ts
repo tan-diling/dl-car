@@ -40,7 +40,13 @@ export class EffortController extends AbstractResourceController{
     @UseAfter(effortMiddleware)
     @Post(`/:parent([0-9a-f]{24})/${type}`)
     async create(@Param('parent') parent:string, @Body() dto:EffortCreateDto, @Req() request) {  
-        const obj = { ...dto, creator: request?.user?.id} ;
+        const obj = { 
+            ...dto, 
+            creator: request?.user?.id,
+        } ;
+
+        obj.assignee = obj.assignee || obj.creator ;
+
         return await this.process(request,{
             method:RequestOperation.CREATE,
             dto:{parent, ...obj,}

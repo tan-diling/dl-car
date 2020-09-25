@@ -25,6 +25,7 @@ export class GoalController extends AbstractResourceController{
     async create(@Param('parent') parent:string, @Body() dto:GoalCreateDto, @Req() request) {  
         const obj = { ...dto, creator: request?.user?.id} ;
         return await this.process(request,{
+            
             method:RequestOperation.CREATE,
             dto:{parent, ...obj,}
         }) ;

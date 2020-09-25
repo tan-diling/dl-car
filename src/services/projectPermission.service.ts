@@ -142,9 +142,19 @@ export class ProjectPermissionService {
      * @param ctx 
      */
     async checkCurrentCURDPolicy(ctx: RequestContext) {
-        if (ctx.resourceId) {
+        let resourceId = ctx.resourceId ;
+        if(!resourceId ){
+            if(ctx.method == RequestOperation.CREATE){
+                resourceId = ctx.dto.parent ;
+            }
+
+            if(ctx.method == RequestOperation.RETRIEVE){
+                resourceId = ctx.filter.parents || ctx.filter.parent ;
+            }
+        }
+        if (resourceId ) {
             //check current
-            const resource = await ResourceModel.findById(ctx.resourceId).exec();
+            const resource = await ResourceModel.findById(resourceId).exec();
             const projectId = resource?.parents?.[0] || resource?._id;
             const pm = await ProjectMemberModel.findOne({ projectId, userId: ctx.user.id }).exec();
 

@@ -17,6 +17,10 @@ export class EffortCreateDto {
     @Min(0)
     @IsOptional()
     effort: number;
+
+    @IsMongoId()
+    @IsOptional()
+    assignee?: string;
 }
 
 export class EffortUpdateDto extends EffortCreateDto {

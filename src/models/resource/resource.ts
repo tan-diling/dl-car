@@ -81,9 +81,24 @@ export class Resource {
   // @prop({ref:()=>Resource,type:[Types.ObjectId]})
   // children: Ref<Resource>[] ;
 
+  ////////////////////////////////////////////////////////////////////////////////  
   @prop({ default:-1, select:false})
   totalEffort: number;
   
+  @prop({ 
+    ref:'ProjectMember',
+    localField:"_id",
+    foreignField:"projectId",
+    // match:{ 
+    //   deleted:false,      
+    // },
+    options:{
+      populate:'userId' ,
+    },
+    
+  })
+  members: Ref<ProjectMember>[];
+
   @prop({ 
     ref:()=>Resource,
     localField:"_id",
@@ -168,7 +183,7 @@ export class ProjectMember {
   userId: Ref<User>;;
 
   @prop({ ref: Resource, required: true })
-  projectId: Ref<Resource>;;
+  projectId: Ref<Resource>;
   
   @prop({ required: true })
   projectRole :string;
