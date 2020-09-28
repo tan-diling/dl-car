@@ -20,7 +20,18 @@ export class CheckListCreateDto {
 
 }
 
-export class CheckListUpdateDto extends CheckListCreateDto {
+export class CheckListUpdateDto {
 
+    @IsString()
+    @IsOptional()
+    title?: string;
+    
+    @IsString()
+    @IsOptional()
+    description?:string;
+
+    @IsBoolean()
+    @IsOptional()
+    done?:boolean;  
 
 }

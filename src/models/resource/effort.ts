@@ -33,10 +33,8 @@ export class Effort extends ResourceRelatedBase {
             }, {
               _id: resource._id,
             }]
-
           }
-        },
-        {
+        },{
           '$lookup': {
             'from': 'efforts',
             'localField': '_id',
@@ -48,6 +46,11 @@ export class Effort extends ResourceRelatedBase {
             'path': '$efforts'
           }
         }, {
+          '$match': {
+            'efforts.deleted': false,
+            'deleted': false,
+          }
+        }, {          
           '$group': {
             '_id': null,
             'totalEffort': {
