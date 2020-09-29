@@ -8,7 +8,7 @@ import { Resource, ResourceModel } from './resource';
 
 export class Goal extends Resource {
 
-  @prop()
+  @prop({default:0})
   roi?: number;
 
   @prop()

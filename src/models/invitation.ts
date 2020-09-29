@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 import { DocumentType } from '@typegoose/typegoose';
 import { ActionStatus } from '@app/defines';
 import { stringify } from 'querystring';
+import { Contact } from './contact';
 
 
 export class PendingAction {
@@ -12,15 +13,14 @@ export class PendingAction {
   @prop({alias:'type'})
   __t?:string;
   
-  @prop()
+  @prop({ref:()=>User})
   receiver: Ref<User>;
    
   @prop()
   data: any;
   
   @prop({default:false})
-  isReplied?:boolean;
-
+  isResponded?:boolean;
     
   @prop({enum:ActionStatus,default:ActionStatus.Pending})
   status?:ActionStatus; //enum(pending,accept,reject)
@@ -94,11 +94,12 @@ export class Invitation extends PendingAction {
       switch (this.inviteType) {
         case InvitationType.Contact:          
           const {userId,contact} = this.data as ContactInvitationData;          
-  
+          await Contact.appendContact(userId,contact) ;          
           break ;
-
       }
-    } 
+    }
+    
+    await this.save() ;
   }
 }
 

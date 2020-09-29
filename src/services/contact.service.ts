@@ -56,6 +56,12 @@ export class ContactService {
      * @param dto 
      */
     async delete(userId:string,id:string) {
+        const contactUser = await ContactModel.findOne({userId,contact:id}).exec() ;
+
+        if (contactUser==null){
+            return {result:false} ;            
+        }
+        
         await Contact.removeContact(userId,id) ; 
         return {result:true};
     }

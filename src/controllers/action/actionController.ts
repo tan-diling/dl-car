@@ -7,6 +7,7 @@ import { ActionService } from '@app/services/action.service';
 import { ContactInvitationDto, ActionStatusDto } from './dto/invitation.dto';
 import { ContactService } from '@app/services/contact.service';
 import { Container } from 'typedi';
+import { Types } from 'mongoose';
 
 @Authorized()
 @JsonController('/action')
@@ -29,7 +30,7 @@ export class ActionController {
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
         return await this.service.list({
             ...query,
-            receiver:currentUser.id,
+            receiver:Types.ObjectId(currentUser.id),            
         }) ;
         
         // return await this.service.list(query) ;

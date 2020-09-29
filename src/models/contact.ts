@@ -15,7 +15,7 @@ export class Contact {
   @prop()
   meta?: any ;
 
-  static async appendContact(user:string,contact:string) {
+  static async appendContact(user:string|Types.ObjectId,contact:string|Types.ObjectId) {
       {
       const filter = {userId:user,contact};
       const c = await ContactModel.findOne(filter).exec() ;
@@ -35,8 +35,9 @@ export class Contact {
   }
 
   static async removeContact(user:string|any,contact:string|any) {
+
     {
-        const filter = {userId:user,contact};
+        const filter = {userId:user,contact};        
         await ContactModel.findOneAndRemove(filter).exec() ;
     
     }
