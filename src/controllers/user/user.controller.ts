@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
 import { UserService } from '../../services/user.service';
 import { SiteRole } from '@app/defines';
+import { ContactService } from '@app/services/contact.service';
 
 enum Operation{
     CREATE,
@@ -25,7 +26,7 @@ interface RequestContext{
 
 @JsonController()
 export class UserController {
-    constructor(private service: UserService) {
+    constructor(private service: UserService,private contactService: ContactService) {
     }
     
     checkPermission(ctx:RequestContext){
@@ -93,7 +94,9 @@ export class UserController {
     @Get('/user/email_validate')
     @Redirect('/login')
     async emailValidate(@QueryParam('id') id:string, @QueryParam('email') email:string){
-        await this.service.validateEmail({id,email}) ;        
+        await this.service.validateEmail({id,email}) ; 
+        
+        await this.contactService.addDefaultContact(id);
     }
 
     @Post('/user/email_exists')
@@ -175,17 +178,17 @@ export class UserController {
     }
 
     // @Authorized()
-    // @Get('/user/:id([0-9a-f]{24})')
-    // async get(@Param('id') id:string,) {
-    //     return await this.processRequest({
-    //         method:Operation.RETRIEVE,
-    //         // user:currentUser,
-    //         filter:{id},
-    //         // dto
-    //     }) ;
-        
-    //     return await this.service.getById(id) ;
+    // @Get('/user/contact')
+    // async listContact(@Req() request,@CurrentUser() currentUser:IUser) {
+    //     return await this.service.getContacts(currentUser.id) ;
     // }
+
+    // @Authorized()
+    // @Delete('/contact/:id([0-9a-f]{24})')
+    // async deleteContact(@Param('id') id:string,@Req() request,@CurrentUser() currentUser:IUser) {
+    //     return await this.service.getContacts(currentUser.id) ;
+    // }
+
 
     @Authorized()
     @Patch('/user/:id([0-9a-f]{24})')

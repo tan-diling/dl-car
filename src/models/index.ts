@@ -8,5 +8,6 @@ export * from './permission' ;
 export * from './photo' ;
 export * from './resource' ;
 
+export * from './contact' ;
 export * from './invitation' ;
 

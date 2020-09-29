@@ -1,6 +1,12 @@
 import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, MaxLength, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
-import { GroupRole, MemberStatus } from '@app/defines';
+import { GroupRole, MemberStatus, ActionStatus } from '@app/defines';
+
+export class ActionStatusDto {
+    
+    @IsEnum(ActionStatus)
+    status: ActionStatus;    
+}
 
 
 export class InvitationDto {
@@ -9,7 +15,7 @@ export class InvitationDto {
 
     @IsMongoId()
     @IsOptional()
-    inviter?: string;
+    userId?: string;
 
 }
 

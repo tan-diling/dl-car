@@ -2,6 +2,7 @@ import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, in
 
 import * as mongooseHidden from 'mongoose-hidden';
 import { SiteRole } from '@app/defines';
+import { Contact } from './contact';
 
 // enum UserRole {
 //   admin ='admin',
@@ -48,16 +49,31 @@ export class User {
   @prop({ required: false, default: false})
   deleted?: boolean ;
 
-
   @prop({ required: false, default: false})
   defaultContact?: boolean ;
 
   @prop({ required: false, default: true})
   defaultContactAccept?: boolean ;
 
+  @prop({ 
+    ref:"Contact",
+    localField:"_id",
+    foreignField:"user",
+    // match:{ 
+    //   deleted:false,    
+    // },
+    options:{
+      populate:"contact",
+    },
+
+  })
+  contacts: Ref<Contact>[];
+
   isNormal() {
     return (this.emailValidated && (!this.deleted));
   }
+
+  
 }
 
 export class LoginSession{

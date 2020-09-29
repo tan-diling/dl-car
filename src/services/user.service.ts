@@ -56,6 +56,7 @@ export class UserService {
         if (user != null &&  user.email == dto.email ) {
             user.emailValidated = true ;
             await user.save() ;
+            
             return ;
         }
 
@@ -76,6 +77,10 @@ export class UserService {
      */
     async getById(id:string){
         return await UserModel.findById(id).exec() ;
+    }
+
+    async getByEmail(email:string){
+        return await UserModel.findOne({ email }).exec();
     }
 
     /**
@@ -108,5 +113,13 @@ export class UserService {
         return null ;
     }
 
+
+    async getContacts(id){
+        const doc = await this.getById(id) ;
+        if(doc){            
+            await doc.populate("contacts").execPopulate() ;
+            return doc.contacts ;
+        }        
+    }
  
 }

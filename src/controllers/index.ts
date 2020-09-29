@@ -11,6 +11,8 @@ import { EffortController } from './resource/effort.controller';
 import { CommentController } from './resource/comment.controller';
 import { CheckListController } from './resource/checkList.controller';
 import { AttachmentController } from './resource/attachment.controller';
+import { ActionController } from './action/actionController';
+import { ContactController } from './user/contact.controller';
 
 export const controllers = [
     LoginController,
@@ -28,5 +30,8 @@ export const controllers = [
     CommentController,
     CheckListController,
     AttachmentController,
+
+    ActionController,
+    ContactController,
 
 ] ;
