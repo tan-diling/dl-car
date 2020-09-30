@@ -4,7 +4,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as moment from 'moment';
 import { SiteRole } from '@app/defines';
 import { ActionService } from '@app/services/action.service';
-import { ContactInvitationDto, ActionStatusDto } from './dto/invitation.dto';
+import { ActionStatusDto } from './dto/action.dto';
 import { ContactService } from '@app/services/contact.service';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
@@ -12,13 +12,7 @@ import { Types } from 'mongoose';
 @Authorized()
 @JsonController('/action')
 export class ActionController {
-    private contactService = Container.get(ContactService)
     constructor(private service: ActionService) {
-    }
-
-    @Post('/invitation/contact')
-    async inviteContact(@Body() dto:ContactInvitationDto,@CurrentUser() currentUser) {
-        return await this.contactService.inviteContact({userId:currentUser.id,...dto}) ;
     }
 
     @Post('/:id([0-9a-f]{24})/status')

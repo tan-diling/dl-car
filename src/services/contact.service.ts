@@ -4,11 +4,12 @@ import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-co
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
-import { Contact,ContactModel, InvitationType, InvitationModel, PendingAction } from '@app/models';
+import { Contact,ContactModel, InvitationType, InvitationModel, PendingAction, GroupMemberModel } from '@app/models';
 import { DbService } from './db.service';
 import { UserService } from './user.service';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
+import { GroupService } from './group.service';
 
 /**
  * Contact service
@@ -67,19 +68,24 @@ export class ContactService {
     }
 
 
-    private async inviteContactByUser(userId:string,contact:DocumentType<User>){
-        const contactUser = await ContactModel.findOne({userId,contact}).exec() ;
+    private async inviteContactByUser(userId:string,contactUser:Types.ObjectId){
+        // const contactUserObjectId = Types.ObjectId(contactUser) ;
+        if(userId== String(contactUser)){
+            throw new NotAcceptableError("contact add self error") ;            
+        }
 
-        if (contactUser!=null){
+        const contact = await ContactModel.findOne({userId,contact:contactUser}).exec() ;
+
+        if (contact!=null){
             throw new NotAcceptableError("contact Exists") ;            
         }
 
         const pendingInvitation = {
-            receiver:contact._id,
+            receiver:contactUser,
             inviteType: InvitationType.Contact,
             data: {
                 userId:Types.ObjectId(userId),
-                contact:contact._id,
+                contact:contactUser,
             },
         } ;
 
@@ -104,8 +110,41 @@ export class ContactService {
         } 
 
         
-        return await this.inviteContactByUser(dto.userId,contactUser) ;
+        return await this.inviteContactByUser(dto.userId,contactUser._id) ;
 
+    }
+
+    async inviteContactByGroup(userId:string, groupId:string) {
+        const gmList = await GroupMemberModel.find({groupId,}).exec() ;
+        
+        const contactInfo = await this.listContact(userId);
+
+        let result = [] ;
+
+        for(const gm of gmList){
+            const contactUser = gm.userId as Types.ObjectId;
+            //skip self
+            if(contactUser.equals(userId)) continue ;
+
+            //skip already exists contact
+            const existContact = null != contactInfo.contacts.find(x=>contactUser.equals(x._id)) ;
+            if(existContact) continue ;
+
+            //skip already exists invitation
+            const existInvitation = null != contactInfo.invitation.find(x=>contactUser.equals(x._id)) ;
+            if(existInvitation) continue ;
+
+            try {
+                const invitation = await this.inviteContactByUser(userId,contactUser) ;
+                result.push(invitation) ;
+            }catch(err) {
+                console.error("inviteGroup "+String(err));
+            }
+
+            
+        }
+        
+        return result ;
     }
 
     /**

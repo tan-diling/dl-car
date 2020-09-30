@@ -4,7 +4,6 @@ import { User } from './user';
 import { Types } from 'mongoose';
 import { DocumentType } from '@typegoose/typegoose';
 import { ActionStatus } from '@app/defines';
-import { stringify } from 'querystring';
 import { Contact } from './contact';
 
 
