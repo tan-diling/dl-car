@@ -121,5 +121,21 @@ export class UserService {
             return doc.contacts ;
         }        
     }
+
+    /**
+     * get user by email ,if not exist,create a new user 
+     * @param email 
+     * @param options 
+     */
+    async getUserByEmailForce(email:string,options?:Partial<User>){
+        const defaultInvitationUser = {name:'New User',company:'',role:SiteRole.Client} ;
+        let user = await this.getByEmail(email);        
+
+        if (user == null){
+            user = await this.create({...defaultInvitationUser,...options, email:email}) ;
+        } 
+
+        return user ;
+    }
  
 }

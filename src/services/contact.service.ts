@@ -68,6 +68,11 @@ export class ContactService {
     }
 
 
+    /**
+     * invite contact user to user's contact 
+     * @param userId user id
+     * @param contactUser user id
+     */
     private async inviteContactByUser(userId:string,contactUser:Types.ObjectId){
         // const contactUserObjectId = Types.ObjectId(contactUser) ;
         if(userId== String(contactUser)){
@@ -102,18 +107,17 @@ export class ContactService {
      * @param dto 
      */
     async inviteContact(dto: {userId,email}) {
-        const defaultInvitationUser = {name:'Invitation User',company:'',role:SiteRole.Client} ;
-        let contactUser = await this.userService.getByEmail(dto.email);        
-
-        if (contactUser == null){
-            contactUser = await this.userService.create({...defaultInvitationUser, email:dto.email}) ;
-        } 
-
+        const contactUser = await this.userService.getUserByEmailForce(dto.email) ;        
         
         return await this.inviteContactByUser(dto.userId,contactUser._id) ;
 
     }
 
+    /**
+     * invite all group member to user's contact
+     * @param userId user id
+     * @param groupId group id
+     */
     async inviteContactByGroup(userId:string, groupId:string) {
         const gmList = await GroupMemberModel.find({groupId,}).exec() ;
         
@@ -148,8 +152,8 @@ export class ContactService {
     }
 
     /**
-     * invite user by email
-     * @param dto 
+     * all all defaultContact users to user' contact
+     * @param userId user id 
      */
     async addDefaultContact(userId:string) {
         const user = await this.userService.getById(userId) ;
