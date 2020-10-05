@@ -31,7 +31,7 @@ export class ProjectResourceService extends ResourceService<Project>{
         const convert = (projects:(Project&Document) [],member:(ProjectMember&Document)[])=>{
             return projects.map(x=>{
                 return {... x.toJSON(),
-                    member:member
+                    members:member
                         .filter(y=>y.projectId==x.id)
                         .map(z=>{
                             return {
