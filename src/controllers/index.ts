@@ -13,14 +13,20 @@ import { CheckListController } from './resource/checkList.controller';
 import { AttachmentController } from './resource/attachment.controller';
 import { ActionController } from './action/actionController';
 import { ContactController } from './user/contact.controller';
+import { GroupMemberController } from './group/groupMember.controller';
+import { ProjectMemberController } from './resource/projectMember.controller';
 
 export const controllers = [
     LoginController,
     UserController,
     PhotoController,
     ImageController,
-    GroupController,    
+    GroupController,  
+    GroupMemberController,
+    
+    
     ProjectController,
+    ProjectMemberController,    
     GoalController,
     RequirementController,
     DeliverableController,

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, Action, UseAfter } from 'routing-controllers';
-import { AbstractResourceController } from './abstractResource.controller';
+import { AbstractResourceController, AbstractResourceRelatedController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi' ;
 import {  CommentUpdateDto, CommentCreateDto, CheckListUpdateDto, CheckListCreateDto } from './dto';
@@ -11,7 +11,7 @@ import { CheckListResourceService } from '@app/services/resource/checkList.resou
 const type = ResourceType.CheckList ;
 @Authorized()
 @JsonController('/resource')
-export class CheckListController extends AbstractResourceController{
+export class CheckListController extends AbstractResourceRelatedController{
     /**
      *
      */

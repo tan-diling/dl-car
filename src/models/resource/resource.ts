@@ -188,8 +188,18 @@ export class ProjectMember {
   @prop({ required: true })
   projectRole :string;
 
-  @prop( { default: ProjectMemberStatus.Invited } )
-  status? :string;
+  // @prop( { default: ProjectMemberStatus.Invited } )
+  // status? :string;
+
+  static async appendMember(projectId:Types.ObjectId, userId:Types.ObjectId,projectRole:string) {
+    const member = await ProjectMemberModel.findOneAndUpdate(
+      { projectId,userId },
+      { projectId,userId, projectRole },
+      { upsert:true, new:true },
+      ).exec();
+
+    return member;  
+  }
 }
 
 

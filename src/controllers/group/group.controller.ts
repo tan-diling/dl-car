@@ -212,41 +212,41 @@ export class GroupController {
         // return await this.service.list(query) ;
     }
 
-    @Delete('/:id([0-9a-f]{24})/member')
-    @OnNull(400)
-    async deleteMember(@Param('id') id: string, @Req() request, @CurrentUser() currentUser, @Body() dto: DeleteGroupMemberDto) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.DELETE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-            dto
-        });
-        // return await this.service.delete(id) ;
-    }
+    // @Delete('/:id([0-9a-f]{24})/member')
+    // @OnNull(400)
+    // async deleteMember(@Param('id') id: string, @Req() request, @CurrentUser() currentUser, @Body() dto: DeleteGroupMemberDto) {
+    //     return await this.processRequest({
+    //         resourceType,
+    //         request,
+    //         method: RequestOperation.DELETE,
+    //         user: currentUser,
+    //         resourceId: id,
+    //         filter: { id },
+    //         dto
+    //     });
+    //     // return await this.service.delete(id) ;
+    // }
 
-    @Post('/:id([0-9a-f]{24})/member')
-    @OnUndefined(400)
-    async createMember(@Param('id') id: string, @Body() dto: CreateGroupMemberDto, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.CREATE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-            dto
-        });
+    // @Post('/:id([0-9a-f]{24})/member')
+    // @OnUndefined(400)
+    // async createMember(@Param('id') id: string, @Body() dto: CreateGroupMemberDto, @Req() request, @CurrentUser() currentUser) {
+    //     return await this.processRequest({
+    //         resourceType,
+    //         request,
+    //         method: RequestOperation.CREATE,
+    //         user: currentUser,
+    //         resourceId: id,
+    //         filter: { id },
+    //         dto
+    //     });
 
-    }
+    // }
 
-    // @Authorized("NONE")
-    @Patch('/:id([0-9a-f]{24})/member_confirm')
-    async memberConfirm(@Param('id') id: string, @Body() dto:GroupMemberInvitedResponseDto, @CurrentUser() currentUser)
-    {
-        return await this.service.memberConfirm({id, email:currentUser.email, ...dto}) ;
-    }
+    // // @Authorized("NONE")
+    // @Patch('/:id([0-9a-f]{24})/member_confirm')
+    // async memberConfirm(@Param('id') id: string, @Body() dto:GroupMemberInvitedResponseDto, @CurrentUser() currentUser)
+    // {
+    //     return await this.service.memberConfirm({id, email:currentUser.email, ...dto}) ;
+    // }
     
 }

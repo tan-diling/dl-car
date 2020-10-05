@@ -1,8 +1,8 @@
 import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
-import { GroupModel, Group, GroupMemberModel, GroupMember } from '../models';
-import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus } from '@app/defines';
+import { GroupModel, Group, GroupMemberModel, GroupMember, InvitationType, InvitationModel } from '../models';
+import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus, ActionStatus } from '@app/defines';
 import { model, Types } from 'mongoose';
 import { UserModel } from '../models';
 /**
@@ -77,7 +77,7 @@ export class GroupService {
         }
     }
 
-    async checkGroupMemberPermission(groupId, userId, ...groupRoles:string[]){
+    async checkGroupMemberPermission(groupId:string|Types.ObjectId, userId:string|Types.ObjectId, ...groupRoles:string[]){
         const gm = await GroupMemberModel.findOne({userId,groupId}).exec() ;
         if (gm){
             if(groupRoles.length>0)
@@ -155,9 +155,9 @@ export class GroupService {
         await GroupMemberModel.create({
             groupId:group._id,
             userId: group.owner,
-            email: dto.email,
+            // email: dto.email,
             groupRole: GroupRole.Admin,
-            status: GroupMemberStatus.Confirmed,
+            // status: GroupMemberStatus.Confirmed,
         }) ;
 
         // GroupModel.emit(Operation.Created, group) ;
@@ -332,30 +332,69 @@ export class GroupService {
     /**
      *  child model create
      */ 
-    async appendMember(id:string,dto:{email,groupRole}){
+    async appendMember(id:string,dto:{userId,groupRole}){
         const group = await GroupModel.findById(id).exec() ;
         if( ! group ) return ;
 
         const groupId= group._id ;
-        const {email,groupRole} = dto
-        const user = await UserModel.findOne({email}).exec();
+        const {userId,groupRole} = dto
+        const user = await UserModel.findById(userId).exec();
 
-        if(group.owner == user?._id) {
-
-            throw new MethodNotAllowedError("not_allowed");
-
-        }
-
-        const groupMember = await GroupMemberModel.findOneAndUpdate(
-            { groupId,email },
-            { groupId,email, groupRole, userId:user?._id },
-            { upsert:true, new:true },
-            ).exec();
-
+        const groupMember = GroupMember.appendMember(groupId,user._id, groupRole) ;
+            
         GroupMemberModel.emit(RepoOperation.Created,groupMember) ;
 
         return groupMember ;
 
+    }
+
+
+
+    /**
+     *  child model create
+     */ 
+    async inviteMember(groupId:Types.ObjectId, dto:{userId:Types.ObjectId,groupRole:string}){
+       
+        const groupMember = await GroupMemberModel.findOne({ 
+            groupId,
+            userId:dto.userId 
+        }).exec();
+
+        if(groupMember!=null){
+            throw new NotAcceptableError('group member already exists') ;
+        }
+       
+
+        const invitation = await InvitationModel.findOne({
+            receiver:dto.userId,
+            inviteType: InvitationType.Group ,
+            data: {
+                userId:dto.userId,
+                groupId:groupId,
+            },
+            status:ActionStatus.Pending,
+        }).exec() ;
+        if (invitation!=null){
+            throw new NotAcceptableError("Invitation Exists") ;            
+        }
+
+        return await InvitationModel.create({
+            receiver:dto.userId,
+            inviteType: InvitationType.Group ,
+            data: {
+                userId:dto.userId,
+                groupId:groupId,
+                groupRole:dto.groupRole,
+            },
+        }) ;              
+    }
+
+
+    /**
+     *  getMember
+     */
+    async getMemberById(id:string){        
+        return  await GroupMemberModel.findById(id).exec();
     }
 
     /**
@@ -380,29 +419,29 @@ export class GroupService {
     }
 
 
-    /**
-     * user handle group invited, action accept or reject
-     * @param dto 
-     */
-    async memberConfirm( dto:{email:string, id:string, status?:string }) {
+    // /**
+    //  * user handle group invited, action accept or reject
+    //  * @param dto 
+    //  */
+    // async memberConfirm( dto:{email:string, id:string, status?:string }) {
 
-        const gm = await GroupMemberModel.findOne({groupId:dto.id,email:dto.email}).exec() ;
+    //     const gm = await GroupMemberModel.findOne({groupId:dto.id,email:dto.email}).exec() ;
 
-        if(gm){
-            gm.status = dto.status == MemberStatus.Refused ? MemberStatus.Refused: MemberStatus.Confirmed  ;
+    //     if(gm){
+    //         gm.status = dto.status == MemberStatus.Refused ? MemberStatus.Refused: MemberStatus.Confirmed  ;
 
-            if(! gm.userId) {
-                const user = await UserModel.findOne({email:gm.email}).exec() ;                
-                gm.userId = user._id ;
-            }
+    //         if(! gm.userId) {
+    //             const user = await UserModel.findOne({email:gm.email}).exec() ;                
+    //             gm.userId = user._id ;
+    //         }
 
-            await gm.save() ;
+    //         await gm.save() ;
 
-            return {result:"Invitation confirmed "} ;
-        }
+    //         return {result:"Invitation confirmed "} ;
+    //     }
         
-        throw new NotFoundError('param_error');
-    }    
+    //     throw new NotFoundError('param_error');
+    // }    
 
  
 }

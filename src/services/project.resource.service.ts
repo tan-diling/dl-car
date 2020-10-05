@@ -1,7 +1,7 @@
 import { Model, Document, Types } from 'mongoose';
-import { RepoCRUDInterface, MemberStatus } from '@app/defines';
+import { RepoCRUDInterface, MemberStatus, ActionStatus } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember } from '../models';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, InvitationType, InvitationModel } from '../models';
 import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
@@ -37,7 +37,7 @@ export class ProjectResourceService extends ResourceService<Project>{
                             return {
                                 "user":z.userId,
                                 "projectRole":z.projectRole,
-                                "status":z.status,
+                                // "status":z.status,
                             };
                         })
                 };
@@ -130,13 +130,59 @@ export class ProjectResourceService extends ResourceService<Project>{
                 ProjectMemberModel.emit(RepoOperation.Created, pm) ;
             }
 
-            if(pm.userId == project.creator && pm.status!=MemberStatus.Confirmed ){
-                pm.status = MemberStatus.Confirmed ;
-                await pm.save() ;                
-            }
+            // if(pm.userId == project.creator && pm.status!=MemberStatus.Confirmed ){
+            //     pm.status = MemberStatus.Confirmed ;
+            //     await pm.save() ;                
+            // }
             
         }        
 
+    }    
+
+
+
+    /**
+     * config project members
+     * @param project project document
+     * @param member members
+     */
+    async inviteProjectMember(dto:{projectId:Types.ObjectId,userId:Types.ObjectId,projectRole:string}){
+
+        const pm = await ProjectMemberModel.findOne({projectId:dto.projectId,userId:dto.userId}).exec() ;
+        
+        if (pm != null){
+            throw new NotAcceptableError('project member already exists');
+        }
+
+        const invitation = await InvitationModel.findOne({
+            receiver:dto.userId,
+            inviteType: InvitationType.Project ,
+            data: {
+                userId: dto.userId,
+                projectId: dto.projectId,
+            },
+            status:ActionStatus.Pending,
+        }).exec() ;
+        if (invitation!=null){
+            throw new NotAcceptableError("Invitation Exists") ;            
+        }
+
+        return await InvitationModel.create({
+            receiver:dto.userId,
+            inviteType: InvitationType.Project ,
+            data:dto,
+        }) ;     
+
+            
+    }    
+
+       /**
+     * config project members
+     * @param project project document
+     * @param member members
+     */
+    async getProjectMemberById(id){
+        return await ProjectMemberModel.findById(id).exec() ;                           
     }    
 
 
@@ -168,15 +214,15 @@ export class ProjectResourceService extends ResourceService<Project>{
                
     };
 
-    async memberConfirm(dto:{id:string,userId:string,status}){
-        const pm = await ProjectMemberModel.findOne({projectId:dto.id, userId:dto.userId}).exec() ;
-        if(pm ){
-            pm.status = dto.status || MemberStatus.Confirmed ;
-            await pm.save() ;
+    // async memberConfirm(dto:{id:string,userId:string,status}){
+    //     const pm = await ProjectMemberModel.findOne({projectId:dto.id, userId:dto.userId}).exec() ;
+    //     if(pm ){
+    //         pm.status = dto.status || MemberStatus.Confirmed ;
+    //         await pm.save() ;
 
-            return pm ;
-        }
+    //         return pm ;
+    //     }
 
-    }
+    // }
 }
 

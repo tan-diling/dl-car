@@ -83,26 +83,26 @@ export class ProjectController extends AbstractResourceController{
     }
 
 
-    @Patch('/:id([0-9a-f]{24})/member')
-    async updateMember(@Param('id') id:string, @Body({ type: ProjectMemberDto }) dto:ProjectMemberDto[], @Req() request, ) {
-        return await this.process(request,{         
-            resourceId: id,
-            method:RequestOperation.UPDATE,    
-            dto:{member:dto}
-        }) ;
-    }
+    // @Patch('/:id([0-9a-f]{24})/member')
+    // async updateMember(@Param('id') id:string, @Body({ type: ProjectMemberDto }) dto:ProjectMemberDto[], @Req() request, ) {
+    //     return await this.process(request,{         
+    //         resourceId: id,
+    //         method:RequestOperation.UPDATE,    
+    //         dto:{member:dto}
+    //     }) ;
+    // }
 
 
-    @Patch('/:id([0-9a-f]{24})/member_confirm')
-    async memberConfirm(@Param('id') id:string, @Req() request, @Body() dto:ProjectMemberConfirmDto)
-    {
+    // @Patch('/:id([0-9a-f]{24})/member_confirm')
+    // async memberConfirm(@Param('id') id:string, @Req() request, @Body() dto:ProjectMemberConfirmDto)
+    // {
         
-        return await this.process(request,{           
-            resourceId: id,
-            method:"memberConfirm",            
-            dto: {userId:request.user.id , ...dto}
-        }) ;  
+    //     return await this.process(request,{           
+    //         resourceId: id,
+    //         method:"memberConfirm",            
+    //         dto: {userId:request.user.id , ...dto}
+    //     }) ;  
 
-    }
+    // }
 
 }

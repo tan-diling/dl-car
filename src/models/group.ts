@@ -18,13 +18,13 @@ export class Group  {
   deleted?: boolean ;
 }
 
-@index({  groupId: 1, email: 1 }, { unique: true })
+@index({  groupId: 1, userId: 1 }, { unique: true })
 export class GroupMember {
   @prop({ ref: Group, required: true })
   groupId: Ref<Group>;;
   
-  @prop({  required: true })
-  email: string;
+  // @prop({  required: true })
+  // email: string;
 
   @prop({ ref: User })
   userId: Ref<User>;
@@ -33,8 +33,16 @@ export class GroupMember {
   @prop({ required: true })
   groupRole :string;
   
-  @prop( { default: GroupMemberStatus.Invited } )
-  status: string ;
+  static async appendMember(groupId:Types.ObjectId, userId:Types.ObjectId,groupRole:string) {
+    const groupMember = await GroupMemberModel.findOneAndUpdate(
+      { groupId,userId },
+      { groupId,groupRole, userId },
+      { upsert:true, new:true },
+      ).exec();
+
+    return groupMember;  
+  }
+  
 }
 
 

@@ -28,9 +28,9 @@ export default () => {
     /**
      * when group member created, send user confirm join email 
      */
-    GroupMemberModel.on(RepoOperation.Created, (doc:GroupMember) => {
-        // const user = UserModel.findById(doc.userId) ;
-        const email = doc.email ;
+    GroupMemberModel.on(RepoOperation.Created,async (doc:GroupMember) => {
+        const user = await UserModel.findById(doc.userId) ;
+        const email = user.email ;
         const { subject, text } = buildMailOfGroupMemberConfirm( doc);
 
         sendMail(email, text, subject).catch(error => {

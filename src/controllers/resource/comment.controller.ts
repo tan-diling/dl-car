@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, Action, UseAfter } from 'routing-controllers';
-import { AbstractResourceController } from './abstractResource.controller';
+import { AbstractResourceController, AbstractResourceRelatedController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi' ;
 import {  CommentUpdateDto, CommentCreateDto } from './dto';
@@ -10,7 +10,7 @@ import {  CommentResourceService } from '@app/services/resource';
 const type = ResourceType.Comment ;
 @Authorized()
 @JsonController('/resource')
-export class CommentController extends AbstractResourceController{
+export class CommentController extends AbstractResourceRelatedController{
     /**
      *
      */

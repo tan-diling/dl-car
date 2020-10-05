@@ -93,9 +93,9 @@ export class ProjectPermissionService {
      * query policy by resource and project_role
      * @param filter 
      */
-    async queryPolicy(filter: { resource, role }) {
+    async queryPolicy(filter: { resource:string, role:string }) {
 
-        return await PermissionPolicyModel.findOne(filter).exec();
+        return await PermissionPolicyModel.findOne({resource:filter.resource.toLowerCase(),role:filter.role.toLowerCase()}).exec();
     }
 
     /**
@@ -213,6 +213,21 @@ export class ProjectPermissionService {
             }
         }
 
+    }
+
+    async validatePermissionRole(projectId:Types.ObjectId, userId:Types.ObjectId, ...roles:string[]){
+        const pm = await ProjectMemberModel.findOne({projectId,userId}).exec() ;
+        
+        if (pm){
+            if(roles.length == 0) return true ;
+
+            if( roles.includes(pm.projectRole)) {
+                return true;
+            };
+            
+        }   
+        
+        return false ;
     }
 
 }

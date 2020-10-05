@@ -32,6 +32,13 @@ export class ProjectMemberDto {
   }
 
 
+export class ProjectMemberUpdateDto {
+    
+    @IsEnum(ProjectRole)
+    projectRole :string;
+}  
+
+
 export class ProjectUpdateDto {    
     @IsString()
     @IsAlphanumeric()

@@ -27,6 +27,12 @@ export class CreateGroupMemberDto {
     groupRole: string;
 }
 
+
+export class UpdateGroupMemberDto {
+    @IsEnum(GroupRole)
+    groupRole: string;
+}
+
 export class DeleteGroupMemberDto {
     @IsEmail()    
     email: string;
