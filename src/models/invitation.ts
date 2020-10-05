@@ -17,6 +17,9 @@ export class PendingAction {
   @prop({ ref: () => User })
   receiver: Ref<User>;
 
+  @prop({ ref: () => User })
+  sender?: Ref<User>;
+
   @prop()
   data: any;
 
@@ -49,11 +52,11 @@ export class PendingAction {
 
 
 
-export enum InvitationType {
-  Contact = "Contact",
-  Group = "Group",
-  Project = "Project",
-}
+// export enum InvitationType {
+//   Contact = "Contact",
+//   Group = "Group",
+//   Project = "Project",
+// }
 
 export enum InvitationUserType {
   Internal,
@@ -61,69 +64,111 @@ export enum InvitationUserType {
 }
 
 interface ContactInvitationData {
+  // @prop({ ref: () => User })
   userId: Types.ObjectId;
   contact: Types.ObjectId;
+  name?: string;
 }
 
 interface GroupInvitationData {
   userId: Types.ObjectId;
   groupId: Types.ObjectId;
   groupRole?: string;
+  name?: string;
 }
 
 interface ProjectInvitationData {
   userId: Types.ObjectId;
   projectId: Types.ObjectId;
   projectRole?: string;
+  name?: string;
 }
 
 type InvitationData = ContactInvitationData | GroupInvitationData | ProjectInvitationData;
 
-export class Invitation extends PendingAction {
-  @prop()
-  email?: string;
+export class InvitationContact extends PendingAction {
+  // @prop()
+  // email?: string;
 
-  @prop({ enum: InvitationType })
-  inviteType: InvitationType; //enum:group，contact, project ,
+  // @prop({ enum: InvitationType })
+  // inviteType: InvitationType; //enum:group，contact, project ,
 
-  data: InvitationData;
+  data: ContactInvitationData;
 
-  async changeStatus(this: DocumentType<Invitation>, status: ActionStatus) {
+  async changeStatus(this: DocumentType<InvitationContact>, status: ActionStatus) {
     await super.changeStatus(status);
 
     if (status == ActionStatus.Accepted) {
-      switch (this.inviteType) {
-        case InvitationType.Contact:
-          {
-            const { userId, contact } = this.data as ContactInvitationData;
-            await Contact.appendContact(userId, contact);
-          }
-          break;
-
-        case InvitationType.Group:
-          {
-            const { userId, groupId, groupRole } = this.data as GroupInvitationData;
-            await GroupMember.appendMember(groupId, userId, groupRole);
-          }
-          break;
-
-        case InvitationType.Project:
-          {
-            const { userId, projectId, projectRole } = this.data as ProjectInvitationData;
-            await ProjectMember.appendMember(projectId, userId, projectRole);
-          }
-          break;
-        default:
-          throw new Error('not implemented');
-      }
+      
+            const { userId, contact } = this.data;
+            await Contact.appendContact(userId, contact);            
     }
 
     await this.save();
   }
+
+ 
+}
+
+export class InvitationGroup extends PendingAction {
+  // @prop()
+  // email?: string;
+
+  // @prop({ enum: InvitationType })
+  // inviteType: InvitationType; //enum:group，contact, project ,
+
+  data: GroupInvitationData;
+
+  async changeStatus(this: DocumentType<InvitationGroup>, status: ActionStatus) {
+    await super.changeStatus(status);
+
+    if (status == ActionStatus.Accepted) {                
+      const { userId, groupId, groupRole } = this.data;
+      await GroupMember.appendMember(groupId, userId, groupRole);          
+        
+    }
+
+    await this.save();
+  }
+
+ 
+}
+
+export class InvitationProject extends PendingAction {
+  // @prop()
+  // email?: string;
+
+  // @prop({ enum: InvitationType })
+  // inviteType: InvitationType; //enum:group，contact, project ,
+
+  data: ProjectInvitationData;
+
+  async changeStatus(this: DocumentType<InvitationProject>, status: ActionStatus) {
+    await super.changeStatus(status);
+
+    if (status == ActionStatus.Accepted) {
+      
+          
+            const { userId, projectId, projectRole } = this.data ;
+            await ProjectMember.appendMember(projectId, userId, projectRole);
+          
+      
+    }
+
+    await this.save();
+  }
+
+ 
 }
 
 
 export const PendingActionModel = getModelForClass(PendingAction, { schemaOptions: { timestamps: true } });
 
 
-export const InvitationModel = getDiscriminatorModelForClass(PendingActionModel, Invitation);
+export const InvitationContactModel = getDiscriminatorModelForClass(PendingActionModel, InvitationContact);
+
+
+export const InvitationGroupModel = getDiscriminatorModelForClass(PendingActionModel, InvitationGroup);
+
+
+export const InvitationProjectModel = getDiscriminatorModelForClass(PendingActionModel, InvitationProject);

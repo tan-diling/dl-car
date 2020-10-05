@@ -4,7 +4,7 @@ import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-co
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
-import { Contact,ContactModel, InvitationType, InvitationModel, PendingAction, GroupMemberModel } from '@app/models';
+import { Contact,ContactModel,  InvitationContactModel, PendingAction, GroupMemberModel } from '@app/models';
 import { DbService } from './db.service';
 import { UserService } from './user.service';
 import { Container } from 'typedi';
@@ -48,7 +48,7 @@ export class ContactService {
     }
     
     async listPendingActionUser(userId:string){   
-        const l = await InvitationModel.find({"data.userId":Types.ObjectId(userId),inviteType: InvitationType.Contact,status:ActionStatus.Pending}).exec() ;
+        const l = await InvitationContactModel.find({"data.userId":Types.ObjectId(userId),status:ActionStatus.Pending}).exec() ;
         return UserModel.find().where('_id').in(l.map(x=>x.receiver));
     }
 
@@ -79,27 +79,40 @@ export class ContactService {
             throw new NotAcceptableError("contact add self error") ;            
         }
 
+        const user = await this.userService.getById(userId) ;
+
+        if (user == null){
+            throw new NotAcceptableError("user not exists") ;            
+        }
+
+
+
         const contact = await ContactModel.findOne({userId,contact:contactUser}).exec() ;
 
         if (contact!=null){
-            throw new NotAcceptableError("contact Exists") ;            
+            throw new NotAcceptableError("contact exists") ;            
         }
 
-        const pendingInvitation = {
-            receiver:contactUser,
-            inviteType: InvitationType.Contact,
-            data: {
-                userId:Types.ObjectId(userId),
-                contact:contactUser,
-            },
+        const invitationData = {
+                userId:user._id,
+                contact:contactUser,        
         } ;
 
-        const invitation = await InvitationModel.findOne({...pendingInvitation,status:ActionStatus.Pending}).exec() ;
+        const invitation = await InvitationContactModel.findOne({data:invitationData, status:ActionStatus.Pending}).exec() ;
         if (invitation!=null){
             throw new NotAcceptableError("Invitation Exists") ;            
         }
             
-        return await InvitationModel.create(pendingInvitation) ;          
+        return await InvitationContactModel.create({
+            receiver:contactUser,
+            data: {
+                userId:user._id,
+                contact:contactUser,
+                name: user.name,
+            },
+            sender: user._id
+        
+        }) ;          
     }
 
     /**

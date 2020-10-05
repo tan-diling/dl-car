@@ -38,7 +38,8 @@ export class ProjectMemberController {
             projectId:Types.ObjectId(id),
             userId: Types.ObjectId(dto.userId),
             projectRole:dto.projectRole,
-        }) ;
+        },
+        currentUser.id) ;
     }
 
   

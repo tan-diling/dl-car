@@ -1,7 +1,7 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus, ActionStatus } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember, InvitationType, InvitationModel } from '../models';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember,  InvitationProjectModel } from '../models';
 import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
@@ -146,7 +146,9 @@ export class ProjectResourceService extends ResourceService<Project>{
      * @param project project document
      * @param member members
      */
-    async inviteProjectMember(dto:{projectId:Types.ObjectId,userId:Types.ObjectId,projectRole:string}){
+    async inviteProjectMember(dto:{projectId:Types.ObjectId,userId:Types.ObjectId,projectRole:string},sender:string){
+
+        const project = await ProjectModel.findById(dto.projectId).exec() ;
 
         const pm = await ProjectMemberModel.findOne({projectId:dto.projectId,userId:dto.userId}).exec() ;
         
@@ -154,9 +156,8 @@ export class ProjectResourceService extends ResourceService<Project>{
             throw new NotAcceptableError('project member already exists');
         }
 
-        const invitation = await InvitationModel.findOne({
-            receiver:dto.userId,
-            inviteType: InvitationType.Project ,
+        const invitation = await InvitationProjectModel.findOne({
+
             data: {
                 userId: dto.userId,
                 projectId: dto.projectId,
@@ -167,10 +168,10 @@ export class ProjectResourceService extends ResourceService<Project>{
             throw new NotAcceptableError("Invitation Exists") ;            
         }
 
-        return await InvitationModel.create({
+        return await InvitationProjectModel.create({
             receiver:dto.userId,
-            inviteType: InvitationType.Project ,
-            data:dto,
+            data:{...dto,name:project.title},
+            sender,
         }) ;     
 
             

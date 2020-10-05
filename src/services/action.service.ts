@@ -4,13 +4,7 @@ import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-co
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
-import { Invitation,InvitationModel, InvitationType,  PendingActionModel, ContactModel } from '@app/models';
-import { userCheck } from '@app/loaders/startup/passport';
-import { EmailBatch } from '@app/models/email';
-import { UserService } from './user.service';
-import { Container } from 'typedi';
-import { UserProfileUpdateDto } from '@app/controllers/user/dto/user.dto';
-import { Types } from 'mongoose';
+import { PendingActionModel } from '@app/models';
 import { DbService } from './db.service';
 
 /**

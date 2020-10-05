@@ -1,7 +1,7 @@
 import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
-import { GroupModel, Group, GroupMemberModel, GroupMember, InvitationType, InvitationModel } from '../models';
+import { GroupModel, Group, GroupMemberModel, GroupMember,  InvitationGroupModel } from '../models';
 import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus, ActionStatus } from '@app/defines';
 import { model, Types } from 'mongoose';
 import { UserModel } from '../models';
@@ -353,8 +353,14 @@ export class GroupService {
     /**
      *  child model create
      */ 
-    async inviteMember(groupId:Types.ObjectId, dto:{userId:Types.ObjectId,groupRole:string}){
+    async inviteMember(groupId:Types.ObjectId, dto:{userId:Types.ObjectId,groupRole:string},sender:string){
        
+        const group = await GroupModel.findById(groupId).exec() ;
+
+        if(group==null){
+            throw new NotAcceptableError('group not exists') ;
+        }
+
         const groupMember = await GroupMemberModel.findOne({ 
             groupId,
             userId:dto.userId 
@@ -365,9 +371,7 @@ export class GroupService {
         }
        
 
-        const invitation = await InvitationModel.findOne({
-            receiver:dto.userId,
-            inviteType: InvitationType.Group ,
+        const invitation = await InvitationGroupModel.findOne({  
             data: {
                 userId:dto.userId,
                 groupId:groupId,
@@ -378,14 +382,15 @@ export class GroupService {
             throw new NotAcceptableError("Invitation Exists") ;            
         }
 
-        return await InvitationModel.create({
+        return await InvitationGroupModel.create({
             receiver:dto.userId,
-            inviteType: InvitationType.Group ,
             data: {
                 userId:dto.userId,
                 groupId:groupId,
                 groupRole:dto.groupRole,
+                name: group.name ,
             },
+            sender:sender,
         }) ;              
     }
 

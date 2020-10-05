@@ -73,7 +73,7 @@ export class GroupMemberController {
 
         const user = await this.userService.getUserByEmailForce(dto.email) ;
 
-        return await this.service.inviteMember(Types.ObjectId(id),{userId: user._id,groupRole:dto.groupRole}) ;
+        return await this.service.inviteMember(Types.ObjectId(id),{userId: user._id,groupRole:dto.groupRole},currentUser.id) ;
     }
 
 }
