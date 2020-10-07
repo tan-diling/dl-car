@@ -15,12 +15,13 @@
     "test": "mocha --exit --reporter mocha-junit-reporter -r ts-node/register ./test/web.ts",
     "test:login": "mocha --exit  -r ts-node/register ./test/login.test.ts",
     "test:crud": "mocha --exit  -r ts-node/register ./test/crud.test.ts",
-    "start": "node ./dist/src/index.js"
+    "start": "node ./dist/src/index.js",
+    "dev": "ts-node-dev --watch ./src ./src/index.ts"
   },
   "engines": {
     "node": ">= 10"
   },
-  "_moduleAliases": {
+  "_moduleAliases00": {
     "@app": "dist/src"
   },
   "repository": {
@@ -39,6 +40,7 @@
     "class-transformer-validator": "^0.8.0",
     "class-validator": "^0.11.1",
     "config": "^3.3.1",
+    "dotenv": "^8.2.0",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "express-http-context": "^1.2.4",
@@ -94,6 +96,7 @@
     "routing-controllers-openapi": "^1.8.1",
     "supertest": "^4.0.2",
     "ts-node": "^8.8.1",
+    "ts-node-dev": "^1.0.0-pre.63",
     "tsconfig-paths": "^3.9.0",
     "typedoc": "^0.17.3",
     "typedoc-plugin-external-module-name": "^3.1.0",

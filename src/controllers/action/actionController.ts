@@ -30,5 +30,15 @@ export class ActionController {
         // return await this.service.list(query) ;
     }
 
+    @Get('/pending')
+    async pendingList(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
+        return await this.service.list({
+            ...query,
+            status:"0",            
+        }) ;
+        
+        // return await this.service.list(query) ;
+    }
+
 
 }

@@ -14,14 +14,9 @@ export class Deliverable extends Resource {
   @prop()
   priority? :number;  
 
-  @prop()
+  @prop({ type: String })
   tags? :string[]; 
 
-  // @prop()
-  // steps? :string; 
-
-  // @prop()
-  // result? :string; 
 }
 
 

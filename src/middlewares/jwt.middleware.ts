@@ -35,4 +35,4 @@ const getStrategy = (): passport.Strategy => {
 
 passport.use('jwt', getStrategy());
 
-export const middleware = passport.authenticate('jwt',{ session: false, failWithError: true } ) ;
+export const jwtAuthenticate = passport.authenticate('jwt',{ session: false, failWithError: true } ) ;
