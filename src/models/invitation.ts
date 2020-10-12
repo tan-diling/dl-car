@@ -17,7 +17,10 @@ export class PendingAction {
   @prop({ ref: () => User })
   receiver: Ref<User>;
 
-  @prop({ ref: () => User })
+  @prop({ 
+    ref: () => User,
+    options: { projection:{ name:1, email:1}}
+  })
   sender?: Ref<User>;
 
   @prop()

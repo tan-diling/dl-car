@@ -22,16 +22,19 @@ export class ActionController {
 
     @Get('')
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
+        const {status,sender,time} = query ;
         return await this.service.list({
-            ...query,
-            receiver:Types.ObjectId(currentUser.id),            
+            status,sender,
+            receiver:Types.ObjectId(currentUser.id),  
+            populate:"sender",        
         }) ;
         
         // return await this.service.list(query) ;
     }
 
     @Get('/pending')
-    async pendingList(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
+    async pendingList(@QueryParams() query:any, @Req() request:Request,@CurrentUser() currentUser) {
+        console.log(query) ;
         return await this.service.list({
             ...query,
             status:"0",            

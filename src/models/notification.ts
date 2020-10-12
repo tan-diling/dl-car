@@ -1,12 +1,11 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, modelOptions } from '@typegoose/typegoose';
 
 import { User } from './user';
 
 enum EventType {
-  Invitation, 
-  InvitationResponse,
-  ContactAdded,
-  ContactRemoved,
+  InvitationSending, //sb invite you to join his
+  InvitationAccepted,
+  InvitationRejected,
 
   GroupMemberAdded,
   GroupMemberRemoved,
@@ -26,23 +25,35 @@ enum EventType {
 }
 
 // type InvitationData = 
-
+@modelOptions({ options: { allowMixed:0}})
 export class Event {  
+
+  // @prop({ alias: 'type' })
+  // __t?: string;
+
+  
 
   @prop({ref: User})
   sender: Ref<User>;
 
   @prop()
-  type: EventType; //enum ('Invitation',
+  type: string;
 
   @prop()
-  data:any;
+  action: string;
+
+  @prop()
+  data?:any;
 
   @prop()
   createdAt?: Date;
 
   @prop()
   updatedAt?: Date;
+
+}
+
+export class InvitationEvent extends Event{  
 
 }
 
@@ -76,4 +87,6 @@ export class Notification {
 
 
 export const EventModel = getModelForClass(Event,{schemaOptions:{timestamps:true}});
+
+
 export const NotificationModel = getModelForClass(Notification,{schemaOptions:{timestamps:true}});

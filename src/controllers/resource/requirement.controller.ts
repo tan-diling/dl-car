@@ -6,6 +6,7 @@ import { Container } from 'typedi' ;
 import { RequirementResourceService } from '@app/services/resource';
 import { RequirementCreateDto, RequirementUpdateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
+import { CheckList } from '@app/models';
 
 const type = 'requirement' ;
 @Authorized()
@@ -46,13 +47,18 @@ export class RequirementController extends AbstractResourceController{
     @Get(`/${type}/:id([0-9a-f]{24})`)
     async getById(@Param('id') id:string, @Req() request) {
         // return await this.repoService.get(id) ;
-        return await this.process(request,{ 
+        const doc = await this.process(request,{ 
             resourceId: id,      
             method:RequestOperation.RETRIEVE,
             filter:{_id:id, memberUserId:request.user.id},
             // dto
         }) ;
 
+        if(doc!=null){
+            return {...doc.toJSON(),completion:await CheckList.getCompletion(doc._id)} ;
+        }
+
+        return doc ;
     }
 
     

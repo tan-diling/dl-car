@@ -25,7 +25,7 @@
             "name": "Debug ts",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
+            "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",            
             "args": [
                 "-r",
                 "tsconfig-paths/register",
@@ -44,6 +44,7 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable":"${workspaceRoot}/node_modules/.bin/ts-node-dev",
+            // "runtimeExecutable": "nodemon",
             "args": [  
                 "--watch",
                 "src",
@@ -53,7 +54,9 @@
                 "DEBUG":"express:*"            
             },
             "cwd": "${workspaceRoot}",
-                     
+            "restart": true,
+            "console": "integratedTerminal",
+            // "internalConsoleOptions": "neverOpen",
             "protocol": "inspector"
             
         },        
