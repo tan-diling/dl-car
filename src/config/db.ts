@@ -12,11 +12,11 @@ dbInitData.push({
     "dataArray": [
         {
             "key": {
-                "email": "admin@admin.com"
+                "email": "onwards.admin@testmvp.com"
             },
             "doc": {
                 "name": "Site Admin",
-                "email": "admin@admin.com",
+                "email": "onwards.admin@testmvp.com",
                 "password": "Dealing.123",
                 "emailValidated": true,
                 "company": "Gestalter",

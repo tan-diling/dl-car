@@ -3,13 +3,14 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
+import { RepoOperation, SiteRole, ActionStatus, ResourceType } from '@app/defines';
 import { Contact,ContactModel,  InvitationContactModel, PendingAction, GroupMemberModel } from '@app/models';
 import { DbService } from './db.service';
 import { UserService } from './user.service';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
 import { GroupService } from './group.service';
+import { NotificationService } from './notification';
 
 /**
  * Contact service
@@ -17,6 +18,8 @@ import { GroupService } from './group.service';
 export class ContactService {
 
     private userService= Container.get(UserService) ;
+
+    private notificationService= Container.get(NotificationService) ;
 
 
     /**
@@ -70,16 +73,16 @@ export class ContactService {
 
     /**
      * invite contact user to user's contact 
-     * @param userId user id
-     * @param contactUser user id
+     * @param inviter user id who is send out invitation
+     * @param invitee user id who is being invited
      */
-    private async inviteContactByUser(userId:string,contactUser:Types.ObjectId){
+    private async inviteContactByUser(inviter:string,invitee:Types.ObjectId){
         // const contactUserObjectId = Types.ObjectId(contactUser) ;
-        if(userId== String(contactUser)){
+        if(inviter== String(invitee)){
             throw new NotAcceptableError("contact add self error") ;            
         }
 
-        const user = await this.userService.getById(userId) ;
+        const user = await this.userService.getById(inviter) ;
 
         if (user == null){
             throw new NotAcceptableError("user not exists") ;            
@@ -87,7 +90,7 @@ export class ContactService {
 
 
 
-        const contact = await ContactModel.findOne({userId,contact:contactUser}).exec() ;
+        const contact = await ContactModel.findOne({userId: inviter,contact:invitee}).exec() ;
 
         if (contact!=null){
             throw new NotAcceptableError("contact exists") ;            
@@ -95,7 +98,7 @@ export class ContactService {
 
         const invitationData = {
                 userId:user._id,
-                contact:contactUser,        
+                contact:invitee,        
         } ;
 
         const invitation = await InvitationContactModel.findOne({data:invitationData, status:ActionStatus.Pending}).exec() ;
@@ -103,16 +106,20 @@ export class ContactService {
             throw new NotAcceptableError("Invitation Exists") ;            
         }
             
-        return await InvitationContactModel.create({
-            receiver:contactUser,
+        const doc = await InvitationContactModel.create({
+            receiver:invitee,
             data: {
                 userId:user._id,
-                contact:contactUser,
+                contact:invitee,
                 name: user.name,
             },
             sender: user._id
         
-        }) ;          
+        }) ;       
+            
+        await this.notificationService.publish('Invitation',RepoOperation.Created,doc,user._id) ;
+
+        return doc ;
     }
 
     /**

@@ -6,6 +6,9 @@ import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
 import { PendingActionModel } from '@app/models';
 import { DbService } from './db.service';
+import { Container } from 'typedi';
+import { NotificationService } from './notification';
+import { Types } from 'mongoose';
 
 /**
  * Invitation service
@@ -13,6 +16,8 @@ import { DbService } from './db.service';
 export class ActionService {
 
 
+
+    private notificationService= Container.get(NotificationService) ;
     // private userService:UserService= Container.get(UserService) ;
 
     // private async inviteContactByUser(userId:string,contact:DocumentType<User>){
@@ -115,6 +120,7 @@ export class ActionService {
             }
             await action.changeStatus(dto.status) ;
             
+            await this.notificationService.publish(action.__t,ActionStatus[action.status],action,Types.ObjectId(dto.userId));
             return action ;
         }
     }

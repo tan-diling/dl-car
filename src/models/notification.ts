@@ -1,28 +1,29 @@
 import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, modelOptions } from '@typegoose/typegoose';
 
 import { User } from './user';
+import { NotificationStatus } from '@app/defines';
 
-enum EventType {
-  InvitationSending, //sb invite you to join his
-  InvitationAccepted,
-  InvitationRejected,
+// enum EventType {
+//   InvitationSending, //sb invite you to join his
+//   InvitationAccepted,
+//   InvitationRejected,
 
-  GroupMemberAdded,
-  GroupMemberRemoved,
+//   GroupMemberAdded,
+//   GroupMemberRemoved,
 
-  ProjectMemberAdded,
-  ProjectMemberRemoved,
+//   ProjectMemberAdded,
+//   ProjectMemberRemoved,
 
-  ProjectStatus,
+//   ProjectStatus,
 
-  GoalStatus,
+//   GoalStatus,
 
-  RequirementStatus,
+//   RequirementStatus,
 
-  DeliverableStatus,
+//   DeliverableStatus,
 
-  TaskStatus,
-}
+//   TaskStatus,
+// }
 
 // type InvitationData = 
 @modelOptions({ options: { allowMixed:0}})
@@ -53,29 +54,19 @@ export class Event {
 
 }
 
-export class InvitationEvent extends Event{  
-
-}
-
-enum NotificationStatus{
-  Unread="unread",
-  Read='read',
-  Deleted='deleted'
-}
-
 export class Notification {  
 
-  @prop()
+  @prop({ref: User})
   receiver: Ref<User>;
 
-  @prop({ref: User})
+  @prop({ref: Event})
   event: Ref<Event>;
 
   @prop({})
   message: string;
 
-  @prop({enum:NotificationStatus})
-  status:NotificationStatus;  //enum('unread', 'read','deleted'),
+  @prop({enum:NotificationStatus,default:NotificationStatus.Unread})
+  status?:string;  //enum('unread', 'read','deleted'),
 
   @prop()
   createdAt?: Date;

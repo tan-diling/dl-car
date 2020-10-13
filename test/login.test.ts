@@ -31,7 +31,7 @@ describe('login module ', () => {
 
         await request(server.httpServer)
               .post('/api/login')
-              .send({email:"admin@admin.com",password:"12345678",device:"chrome"})
+              .send({email:"onwards.admin@testmvp.com",password:"12345678",device:"chrome"})
               .expect('Content-Type', /json/)
               .expect(200)
               .expect((res)=>{
@@ -44,7 +44,7 @@ describe('login module ', () => {
 
         await request(server.httpServer)
             .post('/api/login')
-            .send({email:"admin@admin.com",password:"2345678",device:"chrome"})
+            .send({email:"onwards.admin@testmvp.com",password:"2345678",device:"chrome"})
             // .expect('Content-Type', /json/)
             .expect(404)　;
             

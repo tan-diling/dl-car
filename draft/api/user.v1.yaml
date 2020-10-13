@@ -29,7 +29,7 @@ paths:
                     - _id: 5ef1680aa5d7a708b8546964
                       name: admin
                       role: admin
-                      email: admin@admin.com
+                      email: onwards.admin@testmvp.com
                       company: ' '
                       phone: '1234567890'
                       department: ''
@@ -163,7 +163,7 @@ paths:
                     _id: 5ef1680aa5d7a708b8546964
                     name: admin
                     role: admin
-                    email: admin@admin.com
+                    email: onwards.admin@testmvp.com
                     location: 'Los '
                     phone: '2345678901'
                     company: google
@@ -192,7 +192,7 @@ paths:
                     _id: 5ef1680aa5d7a708b8546964
                     name: admin
                     role: admin
-                    email: admin@admin.com
+                    email: onwards.admin@testmvp.com
                     location: 'Los '
                     phone: '2345678901'
                     company: google
@@ -273,7 +273,7 @@ paths:
                     _id: 5ef1680aa5d7a708b8546964
                     name: admin
                     role: admin
-                    email: admin@admin.com
+                    email: onwards.admin@testmvp.com
                     location: 'Los '
                     phone: '2345678901'
                     company: google
@@ -359,7 +359,7 @@ paths:
               example-1:
                 value:
                   device: chrome
-                  email: admin@admin.com
+                  email: onwards.admin@testmvp.com
                   password: '12345678'
           application/xml:
             schema:
@@ -823,7 +823,7 @@ paths:
             examples:
               example-1:
                 value:
-                  email: admin@admin.com
+                  email: onwards.admin@testmvp.com
                   oldPassword: '12345678'
                   newPassword: '12345678'
       tags:
@@ -1152,7 +1152,7 @@ components:
           _id: 5ef1680aa5d7a708b8546964
           name: admin
           role: admin
-          email: admin@admin.com
+          email: onwards.admin@testmvp.com
           company: 'Los '
           phone: '2345678901'
           department: google

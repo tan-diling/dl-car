@@ -80,3 +80,10 @@ cicd.dev.onwards.ai
 tan
 G5tgDVn2Wrwl6lsEH&gt;oVOKEAs@850EH
 ```
+
+
+google username: dl@testmvp.com
+
+additional linked email alias: onwards.admin@testmvp.com
+
+pw:Zt:\[1nY{/LDh4r

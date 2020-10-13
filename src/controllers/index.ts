@@ -15,6 +15,7 @@ import { ActionController } from './action/actionController';
 import { ContactController } from './user/contact.controller';
 import { GroupMemberController } from './group/groupMember.controller';
 import { ProjectMemberController } from './resource/projectMember.controller';
+import { NotificationController } from './notification/notificationController';
 
 export const controllers = [
     LoginController,
@@ -39,5 +40,7 @@ export const controllers = [
 
     ActionController,
     ContactController,
+
+    NotificationController,
 
 ] ;
