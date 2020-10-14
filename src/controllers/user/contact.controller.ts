@@ -14,7 +14,7 @@ export class ContactController {
     @Get('/user/contact')
     async listContact(@QueryParams() query: any, @CurrentUser() currentUser) {
         // return await this.service.list({userId:currentUser.id,populate:'contact',...query}) ;
-        return await this.service.listContact(currentUser.id) ;
+        return await this.service.listContactUser(currentUser.id) ;
         
     }
 

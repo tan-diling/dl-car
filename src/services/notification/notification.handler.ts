@@ -2,28 +2,16 @@
 import { Event, EventModel, Notification, NotificationModel } from '@app/models/notification';
 import { DocumentType } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
-import { InvitationContact } from '@app/models';
+import { InvitationContact, InvitationGroup, InvitationProject } from '@app/models';
 import Container from 'typedi';
-
-export enum NotificationTopic{
-    InvitationContact="InvitationContact",
-    InvitationGroup="InvitationGroup",
-    InvitationProject="InvitationProject",
-}
-
-export enum NotificationAction{
-    
-    Accept="Accepted",
-    Reject="Rejected",
-}
-
+import { NotificationTopic, NotificationAction } from '@app/defines';
 
 interface NotificationSenderInterface {
     execute(data?: any): void | Promise<void>;
 }
 
 class DbNotificationSender implements NotificationSenderInterface {
-    async execute(data: { receiver: Types.ObjectId, event: Types.ObjectId, message: string }) {
+    async execute(data: { receiver: Types.ObjectId, event: Types.ObjectId, message?: string }) {
         await NotificationModel.create(data);
     }
 }
@@ -39,40 +27,59 @@ interface EventHandlerConfig {
     action: EventHandler
 }
 
+const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => {
+    
+    const receiver = ev.type == NotificationTopic.InvitationContact ? (ev.data as InvitationContact).data.userId 
+        : ev.type == NotificationTopic.InvitationGroup ? (ev.data as InvitationGroup).data.userId 
+        : ev.type == NotificationTopic.InvitationProject ? (ev.data as InvitationProject).data.userId:null  ;
+        
+    if(receiver)    
+    {        
+        await dbNotificationSender.execute({
+            receiver,
+            event: ev._id,
+            // message: ``
+        });
+    }
+}
+
+
 export const notificationConfig: Array<EventHandlerConfig> = [];
 notificationConfig.push(
     {
         topic: NotificationTopic.InvitationContact,
         expressions: [{ property: 'action', value: NotificationAction.Accept }],
-        action: async (ev: DocumentType<Event>) => {
-            // if(ev.data.__t =="InvitationContact") 
-            {
-                const doc = ev.data as InvitationContact;
-                const receiver = doc.data.userId as Types.ObjectId;
-                await dbNotificationSender.execute({
-                    receiver,
-                    event: ev._id,
-                    message: ``
-                });
-            }
-        },
+        action: invitationResponseNotifyForApiAction ,
     },
 
     {
         topic: NotificationTopic.InvitationContact,
         expressions: [{ property: 'action', value: NotificationAction.Reject }],
-        action: async (ev: DocumentType<Event>) => {
-            // if(ev.data.__t =="InvitationContact") 
-            {
-                const doc = ev.data as InvitationContact;
-                const receiver = doc.data.userId as Types.ObjectId;
-                await dbNotificationSender.execute({
-                    receiver,
-                    event: ev._id,
-                    message: ``
-                });
-            }
-        },
+        action: invitationResponseNotifyForApiAction ,
+    },
+
+    {
+        topic: NotificationTopic.InvitationGroup,
+        expressions: [{ property: 'action', value: NotificationAction.Accept }],
+        action: invitationResponseNotifyForApiAction ,
+    },
+
+    {
+        topic: NotificationTopic.InvitationGroup,
+        expressions: [{ property: 'action', value: NotificationAction.Reject }],
+        action: invitationResponseNotifyForApiAction ,
+    },
+
+    {
+        topic: NotificationTopic.InvitationProject,
+        expressions: [{ property: 'action', value: NotificationAction.Accept }],
+        action: invitationResponseNotifyForApiAction ,
+    },
+
+    {
+        topic: NotificationTopic.InvitationProject,
+        expressions: [{ property: 'action', value: NotificationAction.Reject }],
+        action: invitationResponseNotifyForApiAction ,
     },
 );
 

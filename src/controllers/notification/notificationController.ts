@@ -19,14 +19,18 @@ export class NotificationController {
         for(const id of dto.ids){
           await this.service.status({id,userId:currentUser.id, status: dto.status}) ;
         }
+
+        return { count: dto.ids.length };
     }
 
     @Get('')
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
-        const {status,sender,time} = query ;
+        // const {status,sender,time} = query ;
         return await this.service.list({
+            ...query,
             receiver:Types.ObjectId(currentUser.id),  
-            populate:"event,event.sender"          
+            populate:"event,event.sender",
+            fields:"event.sender.name,event.sender.email,event.sender.image"          
         }) ;
         
         // return await this.service.list(query) ;

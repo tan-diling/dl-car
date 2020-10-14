@@ -170,7 +170,7 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         return await InvitationProjectModel.create({
             receiver:dto.userId,
-            data:{...dto,name:project.title},
+            data:{...dto,name:project.title,image:project.logo},
             sender,
         }) ;     
 

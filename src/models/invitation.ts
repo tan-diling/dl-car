@@ -1,4 +1,4 @@
-import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass } from '@typegoose/typegoose';
+import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, modelOptions } from '@typegoose/typegoose';
 
 import { User } from './user';
 import { Types } from 'mongoose';
@@ -8,7 +8,7 @@ import { Contact } from './contact';
 import { GroupMember } from './group';
 import { ProjectMember } from './resource';
 
-
+@modelOptions({ options: { allowMixed:0}})
 export class PendingAction {
 
   @prop({ alias: 'type' })
@@ -23,7 +23,7 @@ export class PendingAction {
   })
   sender?: Ref<User>;
 
-  @prop()
+  @prop({})
   data: any;
 
   @prop({ default: false })
@@ -65,26 +65,24 @@ export enum InvitationUserType {
   Internal,
   External,
 }
-
-interface ContactInvitationData {
-  // @prop({ ref: () => User })
-  userId: Types.ObjectId;
-  contact: Types.ObjectId;
+interface BaseInvitationData {
+  userId: Types.ObjectId; // invitee
   name?: string;
+  image?: string;
 }
 
-interface GroupInvitationData {
-  userId: Types.ObjectId;
+interface ContactInvitationData extends BaseInvitationData {  
+  contact: Types.ObjectId;  
+}
+
+interface GroupInvitationData extends BaseInvitationData {
   groupId: Types.ObjectId;
   groupRole?: string;
-  name?: string;
 }
 
-interface ProjectInvitationData {
-  userId: Types.ObjectId;
+interface ProjectInvitationData extends BaseInvitationData {
   projectId: Types.ObjectId;
   projectRole?: string;
-  name?: string;
 }
 
 type InvitationData = ContactInvitationData | GroupInvitationData | ProjectInvitationData;
@@ -149,13 +147,9 @@ export class InvitationProject extends PendingAction {
   async changeStatus(this: DocumentType<InvitationProject>, status: ActionStatus) {
     await super.changeStatus(status);
 
-    if (status == ActionStatus.Accepted) {
-      
-          
+    if (status == ActionStatus.Accepted) {                
             const { userId, projectId, projectRole } = this.data ;
-            await ProjectMember.appendMember(projectId, userId, projectRole);
-          
-      
+            await ProjectMember.appendMember(projectId, userId, projectRole);                
     }
 
     await this.save();

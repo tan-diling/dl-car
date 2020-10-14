@@ -63,7 +63,7 @@ export class Notification {
   event: Ref<Event>;
 
   @prop({})
-  message: string;
+  message?: string;
 
   @prop({enum:NotificationStatus,default:NotificationStatus.Unread})
   status?:string;  //enum('unread', 'read','deleted'),
