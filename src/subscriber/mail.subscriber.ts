@@ -5,7 +5,7 @@
 import { sendMail } from '@app/modules/mail';
 import { WebServer } from '@app/config';
 import { UserModel, User } from '../models/user';
-import { GroupMemberModel, GroupMember } from '@app/models';
+import { GroupMemberModel, GroupMember, InvitationContactModel, InvitationContact } from '@app/models';
 import { RepoOperation } from '@app/defines';
 import { ProjectMember, ProjectMemberModel } from '@app/models';
 
@@ -24,32 +24,29 @@ export default () => {
         });
     });
 
+    // InvitationContactModel.on(RepoOperation.Created,async (doc:InvitationContact)=>{
 
-    /**
-     * when group member created, send user confirm join email 
-     */
-    GroupMemberModel.on(RepoOperation.Created,async (doc:GroupMember) => {
-        const user = await UserModel.findById(doc.userId) ;
-        const email = user.email ;
-        const { subject, text } = buildMailOfGroupMemberConfirm( doc);
+    // });
 
-        sendMail(email, text, subject).catch(error => {
-            console.log(`send mail error ${error}`);
-        });
-    });
+    // /**
+    //  * when group member created, send user confirm join email 
+    //  */
+    // GroupMemberModel.on(RepoOperation.Created,async (doc:GroupMember) => {
+    //    executeNotificationSend
+    // });
 
-    /**
-     * when project member created, send user confirm join email 
-     */
-    ProjectMemberModel.on(RepoOperation.Created, async (doc:ProjectMember) => {
-        const user = await UserModel.findById(doc.userId).exec() ;
-        const email = user.email ;
-        const { subject, text } = buildMailOfProjectMemberConfirm( doc);
+    // /**
+    //  * when project member created, send user confirm join email 
+    //  */
+    // ProjectMemberModel.on(RepoOperation.Created, async (doc:ProjectMember) => {
+    //     const user = await UserModel.findById(doc.userId).exec() ;
+    //     const email = user.email ;
+    //     const { subject, text } = buildMailOfProjectMemberConfirm( doc);
 
-        sendMail(email, text, subject).catch(error => {
-            console.log(`send mail error ${error}`);
-        });
-    });
+    //     sendMail(email, text, subject).catch(error => {
+    //         console.log(`send mail error ${error}`);
+    //     });
+    // });
 }
 
 /** mail template: user confirm  */

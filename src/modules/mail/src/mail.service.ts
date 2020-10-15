@@ -29,7 +29,7 @@ const transportOption = {
   transactionLog: true,
 };
 
-logger.info(transportOption);
+logger.info(transportOption.auth.user);
 
 // const transportOption_google = {
 //   host: 'gmail.google.com',

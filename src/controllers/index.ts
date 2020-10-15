@@ -1,5 +1,5 @@
 import { LoginController } from '@app/modules/auth';
-import { UserController } from './user/user.controller';
+import { UserController, AdminController } from './user/user.controller';
 import { PhotoController, ImageController } from './photo/photo.controller';
 import { ProjectController } from './resource/project.controller';
 import { GroupController } from './group/group.controller';
@@ -18,6 +18,8 @@ import { ProjectMemberController } from './resource/projectMember.controller';
 import { NotificationController } from './notification/notificationController';
 
 export const controllers = [
+    AdminController,
+
     LoginController,
     UserController,
     PhotoController,

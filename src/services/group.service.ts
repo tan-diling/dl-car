@@ -2,9 +2,12 @@ import { ModelQueryService  } from '@app/modules/query';
 import { DocumentType } from '@typegoose/typegoose' ;
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
 import { GroupModel, Group, GroupMemberModel, GroupMember,  InvitationGroupModel } from '../models';
-import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus, ActionStatus } from '@app/defines';
+import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus, ActionStatus, NotificationTopic, NotificationAction } from '@app/defines';
 import { model, Types } from 'mongoose';
 import { UserModel } from '../models';
+import { Container } from 'typedi';
+import { NotificationService } from './notification';
+import { ActionService } from './action.service';
 /**
  * group service
  */
@@ -27,6 +30,7 @@ export class GroupService {
      ] ;
 
     private queryService= new ModelQueryService() ;
+    private actionService= Container.get(ActionService) ;
     constructor() {
        
     }
@@ -381,8 +385,8 @@ export class GroupService {
         if (invitation!=null){
             throw new NotAcceptableError("Invitation Exists") ;            
         }
-
-        return await InvitationGroupModel.create({
+        
+        return await this.actionService.create(InvitationGroupModel,{
             receiver:dto.userId,
             data: {
                 userId:dto.userId,
@@ -391,7 +395,8 @@ export class GroupService {
                 name: group.name ,
             },
             sender:sender,
-        }) ;              
+        }) ;  
+
     }
 
 

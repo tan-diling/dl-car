@@ -3,15 +3,13 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation, SiteRole, ActionStatus, ResourceType } from '@app/defines';
+import { RepoOperation, SiteRole, ActionStatus, ResourceType, NotificationAction, NotificationTopic } from '@app/defines';
 import { Contact,ContactModel,  InvitationContactModel, PendingAction, GroupMemberModel } from '@app/models';
 import { DbService } from './db.service';
 import { UserService } from './user.service';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
-import { GroupService } from './group.service';
-import { NotificationService } from './notification';
-
+import { ActionService } from './action.service';
 /**
  * Contact service
  */
@@ -19,7 +17,7 @@ export class ContactService {
 
     private userService= Container.get(UserService) ;
 
-    private notificationService= Container.get(NotificationService) ;
+    private actionService= Container.get(ActionService) ;
 
 
     /**
@@ -105,8 +103,8 @@ export class ContactService {
         if (invitation!=null){
             throw new NotAcceptableError("Invitation Exists") ;            
         }
-            
-        const doc = await InvitationContactModel.create({
+        
+        return await this.actionService.create(InvitationContactModel,{
             receiver:invitee,
             data: {
                 userId:user._id,
@@ -116,10 +114,7 @@ export class ContactService {
             sender: user._id
         
         }) ;       
-            
-        await this.notificationService.publish('Invitation',RepoOperation.Created,doc,user._id) ;
-
-        return doc ;
+        
     }
 
     /**

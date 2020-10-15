@@ -3,12 +3,13 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../../models/user';
-import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
+import { RepoOperation, SiteRole, ActionStatus, NotificationAction, NotificationTopic } from '@app/defines';
 import { PendingActionModel } from '@app/models';
 import { DbService } from '../db.service';
 import { Types } from 'mongoose';
 import { EventModel, NotificationModel } from '@app/models/notification';
-import { notificationConfig } from './notification.handler';
+import { notificationConfig } from './notification.config';
+import { NotificationSenderInterface, executeNotificationSend } from './sender';
 
 /**
  * Notification service
@@ -38,16 +39,24 @@ export class NotificationService {
         return await DbService.list(NotificationModel,query) ;
     }
      
-   async publish(type:string,action:string,data:any,sender:Types.ObjectId) {
-       const ev = await EventModel.create({sender,type,action,data})
-       for(const handler of notificationConfig){
-           if(handler.topic!=type) continue ;
+    async publish(type:NotificationTopic|string,action:NotificationAction|string,data:any,sender:Types.ObjectId) {
+        const ev = await EventModel.create({sender,type,action,data})
+        for(const cfg of notificationConfig){
+            if(cfg.topic!=type) continue ;
 
-           if(handler.expressions.every(x=>String(ev[x.property])==x.value)){               
-               await handler.action(ev) ;
-           }
-       }
-   }
+            if(cfg.expressions.every(x=>String(ev[x.property])==x.value)){               
+                const cfgActions = await cfg.action(ev) ;
+                for(const cfgSender of cfgActions){
+                    try{
+                        await executeNotificationSend(cfgSender) ;
+                    }catch(err){
+                        console.log(err) ;
+                    }
+                }
+            }
+        }
+    }
+
  
 }
 

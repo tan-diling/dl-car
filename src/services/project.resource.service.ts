@@ -1,5 +1,5 @@
 import { Model, Document, Types } from 'mongoose';
-import { RepoCRUDInterface, MemberStatus, ActionStatus } from '@app/defines';
+import { RepoCRUDInterface, MemberStatus, ActionStatus, NotificationTopic, NotificationAction } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember,  InvitationProjectModel } from '../models';
 import { ModelQueryService  } from '../modules/query';
@@ -7,15 +7,20 @@ import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
 import { ResourceService } from './resource/resource.service';
+import { Container } from 'typedi';
+import { NotificationService } from './notification';
+import { ActionService } from './action.service';
 
 export class ProjectResourceService extends ResourceService<Project>{
-    /**
-     *
-     */
+    
+
+    private actionService= Container.get(ActionService) ;
+
     constructor() {
         super();
         this.model = ProjectModel ;        
     }
+
 
     /**
      * get projects with member
@@ -168,12 +173,11 @@ export class ProjectResourceService extends ResourceService<Project>{
             throw new NotAcceptableError("Invitation Exists") ;            
         }
 
-        return await InvitationProjectModel.create({
+        return await this.actionService.create( InvitationProjectModel,{
             receiver:dto.userId,
             data:{...dto,name:project.title,image:project.logo},
             sender,
         }) ;     
-
             
     }    
 

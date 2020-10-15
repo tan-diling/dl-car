@@ -11,7 +11,7 @@ export enum NotificationTopic{
 }
 
 export enum NotificationAction{
-    
+    Invite="Invited",
     Accept="Accepted",
     Reject="Rejected",
 }

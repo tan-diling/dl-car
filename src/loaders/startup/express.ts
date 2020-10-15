@@ -15,6 +15,21 @@ import * as jwt from 'jsonwebtoken' ;
 import {Container} from "typedi";
 import { userCheck, initPassport } from './passport';
 
+function useHttpContext(app:express.Application) {
+  function httpContextMiddleware(req,res,next){
+    httpContext.ns.bindEmitter(req);
+    // httpContext.ns.bindEmitter(res);
+    httpContext.set("httpRequest",req) ;
+    // httpContext.set("httpResponse",res) ;
+    next();
+  };
+
+
+  app.use(httpContext.middleware);  
+
+  app.use(httpContextMiddleware);  
+};
+
 export default (server: BackendServer) => {
   /**
    * Health Check endpoints
@@ -25,7 +40,8 @@ export default (server: BackendServer) => {
 
   const app = server.expressApp ;
 
-  app.use(httpContext.middleware);
+  // app.use(httpContext.middleware);
+  useHttpContext(app) ;
 
   app.get('/status', (req, res) => {
     res.status(200).end();

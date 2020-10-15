@@ -3,12 +3,12 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation, SiteRole, ActionStatus } from '@app/defines';
-import { PendingActionModel } from '@app/models';
+import { RepoOperation, SiteRole, ActionStatus, NotificationAction } from '@app/defines';
+import { PendingActionModel, PendingAction } from '@app/models';
 import { DbService } from './db.service';
 import { Container } from 'typedi';
 import { NotificationService } from './notification';
-import { Types } from 'mongoose';
+import { Types, Model, Document } from 'mongoose';
 
 /**
  * Invitation service
@@ -112,16 +112,26 @@ export class ActionService {
     //     return ;
     // }
 
+    async create(model: Model< PendingAction & Document>, obj){
+              
+        const doc = await model.create(obj) ;
+            
+        await this.notificationService.publish(doc.__t,NotificationAction.Invite,doc,doc.sender as Types.ObjectId) ;
+
+        return doc ;
+
+    }
+
     async status(dto:{id:string,status:ActionStatus,userId?:string}){        
-        const action = await PendingActionModel.findById(dto.id).exec() ;
-        if(action !=null){
-            if(String(action.receiver) != dto.userId) {
+        const doc = await PendingActionModel.findById(dto.id).exec() ;
+        if(doc !=null){
+            if(String(doc.receiver) != dto.userId) {
                 throw new NotAcceptableError('current user permission limited')
             }
-            await action.changeStatus(dto.status) ;
-            
-            await this.notificationService.publish(action.__t,ActionStatus[action.status],action,Types.ObjectId(dto.userId));
-            return action ;
+            await doc.changeStatus(dto.status) ;
+            const notificationAction = dto.status == ActionStatus.Accepted ? NotificationAction.Accept: NotificationAction.Reject ;
+            await this.notificationService.publish(doc.__t,notificationAction,doc,Types.ObjectId(dto.userId));
+            return doc ;
         }
     }
 
