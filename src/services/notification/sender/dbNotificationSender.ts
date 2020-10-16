@@ -4,11 +4,11 @@ import { DocumentType } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { InvitationContact, InvitationGroup, InvitationProject } from '@app/models';
 import Container from 'typedi';
-import { NotificationSenderInterface } from './types';
+import { NotificationSenderInterface, NotificationSenderOptions } from './types';
 
 
 class DbNotificationSender implements NotificationSenderInterface {
-    async execute(data: { receiver: Types.ObjectId, event: Types.ObjectId, message?: string }) {
+    async execute(data: NotificationSenderOptions) {
         await NotificationModel.create(data);
     }
 }

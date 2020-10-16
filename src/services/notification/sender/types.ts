@@ -1,16 +1,20 @@
 import { Types } from 'mongoose';
+import { Event } from '@app/models/notification'
 
-export interface  NotificationSenderConfigInterface {
-    executor:'db'|'mail'|'socket',
+export interface  NotificationSenderOptions {    
     receiver:Types.ObjectId,
-    data?:{        
-        event?:Types.ObjectId,
-        template?:string,      
-        topic?:string,
-        data?:any,
-    }
+    event:Event,
+    mailTemplate?:string,
+        
+    // [key:string]:any,
+}
+
+export interface  NotificationSenderConfigInterface extends NotificationSenderOptions {
+    executor:'db'|'mail'|'socket',
+          
+    // [key:string]:any,
 }
 
 export interface NotificationSenderInterface {
-    execute(data:{receiver,[key:string]:any}): void | Promise<void>;
+    execute(data:NotificationSenderOptions): void | Promise<void>;
 }

@@ -4,24 +4,24 @@ import { Types } from 'mongoose';
 import { InvitationContact, InvitationGroup, InvitationProject, UserModel } from '@app/models';
 import Container from 'typedi';
 import { NotificationTopic, NotificationAction } from '@app/defines';
-import { NotificationSenderInterface } from './types';
+import { NotificationSenderInterface, NotificationSenderOptions } from './types';
 import { sendMail } from '@app/modules/mail';
 import { WebServer } from '@app/config';
 import { mailTemplateConfig } from './mailTemplateConfig';
 
 
 class MailNotificationSender implements NotificationSenderInterface {
-    async buildMailInfo(data: { receiver: Types.ObjectId, template?: string, data?}) {
+    async buildMailInfo(data: NotificationSenderOptions) {
         const user = await UserModel.findById(data.receiver).exec();
 
-        const mailTemplateFunction: (ctx) => { subject: string, html: string } = mailTemplateConfig[data.template];
+        const mailTemplateFunction: (ctx) => { subject: string, html: string } = mailTemplateConfig[data.mailTemplate];
         if (user && mailTemplateFunction) {
-            const mailInfo = mailTemplateFunction({ user,server:WebServer, doc: data.data });
+            const mailInfo = mailTemplateFunction({ user,server:WebServer, doc: data.event.data });
             return { email: user.email, ...mailInfo };
         }
     }
 
-    async execute(data: { receiver: Types.ObjectId, template?: string, data?}) {
+    async execute(data: NotificationSenderOptions) {
 
         const mailInfo = await this.buildMailInfo(data);
         const { email, subject, html } = mailInfo;

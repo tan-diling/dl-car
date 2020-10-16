@@ -46,36 +46,35 @@ export class NotificationService {
 
 
     async publish(type: NotificationTopic | string, action: NotificationAction | string, data: any, sender: Types.ObjectId) {
-        
+
         const ev = await EventModel.create({ sender, type, action, data })
-        const expressionEval=(data) => {
-            const expr = typeof(data)==typeof('')?{val:data,path:"action"}:data;
-            const keys = String(expr.path).split('.') ;
-            let v = ev ;
-            for(const k of keys ){
-                if(Object.keys(v).includes(k)){
-                    v = v[k] ;
-                }else{
-                    return false ;
-                }                
+        const expressionEval = (data) => {
+            const expr = typeof (data) == typeof ('') ? { val: data, path: "action" } : data;
+            const keys = String(expr.path).split('.');
+            let v = ev;
+            for (const k of keys) {
+                if (Object.keys(v).includes(k)) {
+                    v = v[k];
+                } else {
+                    return false;
+                }
             }
-            
-            return String(v) == expr.val ;
+
+            return String(v) == expr.val;
         };
         for (const cfg of notificationConfig) {
             if (cfg.topic != type) continue;
 
             for (const actionConfig of cfg.actions) {
-                const expressions = actionConfig.expressions ;
-                
+                const expressions = actionConfig.expressions;
+
                 if (expressions.every(x => expressionEval(x))) {
-                    const cfgActions = await actionConfig.action(ev);
-                    for (const cfgSender of cfgActions) {
-                        try {
-                            await executeNotificationSend(cfgSender);
-                        } catch (err) {
-                            console.log(err);
-                        }
+                    let actionFunction = actionConfig.action;
+
+                    try {
+                        await actionFunction(ev);
+                    } catch (err) {
+                        console.log(err);
                     }
                 }
             }

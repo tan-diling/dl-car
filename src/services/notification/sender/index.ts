@@ -9,14 +9,13 @@ export * from './mailNotificationSender';
 
 
 export async function executeNotificationSend(cfg:NotificationSenderConfigInterface){
-    const {executor,receiver,data} =cfg ;
-    
+    const {executor,...options} = cfg ;
     switch(executor){
         case "db":
-            await dbNotificationSender.execute({receiver,event:data.event});
+            await dbNotificationSender.execute(options);
             break;
         case "mail":
-            await mailNotificationSender.execute({receiver,template:data.template,data:data.data});
+            await mailNotificationSender.execute(options);
             break;
         default:
             throw new Error('send not impl');
