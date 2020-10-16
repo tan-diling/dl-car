@@ -73,6 +73,11 @@ export class User {
     return (this.emailValidated && (!this.deleted));
   }
 
+
+  static 
+  async findByMail(email:string){
+    return await UserModel.findOne({email:{$regex:new RegExp('^'+email+'$','i')}}).exec() ;
+  }
   
 }
 

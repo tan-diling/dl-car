@@ -12,9 +12,9 @@ export const mailTemplateConfig = {
                     "html": `
 Hi Sir/Madam,
 
-You have been invited as contact for ${user.name}, please click the below link to view.
+You have been invited as contact for ${doc.data.name}, please click the below link to view.
 
-URL: ${server}/dashboard?actionId=${doc._id}&userId=${user._id}
+URL: ${server}/project/dashboard?actionId=${doc._id}&userId=${user._id}
 
 Thank you for joining us!
 
@@ -29,7 +29,7 @@ Hi Sir/Madam,
 
 You have been invited to join group ${doc.data.name}, please click the below link to view.
 
-URL: ${server}/dashboard?actionId=${doc._id}&userId=${user._id}
+URL: ${server}/project/dashboard?actionId=${doc._id}&userId=${user._id}
 
 Thank you for joining us!
 
@@ -45,7 +45,7 @@ Hi Sir/Madam,
 
 You have been invited to join project ${doc.data.name}, please click the below link to view.
 
-URL: ${server}/dashboard?actionId=${doc._id}&userId=${user._id}
+URL: ${server}/project/dashboard?actionId=${doc._id}&userId=${user._id}
 
 Thank you for joining us!
 

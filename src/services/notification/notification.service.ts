@@ -3,7 +3,7 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../../models/user';
-import { RepoOperation, SiteRole, ActionStatus, NotificationAction, NotificationTopic } from '@app/defines';
+import { RepoOperation, SiteRole, ActionStatus, NotificationAction, NotificationTopic, NotificationStatus } from '@app/defines';
 import { PendingActionModel } from '@app/models';
 import { DbService } from '../db.service';
 import { Types } from 'mongoose';
@@ -38,6 +38,12 @@ export class NotificationService {
     async list(query:any){
         return await DbService.list(NotificationModel,query) ;
     }
+
+    async deleteAllByReceiver(receiver:string|Types.ObjectId){
+        await NotificationModel.updateMany({receiver:receiver},{status:NotificationStatus.Deleted}).exec() ;
+        return { user:receiver,time:Date.now()};
+    }
+
      
     async publish(type:NotificationTopic|string,action:NotificationAction|string,data:any,sender:Types.ObjectId) {
         const ev = await EventModel.create({sender,type,action,data})

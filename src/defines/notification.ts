@@ -4,7 +4,8 @@ export enum NotificationStatus{
     Deleted='deleted'
   }
   
-export enum NotificationTopic{
+export enum NotificationTopic{    
+    Invitation="Invitation",
     InvitationContact="InvitationContact",
     InvitationGroup="InvitationGroup",
     InvitationProject="InvitationProject",

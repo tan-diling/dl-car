@@ -2,11 +2,12 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
 
 import * as moment from 'moment';
-import { SiteRole } from '@app/defines';
+import { SiteRole, NotificationStatus } from '@app/defines';
 import { NotificationStatusDto } from './dto/notification.dto';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
 import { NotificationService } from '@app/services/notification';
+import { stringify } from 'querystring';
 
 @Authorized()
 @JsonController('/notification')
@@ -23,10 +24,11 @@ export class NotificationController {
         return { count: dto.ids.length };
     }
 
-    @Get('')
+    @Get('/my')
     async list(@QueryParams() query:any, @Req() request,@CurrentUser() currentUser) {
         // const {status,sender,time} = query ;
         return await this.service.list({
+            status: [NotificationStatus.Read,NotificationStatus.Unread].join(','),
             ...query,
             receiver:Types.ObjectId(currentUser.id),  
             populate:"event,event.sender",
@@ -36,16 +38,12 @@ export class NotificationController {
         // return await this.service.list(query) ;
     }
 
-    // @Get('/pending')
-    // async pendingList(@QueryParams() query:any, @Req() request:Request,@CurrentUser() currentUser) {
-    //     console.log(query) ;
-    //     return await this.service.list({
-    //         ...query,
-    //         status:"0",            
-    //     }) ;
+    @Delete('/my')
+    async clearMy(@CurrentUser() currentUser) {
         
-    //     // return await this.service.list(query) ;
-    // }
+        return await this.service.deleteAllByReceiver(currentUser.id) ;
+        
+    }
 
 
 }
