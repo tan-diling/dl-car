@@ -1,10 +1,15 @@
 import { Model, Document, Types, } from 'mongoose';
-import { RepoCRUDInterface, MemberStatus } from '@app/defines';
+import { RepoCRUDInterface, MemberStatus, NotificationAction, NotificationTopic } from '@app/defines';
 import { ProjectModel, ProjectMemberModel, Project, ProjectMember, ResourceModel, Resource, ResourceRelatedBase, EffortModel } from '@app/models';
 import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError, JsonController } from 'routing-controllers';
 import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
 import { DbService } from '../db.service';
+import { Container } from 'typedi';
+import { NotificationService } from '../notification';
+
+
+const notificationService= Container.get(NotificationService) ;
 
 export class ResourceService<T extends Resource | ResourceRelatedBase> implements RepoCRUDInterface {
 
@@ -158,9 +163,18 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
 
         throw new Error(`${method} not support!`);
     };
+
+    async publishNotification(id:Types.ObjectId,sender:Types.ObjectId,action: NotificationAction){
+        const doc = await ResourceModel.findById(id).populate('parents').exec() ;
+
+        const data = {...doc.toJSON(),members: doc.getMembers()};
+
+
+        await notificationService.publish(NotificationTopic.Project, action, doc , sender ) ;
+
+    }
     
 }
-
 
 
 // export function createResourceRepoService(

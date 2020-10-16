@@ -40,6 +40,7 @@ export class ProjectResourceService extends ResourceService<Project>{
                         .filter(y=>y.projectId==x.id)
                         .map(z=>{
                             return {
+                                "_id":z._id,
                                 "user":z.userId,
                                 "projectRole":z.projectRole,
                                 // "status":z.status,

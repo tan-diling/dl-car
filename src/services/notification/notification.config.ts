@@ -1,9 +1,9 @@
 import { Event, EventModel, Notification, NotificationModel } from '@app/models/notification';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
-import { InvitationContact, InvitationGroup, InvitationProject } from '@app/models';
+import { InvitationContact, InvitationGroup, InvitationProject, Resource, ProjectMember } from '@app/models';
 import Container from 'typedi';
-import { NotificationTopic, NotificationAction } from '@app/defines';
+import { NotificationTopic, NotificationAction, ProjectRole } from '@app/defines';
 import { NotificationSenderConfigInterface } from './sender';
 
 interface EventHandler {
@@ -11,8 +11,10 @@ interface EventHandler {
 }
 interface EventHandlerConfig {
     topic: string,
-    expressions: Array<{ property: string, value: string }>
-    action: EventHandler
+    actions: Array<{
+        expressions: Array<{ property: string, value: string }|string>,
+        action: EventHandler,
+    }>
 }
 
 const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => {
@@ -62,62 +64,164 @@ const invitationGroupNotifyForMailAction = invitationNotifyForMailAction();
 
 const invitationProjectNotifyForMailAction = invitationNotifyForMailAction();
 
+//send notification to project_manager
+const projectNotifyToProjectAdminAction =  async (ev: DocumentType<Event>) => {
+    const doc = (ev.data as Resource);
+    const ret: Array<NotificationSenderConfigInterface> = [];
+
+    const members = doc.members as Array<ProjectMember> ;
+    members.filter(x=>x.projectRole==ProjectRole.ProjectManager)
+        .forEach(x=>{ ret.push({
+            executor: 'db',
+            receiver: x.userId as Types.ObjectId,
+            data: {
+                event:ev._id
+            }
+        }); }) ;
+    
+
+    return ret;
+};
+
+
+//send notification to project assignee
+const projectNotifyToAssigneeAction =  async (ev: DocumentType<Event>) => {
+    const doc = (ev.data as Resource);
+    const ret: Array<NotificationSenderConfigInterface> = [];
+
+    doc.assignees
+        .forEach(x=>{ ret.push({
+            executor: 'db',
+            receiver: x as Types.ObjectId,
+            data: {
+                event:ev._id
+            }
+        }); }) ;
+    
+
+    return ret;
+};
+
 
 export const notificationConfig: Array<EventHandlerConfig> = [];
 notificationConfig.push(
     {
         topic: NotificationTopic.InvitationContact,
-        expressions: [{ property: 'action', value: NotificationAction.Invite }],
-        action: invitationContactNotifyForMailAction,
-    },
+        actions: [
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Invite }],
+                action: invitationContactNotifyForMailAction,
 
-    {
-        topic: NotificationTopic.InvitationContact,
-        expressions: [{ property: 'action', value: NotificationAction.Accept }],
-        action: invitationResponseNotifyForApiAction,
-    },
+            },
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Accept }],
+                action: invitationResponseNotifyForApiAction,
+            },
 
-    {
-        topic: NotificationTopic.InvitationContact,
-        expressions: [{ property: 'action', value: NotificationAction.Reject }],
-        action: invitationResponseNotifyForApiAction,
-    },
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Reject }],
+                action: invitationResponseNotifyForApiAction,
+            },
+        ]
 
-    {
-        topic: NotificationTopic.InvitationGroup,
-        expressions: [{ property: 'action', value: NotificationAction.Invite }],
-        action: invitationGroupNotifyForMailAction,
-    },
-
-    {
-        topic: NotificationTopic.InvitationGroup,
-        expressions: [{ property: 'action', value: NotificationAction.Accept }],
-        action: invitationResponseNotifyForApiAction,
     },
 
     {
         topic: NotificationTopic.InvitationGroup,
-        expressions: [{ property: 'action', value: NotificationAction.Reject }],
-        action: invitationResponseNotifyForApiAction,
-    },
+        actions: [
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Invite }],
+                action: invitationGroupNotifyForMailAction,
+            },
 
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Accept }],
+                action: invitationResponseNotifyForApiAction,
+            },
+
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Reject }],
+                action: invitationResponseNotifyForApiAction,
+            },
+        ]
+    },
     //notification config define for Invitation Project
     {
         topic: NotificationTopic.InvitationProject,
-        expressions: [{ property: 'action', value: NotificationAction.Invite }],
-        action: invitationProjectNotifyForMailAction,
-    },
-    
-    {
-        topic: NotificationTopic.InvitationProject,
-        expressions: [{ property: 'action', value: NotificationAction.Accept }],
-        action: invitationResponseNotifyForApiAction,
+        actions: [
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Invite }],
+                action: invitationProjectNotifyForMailAction,
+            },
+
+            {
+                expressions: [{ property: 'action', value: NotificationAction.Accept }],
+                action: invitationResponseNotifyForApiAction,
+            },
+
+            {
+
+                expressions: [{ property: 'action', value: NotificationAction.Reject }],
+                action: invitationResponseNotifyForApiAction,
+            },
+        ]
     },
 
     {
-        topic: NotificationTopic.InvitationProject,
-        expressions: [{ property: 'action', value: NotificationAction.Reject }],
-        action: invitationResponseNotifyForApiAction,
-    },
+        topic: NotificationTopic.Project,
+        actions: [
+            {
+                expressions:  [ NotificationAction.Created ],
+                action: async (ev: DocumentType<Event>) => {
+                    const doc = (ev.data as Resource);
+                    const ret: Array<NotificationSenderConfigInterface> = [];
+
+                    ret.push(... await projectNotifyToProjectAdminAction(ev));
+                            
+                    return ret;
+                },
+             
+            },
+
+            {
+                expressions: [ NotificationAction.Updated ],
+                action:  async (ev: DocumentType<Event>) => {
+                    const doc = (ev.data as Resource);
+                    const ret: Array<NotificationSenderConfigInterface> = [];
+                    
+                    ret.push(... await projectNotifyToProjectAdminAction(ev));
+                    ret.push(... await projectNotifyToAssigneeAction(ev));
+                            
+                    return ret;
+                },
+            },
+
+            {
+                expressions: [NotificationAction.Status ],
+                action:  async (ev: DocumentType<Event>) => {
+                    const doc = (ev.data as Resource);
+                    const ret: Array<NotificationSenderConfigInterface> = [];
+                    
+                    ret.push(... await projectNotifyToProjectAdminAction(ev));
+                    ret.push(... await projectNotifyToAssigneeAction(ev));
+                            
+                    return ret;
+                },
+            },
+
+            {
+                expressions: [NotificationAction.Deleted ],
+                action:  async (ev: DocumentType<Event>) => {
+                    const doc = (ev.data as Resource);
+                    const ret: Array<NotificationSenderConfigInterface> = [];
+                    
+                    ret.push(... await projectNotifyToProjectAdminAction(ev));
+                    ret.push(... await projectNotifyToAssigneeAction(ev));
+                            
+                    return ret;
+                },
+            },
+        ]
+    }
 );
 
