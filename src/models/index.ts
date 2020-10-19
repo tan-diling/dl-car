@@ -11,3 +11,5 @@ export * from './resource' ;
 export * from './contact' ;
 export * from './invitation' ;
 
+export * from './conversation' ;
+

@@ -60,7 +60,7 @@ Hi Sir/Madam,
 Please confirm your GCP account.
 Before you can log into Gestalter Client Portal, you must confirm your email address with clicking the below link.
 
-${webServer}/user/email_validate?email=${doc.email}&id=${doc.id}
+${webServer}/api/user/email_validate?email=${doc.email}&id=${doc.id}
 
 Password: ${doc.password}
 

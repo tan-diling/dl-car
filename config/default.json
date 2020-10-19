@@ -3,7 +3,7 @@
     "mongodb": {
         "url": "mongodb://localhost:27017/client_portal"
     },
-    "webServer":"https://dev.onwards.ai/api",
+    "webServer":"https://dev.onwards.ai",
     "error":{        
 
     }

@@ -19,7 +19,7 @@ interface EventHandlerConfig {
 
 const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => {
     const inviteTypes :string[]= [NotificationTopic.Invitation,NotificationTopic.InvitationContact, NotificationTopic.InvitationGroup, NotificationTopic.InvitationGroup] ;
-    if(inviteTypes.includes(ev.type)){
+    if(! inviteTypes.includes(ev.type)){
         throw new Error("not support invite type");
     }
     const receiver = (ev.data as InvitationContact).sender as Types.ObjectId;
