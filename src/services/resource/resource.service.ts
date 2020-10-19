@@ -167,10 +167,10 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
     async publishNotification(id:Types.ObjectId,sender:Types.ObjectId,action: NotificationAction){
         const doc = await ResourceModel.findById(id).populate('parents').exec() ;
 
-        const data = {...doc.toJSON(),members: doc.getMembers()};
+        const data = {...doc.toJSON(),members: await doc.getMembers()};
 
 
-        await notificationService.publish(NotificationTopic.Project, action, doc , sender ) ;
+        await notificationService.publish(NotificationTopic.Project, action, data , sender ) ;
 
     }
     

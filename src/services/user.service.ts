@@ -39,7 +39,7 @@ export class UserService {
 
         user = new UserModel(dto);
         user.emailValidated = false;
-        if (!user.password) user.password = randToken.uid(8);
+        if (!user.password) user.password = process.env.GCP_DEFAULT_PASSWORD || randToken.uid(8);
 
         await user.save();
         UserModel.emit(RepoOperation.Created, user);

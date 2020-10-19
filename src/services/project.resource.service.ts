@@ -1,7 +1,7 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus, ActionStatus, NotificationTopic, NotificationAction } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember,  InvitationProjectModel } from '../models';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember,  InvitationProjectModel, Resource } from '../models';
 import { ModelQueryService  } from '../modules/query';
 import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
@@ -200,6 +200,8 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         await this.setProjectMember(project,members);
 
+        await this.publishNotification(project._id, project.creator, NotificationAction.Created) ;
+        
         return await this.getProjectMember(project)  ;
 
     }    
