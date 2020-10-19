@@ -53,7 +53,7 @@ export class Message {
     sender: Ref<User> ;
 
     @prop({})
-    content: string;
+    type: string;
 
     @prop({default:Date.now})
     sendAt?: Date;
@@ -63,6 +63,16 @@ export class Message {
 
     @prop()
     updatedAt?: Date; 
+}
+
+export class TextMessage extends Message {  
+    @prop({})
+    text: string;    
+}
+
+export class ImageMessage extends Message {  
+    @prop({})
+    image: string;    
 }
 
 export const ConversationModel = getModelForClass(Conversation,{schemaOptions:{timestamps:true}});

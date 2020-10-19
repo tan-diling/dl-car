@@ -5,7 +5,7 @@
 export const mailTemplateConfig = {
     invitation: (ctx: any) => {
         const { user,server, doc } = ctx;
-        switch(doc.__t){
+        switch(doc.__t|| doc.type){
             case "InvitationContact" :
                 return {
                     "subject": "Please confirm the contact invitation ",
