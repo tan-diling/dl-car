@@ -91,53 +91,69 @@ const projectNotifyToAssigneeAction =  async (ev: DocumentType<Event>) => {
 export const notificationConfig: Array<EventHandlerConfig> = [];
 notificationConfig.push(
     {
-        topic: NotificationTopic.InvitationContact,
+        topic: NotificationTopic.Invitation,
         actions: [
             {
-                expressions: [{ property: 'action', value: NotificationAction.Invite }],
+                expressions: [ NotificationAction.Invite ],
                 action: invitationContactNotifyForMailAction,
             },{
-                expressions: [{ property: 'action', value: NotificationAction.Accept }],
+                expressions: [ NotificationAction.Accept ],
                 action: invitationResponseNotifyForApiAction,
             },{
-                expressions: [{ property: 'action', value: NotificationAction.Reject }],
+                expressions: [ NotificationAction.Reject ],
                 action: invitationResponseNotifyForApiAction,
             },
         ]
 
     },
+    // {
+    //     topic: NotificationTopic.InvitationContact,
+    //     actions: [
+    //         {
+    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
+    //             action: invitationContactNotifyForMailAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },
+    //     ]
 
-    {
-        topic: NotificationTopic.InvitationGroup,
-        actions: [
-            {
-                expressions: [{ property: 'action', value: NotificationAction.Invite }],
-                action: invitationGroupNotifyForMailAction,
-            },{
-                expressions: [{ property: 'action', value: NotificationAction.Accept }],
-                action: invitationResponseNotifyForApiAction,
-            },{
-                expressions: [{ property: 'action', value: NotificationAction.Reject }],
-                action: invitationResponseNotifyForApiAction,
-            },
-        ]
-    },
-    //notification config define for Invitation Project
-    {
-        topic: NotificationTopic.InvitationProject,
-        actions: [
-            {
-                expressions: [{ property: 'action', value: NotificationAction.Invite }],
-                action: invitationProjectNotifyForMailAction,
-            },{
-                expressions: [{ property: 'action', value: NotificationAction.Accept }],
-                action: invitationResponseNotifyForApiAction,
-            },{
-                expressions: [{ property: 'action', value: NotificationAction.Reject }],
-                action: invitationResponseNotifyForApiAction,
-            },
-        ]
-    },
+    // },
+
+    // {
+    //     topic: NotificationTopic.InvitationGroup,
+    //     actions: [
+    //         {
+    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
+    //             action: invitationGroupNotifyForMailAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },
+    //     ]
+    // },
+    // //notification config define for Invitation Project
+    // {
+    //     topic: NotificationTopic.InvitationProject,
+    //     actions: [
+    //         {
+    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
+    //             action: invitationProjectNotifyForMailAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },{
+    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
+    //             action: invitationResponseNotifyForApiAction,
+    //         },
+    //     ]
+    // },
 
     {
         topic: NotificationTopic.Project,

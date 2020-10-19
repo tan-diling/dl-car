@@ -3,7 +3,7 @@ import { ModelQueryService  } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation, SiteRole, ActionStatus, NotificationAction } from '@app/defines';
+import { RepoOperation, SiteRole, ActionStatus, NotificationAction, NotificationTopic } from '@app/defines';
 import { PendingActionModel, PendingAction } from '@app/models';
 import { DbService } from './db.service';
 import { Container } from 'typedi';
@@ -116,7 +116,7 @@ export class ActionService {
               
         const doc = await model.create(obj) ;
             
-        await this.notificationService.publish(doc.__t,NotificationAction.Invite,doc,doc.sender as Types.ObjectId) ;
+        await this.notificationService.publish(NotificationTopic.Invitation,NotificationAction.Invite,doc.toJSON(),doc.sender as Types.ObjectId) ;
 
         return doc ;
 
@@ -130,7 +130,7 @@ export class ActionService {
             }
             await doc.changeStatus(dto.status) ;
             const notificationAction = dto.status == ActionStatus.Accepted ? NotificationAction.Accept: NotificationAction.Reject ;
-            await this.notificationService.publish(doc.__t,notificationAction,doc,Types.ObjectId(dto.userId));
+            await this.notificationService.publish(NotificationTopic.Invitation, notificationAction ,doc.toJSON(),Types.ObjectId(dto.userId));
             return doc ;
         }
     }
