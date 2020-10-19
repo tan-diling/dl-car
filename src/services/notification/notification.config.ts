@@ -18,10 +18,11 @@ interface EventHandlerConfig {
 }
 
 const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => {
-
-    const receiver = ev.type == NotificationTopic.InvitationContact ? (ev.data as InvitationContact).data.userId
-        : ev.type == NotificationTopic.InvitationGroup ? (ev.data as InvitationGroup).data.userId
-            : ev.type == NotificationTopic.InvitationProject ? (ev.data as InvitationProject).data.userId : null;
+    const inviteTypes :string[]= [NotificationTopic.Invitation,NotificationTopic.InvitationContact, NotificationTopic.InvitationGroup, NotificationTopic.InvitationGroup] ;
+    if(inviteTypes.includes(ev.type)){
+        throw new Error("not support invite type");
+    }
+    const receiver = (ev.data as InvitationContact).sender as Types.ObjectId;
 
     if (receiver) {
         await executeNotificationSend({
@@ -57,7 +58,7 @@ const invitationGroupNotifyForMailAction = invitationNotifyForMailAction();
 const invitationProjectNotifyForMailAction = invitationNotifyForMailAction();
 
 //send notification to project_manager
-const projectNotifyToProjectAdminAction =  async (ev: DocumentType<Event>) => {
+const projectNotifyToProjectManagerAction =  async (ev: DocumentType<Event>) => {
     const doc = (ev.data as Resource);
 
     const members = doc.members as Array<ProjectMember> ;
@@ -144,24 +145,24 @@ notificationConfig.push(
             {
                 expressions:  [ NotificationAction.Created ],
                 action: async (ev: DocumentType<Event>) => {                
-                    await projectNotifyToProjectAdminAction(ev);                            
+                    await projectNotifyToProjectManagerAction(ev);                            
                 },             
             },{
                 expressions: [ NotificationAction.Updated ],
                 action:  async (ev: DocumentType<Event>) => {
-                    await projectNotifyToProjectAdminAction(ev);
+                    await projectNotifyToProjectManagerAction(ev);
                     await projectNotifyToAssigneeAction(ev);                    
                 },
             },{
                 expressions: [NotificationAction.Status ],
                 action:  async (ev: DocumentType<Event>) => {
-                    await projectNotifyToProjectAdminAction(ev);
+                    await projectNotifyToProjectManagerAction(ev);
                     await projectNotifyToAssigneeAction(ev); 
                 },
             },{
                 expressions: [NotificationAction.Deleted ],
                 action:  async (ev: DocumentType<Event>) => {
-                    await projectNotifyToProjectAdminAction(ev);
+                    await projectNotifyToProjectManagerAction(ev);
                     await projectNotifyToAssigneeAction(ev); 
                 },
             },

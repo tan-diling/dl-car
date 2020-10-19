@@ -49,18 +49,17 @@ export class NotificationService {
 
         const ev = await EventModel.create({ sender, type, action, data })
         const expressionEval = (data) => {
-            const expr = typeof (data) == typeof ('') ? { val: data, path: "action" } : data;
-            const keys = String(expr.path).split('.');
+            const expr = typeof (data) == typeof ('') ? { value: data, property: "action" } : data;
+            const keys = String(expr.property).split('.');
             let v = ev;
             for (const k of keys) {
-                if (Object.keys(v).includes(k)) {
-                    v = v[k];
-                } else {
+                v = v[k];
+                if (v==null) {
                     return false;
                 }
             }
 
-            return String(v) == expr.val;
+            return String(v) == expr.value;
         };
         for (const cfg of notificationConfig) {
             if (cfg.topic != type) continue;

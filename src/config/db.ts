@@ -71,6 +71,27 @@ dbInitData.push({
             key: { resource: ResourceType.Task, role: ProjectRole.ProjectManager },
             doc: { scope: PermissionOperation.CRUD, }
         },
+
+        {
+            key: { resource: ResourceType.Project, role: ProjectRole.QualityAssurance },
+            doc: { scope: PermissionOperation.Retrieve + PermissionOperation.Update, }
+        },
+        {
+            key: { resource: ResourceType.Goal, role: ProjectRole.QualityAssurance },
+            doc: { scope: PermissionOperation.CRUD, }
+        },
+        {
+            key: { resource: ResourceType.Requirement, role: ProjectRole.QualityAssurance },
+            doc: { scope: PermissionOperation.CRUD, }
+        },
+        {
+            key: { resource: ResourceType.Deliverable, role: ProjectRole.QualityAssurance },
+            doc: { scope: PermissionOperation.CRUD, }
+        },
+        {
+            key: { resource: ResourceType.Task, role: ProjectRole.QualityAssurance },
+            doc: { scope: PermissionOperation.CRUD, }
+        },
         {
             key: { resource: ResourceType.Project, role: ProjectRole.Developer },
             doc: { scope: PermissionOperation.Retrieve, }

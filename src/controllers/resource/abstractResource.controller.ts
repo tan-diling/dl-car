@@ -117,8 +117,8 @@ export class AbstractResourceRelatedController extends AbstractResourceControlle
                 break ;
             case RequestOperation.RETRIEVE:  
                 _ctx.method = RequestOperation.RETRIEVE ;
-                if(ctx.dto.parent) {
-                    _ctx.resourceId = ctx.dto.parent ;
+                if(ctx.filter?.parent) {
+                    _ctx.resourceId = ctx.filter.parent ;
                 }
 
                 if(ctx.resourceId) {

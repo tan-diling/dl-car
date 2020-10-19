@@ -128,7 +128,19 @@ export class ProjectPermissionService {
         if (policy == null) return false;
 
         const { scope, fields } = policy;
-        const op: number = Number(ctx.method);
+        let op = 0;
+        if (ctx.method ==RequestOperation.RETRIEVE){
+            op = PermissionOperation.Retrieve;
+        }
+        if (ctx.method ==RequestOperation.CREATE){
+            op = PermissionOperation.Create;
+        }
+        if (ctx.method ==RequestOperation.UPDATE){
+            op = PermissionOperation.Update;
+        }
+        if (ctx.method ==RequestOperation.DELETE){
+            op = PermissionOperation.Delete;
+        }
 
         if ((op & scope) == op) {
             return await this.validateInputField(ctx, policy);
