@@ -7,11 +7,11 @@ import { DocumentType } from '@typegoose/typegoose';
 
 @modelOptions({ options: { allowMixed:0}})
 export class Conversation {  
-    @prop({ref:()=>User,type:[Types.ObjectId]})
-    users: Ref<User>[] ;
+    @prop({})
+    image?: string ;
 
     @prop({})
-    title: string;
+    title?: string;
 
     @prop({ default: false })
     isGroup?: boolean;
@@ -21,27 +21,40 @@ export class Conversation {
 
     @prop()
     updatedAt?: Date;
- 
+
+    @prop({ 
+      ref:'ConversationMember',
+      localField:"_id",
+      foreignField:"conversation",    
+    })
+    members?: Ref<ConversationMember>[];
+   
 }
 
 export class ConversationMember {  
     @prop({ref:()=>Conversation, type:Types.ObjectId})
-    Conversation: Ref<Conversation> ;
+    conversation: Ref<Conversation> ;
 
     @prop({ref:()=>User})
     user: Ref<User> ;
-
-    @prop({ default: false })
-    isDeleted?: boolean;
-
+    
     @prop({default:Date.now})
     readAt?: Date;
 
     @prop({default:Date.now})
-    joinAt?: Date;
+    enterAt?: Date;
 
     @prop()
-    removeAt?: Date; 
+    leaveAt?: Date; 
+
+    @prop({ default: false })
+    isDeleted?: boolean;
+
+    @prop()
+    createdAt?: Date;
+
+    @prop()
+    updatedAt?: Date; 
 }
 
 
@@ -76,5 +89,7 @@ export class ImageMessage extends Message {
 }
 
 export const ConversationModel = getModelForClass(Conversation,{schemaOptions:{timestamps:true}});
+
+export const ConversationMemberModel = getModelForClass(ConversationMember,{schemaOptions:{timestamps:true}});
 
 export const MessageModel = getModelForClass(Message,{schemaOptions:{timestamps:true}});

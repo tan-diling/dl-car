@@ -16,6 +16,7 @@ import { ContactController } from './user/contact.controller';
 import { GroupMemberController } from './group/groupMember.controller';
 import { ProjectMemberController } from './resource/projectMember.controller';
 import { NotificationController } from './notification/notificationController';
+import { ConversationController } from './conversation/conversation.controller';
 
 export const controllers = [
     AdminController,
@@ -44,5 +45,7 @@ export const controllers = [
     ContactController,
 
     NotificationController,
+
+    ConversationController,
 
 ] ;

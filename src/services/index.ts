@@ -7,3 +7,5 @@ export * from './contact.service';
 
 export * from './project.resource.service';
 export * from './projectPermission.service';
+
+export * from './conversation.service';

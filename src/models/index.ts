@@ -13,3 +13,5 @@ export * from './invitation' ;
 
 export * from './conversation' ;
 
+export * from './notification' ;
+
