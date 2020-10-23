@@ -4,7 +4,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as moment from 'moment';
 import { SiteRole, RequestContext, RequestOperation } from '@app/defines';
 import { ConversationService } from '@app/services';
-import { ConversationDto, ConversationUserDto } from './dto/conversation.dto';
+import { ConversationDto, ConversationUserDto, UpdateConversationDto } from './dto/conversation.dto';
 
 
 
@@ -18,8 +18,8 @@ export class ConversationController {
 
     @Post('/group')
     async createGroup(@Body() dto: ConversationDto,@Req() request) {
-        const conversation= await this.service.createGroupConversation(dto);
-        await this.service.appendMember(conversation._id,[request.user.id]) ;
+        const conversation= await this.service.createGroupConversation({title:dto.title,image:dto.image});
+        await this.service.appendMember(conversation._id,[request.user.id,...dto.users]) ;
         return await this.getById(conversation._id) ;
     }
 
@@ -46,7 +46,7 @@ export class ConversationController {
 
 
     @Patch('/:id([0-9a-f]{24})')
-    async update(@Param('id') id: string, @Body() dto: ConversationDto, @Req() request, @CurrentUser() currentUser) {
+    async update(@Param('id') id: string, @Body() dto: UpdateConversationDto, @Req() request, @CurrentUser() currentUser) {
         await this.service.updateConversation(id,dto);            
         return await this.getById(id) ;
     }

@@ -10,7 +10,24 @@ export class ConversationDto {
     @IsString()
     @IsOptional()
     image?: string;    
+
+
+    @IsMongoId({each:true})
+    users?: string[];    
 }
+
+export class UpdateConversationDto {
+        
+    @IsString()
+    title: string;    
+
+    @IsString()
+    @IsOptional()
+    image?: string;    
+
+
+}
+
 
 export class ConversationUserDto {
         
