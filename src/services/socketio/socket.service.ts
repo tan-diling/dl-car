@@ -7,8 +7,6 @@ import { logger } from '@app/config';
 
 /**
  * chat context
- * - __visitor__ chat visitor id 
- * - __client__ chat client id ,if a visitor fill a form 
  */
 export class ChatContext {
 

@@ -3,7 +3,7 @@ import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, mod
 import { User } from './user';
 import { Types } from 'mongoose';
 import { DocumentType } from '@typegoose/typegoose';
-
+import { text } from 'body-parser';
 
 @modelOptions({ options: { allowMixed:0}})
 export class Conversation {  
@@ -58,15 +58,24 @@ export class ConversationMember {
 }
 
 
+const mongoose = require('mongoose')
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+@plugin(AutoIncrement, {id: 'conversation_seq', inc_field: 'seq', reference_fields: ['conversation'] })
 export class Message {  
     @prop({ref:()=>Conversation, type:Types.ObjectId})
-    Conversation: Ref<Conversation> ;
+    conversation: Ref<Conversation> ;
+
+    @prop()
+    seq?: number ;
 
     @prop({ref:()=>User,type:Types.ObjectId})
     sender: Ref<User> ;
 
     @prop({})
     type: string;
+
+    @prop({})
+    data: any;
 
     @prop({default:Date.now})
     sendAt?: Date;
@@ -76,17 +85,19 @@ export class Message {
 
     @prop()
     updatedAt?: Date; 
+
+   
 }
 
-export class TextMessage extends Message {  
-    @prop({})
-    text: string;    
-}
+// export class TextMessage extends Message {  
+//     @prop({})
+//     text: string;    
+// }
 
-export class ImageMessage extends Message {  
-    @prop({})
-    image: string;    
-}
+// export class ImageMessage extends Message {  
+//     @prop({})
+//     image: string;    
+// }
 
 export const ConversationModel = getModelForClass(Conversation,{schemaOptions:{timestamps:true}});
 

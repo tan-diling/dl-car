@@ -44,8 +44,7 @@ export const chatBot = async (socket: ServerIO.Socket) => {
 
     const logChatMessage = async (topic: string, body: any) => {
         const socket_id = socket.id;
-        const session = ctx.visitor;
-        const user = ctx.client;
+        const user = ctx.user;
 
         // await MeetingService.appendChatLog({
         //     socket_id,

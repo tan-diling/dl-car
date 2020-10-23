@@ -5,9 +5,10 @@ import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
 import { Types } from 'mongoose';
-import { ConversationModel, MessageModel, ConversationMemberModel, ConversationMember } from '@app/models';
+import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember } from '@app/models';
 import { compileFunction } from 'vm';
 import { timingSafeEqual } from 'crypto';
+import { DbService } from './db.service';
 
 /**
  * user service
@@ -35,8 +36,13 @@ export class ConversationService {
         return await ConversationModel.findById(id).populate('members').exec() ;        
     }
 
-    async listMessage(conversation:Types.ObjectId) {
-        await MessageModel.find(conversation).exec() ;
+    // async appendTextMessage(data:{sender:string|Types.ObjectId, conversation:string|Types.ObjectId,text:string}) {
+    //     await Message.createTextMessage(data) ;
+    // }
+
+
+    async listMessage(query) {
+        return await DbService.list(MessageModel,query) ;
     }
 
     /**
@@ -48,6 +54,11 @@ export class ConversationService {
         return conversation ;        
     }
 
+    /**
+     * update conversation info
+     * @param id 
+     * @param data 
+     */
     async updateConversation(id:string|Types.ObjectId,data:{title:string,image?:string}) {
         const conversation = await ConversationModel.findById(id).exec() ;
         if(conversation){
@@ -58,6 +69,11 @@ export class ConversationService {
         }
     }
 
+    /**
+     * append conversation member
+     * @param id conversation id
+     * @param users 
+     */
     async appendMember(id:string|Types.ObjectId,users:string[]){
         const conversation = await ConversationModel.findById(id).exec() ;
         if(conversation ){
@@ -66,13 +82,31 @@ export class ConversationService {
             }
 
             for(const user of users){
-                await ConversationMemberModel.findOneAndUpdate({user:user,conversation:conversation._id},{enter:new Date(),isDeleted:false},{upsert:true}).exec() ;
+                let member = await ConversationMemberModel.findOne({user:user,conversation:conversation._id}).exec() ;
+                if(member==null){
+                    member = await ConversationMemberModel.create({user:user,conversation:conversation._id}) ;
+                    
+                    
+                } else {
+                    if(member.isDeleted){                       
+                        member.enterAt = new Date();
+                        member.isDeleted = false ;
+                        await member.save() ;                        
+                    }
+                }
+
+                await this.createActionMessage({ conversation:id, type:'enter', time:member.enterAt, sender:user}) ;
             }
 
             return conversation ;
         }
     }
 
+    /**
+     * remove conversation member
+     * @param id conversation id
+     * @param users 
+     */
     async removeMember(id:string|Types.ObjectId,users:string[]){
         const conversation = await ConversationModel.findById(id).exec() ;
         if(conversation){
@@ -81,14 +115,25 @@ export class ConversationService {
             }
 
             for(const user of users){
-                await ConversationMemberModel.findOneAndUpdate({user:user,conversation:conversation._id},{leaveAt:new Date(),isDeleted:true}).exec() ;
+                const member = await ConversationMemberModel.findOne({user:user,conversation:conversation._id}).exec() ;
+                if(member){
+                    member.leaveAt = new Date();
+                    member.isDeleted = true ;
+                    await member.save() ;
+                    await this.createActionMessage({ conversation:id, type:'leave', time:member.leaveAt, sender:user}) ;
+                }
             }
-
+            
             return conversation ;
         }
     }
 
-    async forceConversation(user1:string|Types.ObjectId,user2:string|Types.ObjectId) {
+    /**
+     * get one to one conversation by user,if not exists ,create it 
+     * @param user1 user id
+     * @param user2 user id
+     */
+    async getUserConversation(user1:string|Types.ObjectId,user2:string|Types.ObjectId) {
         const conversationList = await ConversationModel.find({isGroup:false}).populate('members').exec() ;        
         for(const conversation of conversationList){
             const members = conversation.members as Array<ConversationMember> ;
@@ -108,5 +153,23 @@ export class ConversationService {
         return conversation ;
     }
 
+
+    async createTextMessage(dto:{conversation:string|Types.ObjectId, text:string ,sender:string|Types.ObjectId}){
+        const {conversation,sender,...data} = dto ;
+        return await MessageModel.create({conversation,sender,type:'text',data}) ;        
+
+    }
+
+    
+    async createImageMessage(dto:{conversation:string|Types.ObjectId, url:string ,sender:string|Types.ObjectId}){
+        const {conversation,sender,...data} = dto ;
+        return await MessageModel.create({conversation,sender,type:'image',data}) ;        
+    }
+
+    
+    async createActionMessage(dto:{conversation:string|Types.ObjectId,sender:string|Types.ObjectId, time:Date,type:"enter"|"leave"|"read"|"typing" }){
+        const {conversation,sender,...data} = dto ;
+        return await MessageModel.create({conversation,sender,type:'action',data}) ;        
+    }
 
 }

@@ -25,13 +25,18 @@ export class ConversationController {
 
     @Post('/user')
     async createUser(@Body() dto: ConversationUserDto,@Req() request) {
-        const conversation= await this.service.forceConversation(dto.user,request.user.id);        
+        const conversation= await this.service.getUserConversation(dto.user,request.user.id);        
         return await this.getById(conversation._id) ;
     }
 
     @Get('/my')
     async myList(@Req() request) {
         return await this.service.listByUser(request.user.id);
+    }
+
+    @Get('/message')
+    async myMessageList(@Req() request) {
+        return await this.service.listMessage(request.query);
     }
 
     @Get('/:id([0-9a-f]{24})')
