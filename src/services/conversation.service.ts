@@ -4,8 +4,8 @@ import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-co
 import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
-import { Types } from 'mongoose';
-import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember } from '@app/models';
+import { Types, CreateQuery } from 'mongoose';
+import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember, Conversation } from '@app/models';
 import { compileFunction } from 'vm';
 import { timingSafeEqual } from 'crypto';
 import { DbService } from './db.service';
@@ -153,23 +153,74 @@ export class ConversationService {
         return conversation ;
     }
 
+    private async createMessage(data:CreateQuery<DocumentType<Message>>){
+        const conversation = await ConversationModel.findById(data.conversation).populate('members').exec() ;
+        if(conversation){
+            const userStatus = new Map() ;
+            for(const member of conversation.members){
+                userStatus.set(String((member as ConversationMember).user),0) ;
+            }
+            const message =  await MessageModel.create({...data,userStatus}) ;        
+
+            conversation.lastMessageTime = message.sendAt ;
+            conversation.lastMessageSeq = message.seq ;
+
+            
+
+            await conversation.save() ;
+
+            return message ;
+        }
+    }
 
     async createTextMessage(dto:{conversation:string|Types.ObjectId, text:string ,sender:string|Types.ObjectId}){
         const {conversation,sender,...data} = dto ;
-        return await MessageModel.create({conversation,sender,type:'text',data}) ;        
+        return await this.createMessage({conversation,sender,type:'text',data}) ;        
 
     }
 
     
     async createImageMessage(dto:{conversation:string|Types.ObjectId, url:string ,sender:string|Types.ObjectId}){
         const {conversation,sender,...data} = dto ;
-        return await MessageModel.create({conversation,sender,type:'image',data}) ;        
+        return await this.createMessage({conversation,sender,type:'image',data}) ;        
     }
 
     
-    async createActionMessage(dto:{conversation:string|Types.ObjectId,sender:string|Types.ObjectId, time:Date,type:"enter"|"leave"|"read"|"typing" }){
+    async createActionMessage(dto:{conversation:string|Types.ObjectId,sender:string|Types.ObjectId, time:Date,type:"enter"|"leave"|"read"|"typing"|string }){
         const {conversation,sender,...data} = dto ;
-        return await MessageModel.create({conversation,sender,type:'action',data}) ;        
+        return await this.createMessage({conversation,sender,type:'action',data}) ;        
     }
+
+    /**
+     * query user unsent messages;
+     * @param user user id
+     */
+    async processUserMessageUnSent(user:string|Types.ObjectId,callback){
+
+        const idString = String(user) ;
+        
+        const messageList =  await MessageModel.find().where('userStatus.'+idString, 0).sort('seq').exec() ;
+        
+        for(const message of messageList){
+            callback(message) ;
+            
+            await this.updateMessageSent(message._id,idString) ;            
+        }
+    }
+
+    async updateMessageSent(messageId:string|Types.ObjectId, user:string|Types.ObjectId){
+
+        const idString = String(user) ;
+        
+        const message =  await MessageModel.findById(messageId).exec() ;
+
+        if(message ){
+            if(message.userStatus?.get(idString)==0){
+                message.userStatus.set(idString,1) ;
+                await message.save() ;
+            }
+        }
+    }
+
 
 }

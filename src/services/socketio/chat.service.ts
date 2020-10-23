@@ -3,27 +3,21 @@ import ServerIO = require("socket.io");
 import { UserService } from '../user.service';
 import { logger } from '@app/config';
 import { Container } from 'typedi';
-import { ChatContext, ChatProcessor } from './socket.service';
+import { ChatContext, ChatProcessor, ChatMessageTopic, chatContextArray } from './message.socket.service';
+import { ConversationService } from '../conversation.service';
 
 const userService = Container.get(UserService) ;
-
-export const enum ChatEvent {    
-    REQUEST = 'chat-request',
-    REQUEST_ACK = 'chat-request-ack',
-    RESPONSE = 'chat-response',
-    NOTIFICATION = 'notification',
-}
-
+const conversationService = Container.get(ConversationService)
 
 const chatProcessor = new ChatProcessor();
 
-const chatContextArray :ChatContext[] =[] ;
+
 
 export const chatBot = async (socket: ServerIO.Socket) => {
     console.log("Connected socket.id %s.", socket.id);
 
     const id = socket.handshake.query['token'];
-    const user = await userService.getById(id);
+    const user = await userService.getByToken(id);
     if (user == null) {
         logger.error("chat connect error NOTFOUND", id);
         socket.error("token error");
@@ -55,16 +49,25 @@ export const chatBot = async (socket: ServerIO.Socket) => {
         // });
     };
 
+    await conversationService.processUserMessageUnSent(ctx.user,async doc=>{}) ;
 
-    socket.on(ChatEvent.REQUEST, async (m) => {
+    socket.on(ChatMessageTopic.REQUEST, async (m) => {
         console.log("[server](message): %s --", socket.id, JSON.stringify(m));
 
-        await logChatMessage(ChatEvent.REQUEST, m);
+        await logChatMessage(ChatMessageTopic.REQUEST, m);
 
         const ret = await chatProcessor.process(ctx, m);
         if ( ret ) {
-            socket.emit(ChatEvent.RESPONSE, ret);
-            await logChatMessage(ChatEvent.RESPONSE, ret);
+            // if(ret.error==null){
+            //     chatContextArray.forEach(x => {
+            //         if(String( x.user ) == String(ret.._id)) {
+            //             x.client = visitor.user ;
+            //             console.log("visitor.updated");
+            //         }    
+            //     });
+            // }else{            
+            socket.emit(ChatMessageTopic.RESPONSE, ret);            
+            await logChatMessage(ChatMessageTopic.RESPONSE, ret);
         }
     });
 

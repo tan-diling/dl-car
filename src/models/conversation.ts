@@ -22,6 +22,13 @@ export class Conversation {
     @prop()
     updatedAt?: Date;
 
+
+    @prop()
+    lastMessageTime?: Date ;
+
+    @prop()
+    lastMessageSeq?: number ;
+
     @prop({ 
       ref:'ConversationMember',
       localField:"_id",
@@ -39,6 +46,9 @@ export class ConversationMember {
     user: Ref<User> ;
     
     @prop({default:Date.now})
+    deliverAt?:Date ;
+
+    @prop({default:Date.now})
     readAt?: Date;
 
     @prop({default:Date.now})
@@ -55,6 +65,7 @@ export class ConversationMember {
 
     @prop()
     updatedAt?: Date; 
+
 }
 
 
@@ -84,9 +95,10 @@ export class Message {
     createdAt?: Date;
 
     @prop()
-    updatedAt?: Date; 
+    updatedAt?: Date;    
 
-   
+    @prop({select:false,of:Number})
+    userStatus?: Map<string,number>; 
 }
 
 // export class TextMessage extends Message {  

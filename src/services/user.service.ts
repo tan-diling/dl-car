@@ -2,7 +2,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { ModelQueryService } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
-import { UserModel, User } from '../models/user';
+import { UserModel, User, LoginSessionModel } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
 
 /**
@@ -79,9 +79,11 @@ export class UserService {
         return await UserModel.findById(id).exec();
     }
 
-    // async getByEmail(email: string) {
-    //     return await UserModel.findOne({ email }).exec();
-    // }
+    async getByToken(token: string) {
+        const userSession = await LoginSessionModel.findOne({ refreshToken:token }).populate('user').exec();
+        
+        return userSession?.user　as DocumentType<User> ;
+    }
 
     /**
      * update user info
