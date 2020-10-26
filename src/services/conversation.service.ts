@@ -36,9 +36,47 @@ export class ConversationService {
         return await ConversationModel.findById(id).populate('members').exec();
     }
 
-    // async appendTextMessage(data:{sender:string|Types.ObjectId, conversation:string|Types.ObjectId,text:string}) {
-    //     await Message.createTextMessage(data) ;
-    // }
+    async listConversationStatisticsByUser(user: string | Types.ObjectId) {
+        const userId = new Types.ObjectId(user);
+        const aggr =
+            [{
+                $match: {
+                    user: userId,
+                }
+            }, {
+                $lookup: {
+                    from: 'messages',
+                    localField: 'conversation',
+                    foreignField: 'conversation',
+                    as: 'messages'
+                }
+            }, {
+                $unwind: {
+                    path: "$messages"
+                }
+            }, {
+                $project: {
+                    conversation: 1,
+                    read: {
+                        $gte: ["$readAt", "$messages.sendAt"]
+                    }
+                }
+            }, {
+                $group: {
+                    _id: "$conversation",
+                    total: {
+                        $sum: 1
+                    },
+                    unread: {
+                        $sum: {
+                            $cond: ["$read", 0, 1]
+                        }
+                    }
+                }
+            }];
+
+        return ConversationMemberModel.aggregate(aggr).exec();
+    }
 
 
     async listMessage(query) {

@@ -34,6 +34,11 @@ export class ConversationController {
         return await this.service.listByUser(request.user.id);
     }
 
+    @Get('/my/statistics')
+    async myStatistics(@Req() request) {
+        return await this.service.listConversationStatisticsByUser(request.user.id);
+    }
+
     @Get('/message')
     async myMessageList(@Req() request) {
         return await this.service.listMessage(request.query);
