@@ -78,6 +78,7 @@ class MessageData {
 
     @IsDate()
     @IsOptional()
+    @Type(() => Date)
     time?: Date;
 }
 

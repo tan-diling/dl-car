@@ -170,6 +170,8 @@ export class ConversationService {
 
             await conversation.save();
 
+            MessageModel.emit('created', message);
+
             return message;
         }
     }
