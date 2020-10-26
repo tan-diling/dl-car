@@ -1,5 +1,7 @@
+
 export interface Entity {
     parents: Entity[];
+    parent: Entity;
     assignees: string[];
     deleted: boolean;
     status: number;
@@ -20,23 +22,24 @@ export interface ProjectMember {
 export interface CurrentUser {
     id: string;
     name: string;
-    email: string;
-    image: string;
     projectRole: string;
 }
 
 
-export enum EntityContextMacro {
-    'CURRENT_USER' = 'user',
-    'ENTITY' = 'entity',
-    'ENTITY_PARENT' = 'entity.parent',
-}
+// export enum EntityContextMacro {
+//     'CURRENT_USER' = 'user',
+//     'ENTITY' = 'entity',
+//     'ENTITY_PARENT' = 'entity.parent',
+// }
 
 export interface EntityContext<T extends Entity> {
     user: CurrentUser;
     members: ProjectMember[];
     entity: T;
+    entityType: string;
+    method: string;
     timestamp: number;
     req,
 }
+
 

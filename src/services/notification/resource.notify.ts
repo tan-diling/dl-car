@@ -7,7 +7,6 @@ import { StatusHandlers, ProjectStatus } from '@app/defines/projectStatus';
 import { DbService } from '../db.service';
 import { Container } from 'typedi';
 import { NotificationService } from '.';
-// import * as safeEval from 'notevil';
 
 
 const notificationService = Container.get(NotificationService);
