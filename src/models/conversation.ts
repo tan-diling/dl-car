@@ -5,10 +5,10 @@ import { Types } from 'mongoose';
 import { DocumentType } from '@typegoose/typegoose';
 import { text } from 'body-parser';
 
-@modelOptions({ options: { allowMixed:0}})
-export class Conversation {  
+@modelOptions({ options: { allowMixed: 0 } })
+export class Conversation {
     @prop({})
-    image?: string ;
+    image?: string;
 
     @prop({})
     title?: string;
@@ -24,38 +24,38 @@ export class Conversation {
 
 
     @prop()
-    lastMessageTime?: Date ;
+    lastMessageTime?: Date;
 
     @prop()
-    lastMessageSeq?: number ;
+    lastMessageSeq?: number;
 
-    @prop({ 
-      ref:'ConversationMember',
-      localField:"_id",
-      foreignField:"conversation",    
+    @prop({
+        ref: 'ConversationMember',
+        localField: "_id",
+        foreignField: "conversation",
     })
     members?: Ref<ConversationMember>[];
-   
+
 }
 
-export class ConversationMember {  
-    @prop({ref:()=>Conversation, type:Types.ObjectId})
-    conversation: Ref<Conversation> ;
+export class ConversationMember {
+    @prop({ ref: () => Conversation, type: Types.ObjectId })
+    conversation: Ref<Conversation>;
 
-    @prop({ref:()=>User})
-    user: Ref<User> ;
-    
-    @prop({default:Date.now})
-    deliverAt?:Date ;
+    @prop({ ref: () => User })
+    user: Ref<User>;
 
-    @prop({default:Date.now})
+    @prop({ default: Date.now })
+    deliverAt?: Date;
+
+    @prop({ default: Date.now })
     readAt?: Date;
 
-    @prop({default:Date.now})
+    @prop({ default: Date.now })
     enterAt?: Date;
 
     @prop()
-    leaveAt?: Date; 
+    leaveAt?: Date;
 
     @prop({ default: false })
     isDeleted?: boolean;
@@ -64,23 +64,23 @@ export class ConversationMember {
     createdAt?: Date;
 
     @prop()
-    updatedAt?: Date; 
+    updatedAt?: Date;
 
 }
 
 
 const mongoose = require('mongoose')
 const AutoIncrement = require('mongoose-sequence')(mongoose);
-@plugin(AutoIncrement, {id: 'conversation_seq', inc_field: 'seq', reference_fields: ['conversation'] })
-export class Message {  
-    @prop({ref:()=>Conversation, type:Types.ObjectId})
-    conversation: Ref<Conversation> ;
+@plugin(AutoIncrement, { id: 'conversation_seq', inc_field: 'seq', reference_fields: ['conversation'] })
+export class Message {
+    @prop({ ref: () => Conversation, type: Types.ObjectId })
+    conversation: Ref<Conversation>;
 
     @prop()
-    seq?: number ;
+    seq?: number;
 
-    @prop({ref:()=>User,type:Types.ObjectId})
-    sender: Ref<User> ;
+    @prop({ ref: () => User, type: Types.ObjectId })
+    sender: Ref<User>;
 
     @prop({})
     type: string;
@@ -88,17 +88,17 @@ export class Message {
     @prop({})
     data: any;
 
-    @prop({default:Date.now})
+    @prop({ default: Date.now })
     sendAt?: Date;
 
     @prop()
     createdAt?: Date;
 
     @prop()
-    updatedAt?: Date;    
+    updatedAt?: Date;
 
-    @prop({select:false,of:Number})
-    userStatus?: Map<string,number>; 
+    @prop({ type: Number })
+    userStatus?: Map<string, number>;
 }
 
 // export class TextMessage extends Message {  
@@ -111,8 +111,8 @@ export class Message {
 //     image: string;    
 // }
 
-export const ConversationModel = getModelForClass(Conversation,{schemaOptions:{timestamps:true}});
+export const ConversationModel = getModelForClass(Conversation, { schemaOptions: { timestamps: true } });
 
-export const ConversationMemberModel = getModelForClass(ConversationMember,{schemaOptions:{timestamps:true}});
+export const ConversationMemberModel = getModelForClass(ConversationMember, { schemaOptions: { timestamps: true } });
 
-export const MessageModel = getModelForClass(Message,{schemaOptions:{timestamps:true}});
+export const MessageModel = getModelForClass(Message, { schemaOptions: { timestamps: true } });

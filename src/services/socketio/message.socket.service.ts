@@ -8,6 +8,7 @@ import { logger } from '@app/config';
 import { ConversationService } from '../conversation.service';
 import { Container } from 'typedi';
 import { Type } from 'class-transformer';
+import { MessageModel } from '@app/models';
 
 
 const conversationService = Container.get(ConversationService)
@@ -17,15 +18,24 @@ const conversationService = Container.get(ConversationService)
 export class ChatContext {
 
     constructor(
-        public user: Types.ObjectId
+        public user: Types.ObjectId,
+        public socket
     ) {
     }
 
     callback: (error: any, data: { event: string, message: any } | any) => any;
     [k: string]: any;
+
+    async processMessageUnsent() {
+        await conversationService.processUserMessageUnSent(this.user, async doc => {
+
+            this.socket.emit(ChatMessageTopic.MESSAGE, doc);
+
+        });
+    }
 }
 
-export const chatContextArray :ChatContext[] =[] ;
+export const chatContextArray: ChatContext[] = [];
 
 interface ChatProcessFunction {
     (ctx: ChatContext, data): any
@@ -39,12 +49,16 @@ type ContextInterface = {
     requestId: string;
 }
 
-class MessageData{
+class MessageData {
     @IsMongoId()
     user: string;
+
     @IsMongoId()
     conversation: string;
 
+    @IsMongoId()
+    @IsOptional()
+    message?: string;
 
     //type:text
     @IsString()
@@ -83,13 +97,17 @@ enum ChatMessageType {
 };
 
 
-const sendUserMessage = async (user:string|Types.ObjectId, message)=>{
-    for(const ctx of chatContextArray){
-        if(String(ctx.user)==String(user)){
-            ctx.callback(null,{topic:ChatMessageTopic.MESSAGE,message})
-        }
-    }
-}
+// const sendUserMessage = async (user: string | Types.ObjectId, message) => {
+//     for (const ctx of chatContextArray) {
+//         if (String(ctx.user) == String(user)) {
+//             ctx.socket.emit(ChatMessageTopic.MESSAGE, message);
+
+//             await conversationService.updateMessageSent(message._id,user);
+
+//         }
+//     }
+// }
+
 
 
 class ChatRequestDto {
@@ -102,7 +120,7 @@ class ChatRequestDto {
     // @IsOptional()
     @Type(() => MessageData)
     @ValidateNested()
-    data: MessageData ;
+    data: MessageData;
 }
 
 
@@ -117,22 +135,19 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
     /**text process */
     processMap.set(ChatMessageType.TEXT, async (ctx: ChatContext, msg: ChatRequestDto) => {
         // return null;
-        const { user, conversation, text } = msg.data ;
-        const req = await conversationService.createTextMessage({ sender: user, conversation, text });
-        for(const user of req.userStatus.keys()){
-            if(req.userStatus.get(user)==0){
-                await sendUserMessage(user,req) ;
-            }
-            // ctx.callback()
-        }
+        const { conversation, text } = msg.data;
+        const sender = ctx.user;
+        const req = await conversationService.createTextMessage({ sender, conversation, text });
+
         return req;
     });
 
     /**image process */
     processMap.set(ChatMessageType.IMAGE, async (ctx: ChatContext, msg: ChatRequestDto) => {
         // return null;
-        const { user, conversation, url } = msg.data ;
-        const req = await conversationService.createImageMessage({ sender: user, conversation, url });
+        const { conversation, url } = msg.data;
+        const sender = ctx.user;
+        const req = await conversationService.createImageMessage({ sender, conversation, url });
         return req;
     });
 
@@ -140,11 +155,24 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
     processMap.set(ChatMessageType.ACTION, async (ctx: ChatContext, msg: ChatRequestDto) => {
         // return null;
         const { user, conversation, time, type } = msg.data;
+        const sender = ctx.user;
+        if (type == "read") {
 
-        const req = await conversationService.createActionMessage({ sender: user, conversation, time, type });
-        
-        
-        return req;
+            await conversationService.updateMessageAsRead({ conversation, user: sender, time });
+            const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
+
+            return req;
+        }
+
+        // if(type=="enter"){
+        //     const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
+        //     return req;
+        // }
+
+        // if(type=="leave"){
+        //     const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
+        //     return req;
+        // }
     });
 
 }
@@ -162,6 +190,13 @@ export class ChatProcessor extends EventEmitter {
         super()
         configChatProcessMap(this.chatProcessorMap);
 
+
+        MessageModel.on('created', async msg => {
+            console.log(msg);
+            for (const ctx of chatContextArray) {
+                await ctx.processMessageUnsent();
+            }
+        });
     }
 
     getProcessorFunction(actions: Array<string>) {
@@ -201,7 +236,7 @@ export class ChatProcessor extends EventEmitter {
             const func = this.getProcessorFunction([actionType]);
             if (func) {
                 const ret = await func(ctx, msg);
-                
+
                 return ret;
             } else {
                 const error = `unknown message type:${actionType}`;

@@ -14,19 +14,19 @@ export class ConversationController {
     constructor(private service: ConversationService) {
     }
 
-   
+
 
     @Post('/group')
-    async createGroup(@Body() dto: ConversationDto,@Req() request) {
-        const conversation= await this.service.createGroupConversation({title:dto.title,image:dto.image});
-        await this.service.appendMember(conversation._id,[request.user.id,...dto.users]) ;
-        return await this.getById(conversation._id) ;
+    async createGroup(@Body() dto: ConversationDto, @Req() request) {
+        const conversation = await this.service.createGroupConversation({ title: dto.title, image: dto.image });
+        await this.service.appendMember(conversation._id, [request.user.id, ...dto.users], request.user.id);
+        return await this.getById(conversation._id);
     }
 
     @Post('/user')
-    async createUser(@Body() dto: ConversationUserDto,@Req() request) {
-        const conversation= await this.service.getUserConversation(dto.user,request.user.id);        
-        return await this.getById(conversation._id) ;
+    async createUser(@Body() dto: ConversationUserDto, @Req() request) {
+        const conversation = await this.service.getUserConversation(dto.user, request.user.id);
+        return await this.getById(conversation._id);
     }
 
     @Get('/my')
@@ -41,27 +41,27 @@ export class ConversationController {
 
     @Get('/:id([0-9a-f]{24})')
     async getById(@Param('id') id: string) {
-        return await this.service.getById(id) ;
+        return await this.service.getById(id);
     }
 
 
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: UpdateConversationDto, @Req() request, @CurrentUser() currentUser) {
-        await this.service.updateConversation(id,dto);            
-        return await this.getById(id) ;
+        await this.service.updateConversation(id, dto);
+        return await this.getById(id);
     }
 
     @Post('/:id([0-9a-f]{24})/member')
     async appendMember(@Param('id') id: string, @Body() dto: ConversationUserDto, @Req() request, @CurrentUser() currentUser) {
-        await this.service.appendMember(id,[dto.user]);            
-        return await this.getById(id) ;
+        await this.service.appendMember(id, [dto.user], currentUser.id);
+        return await this.getById(id);
     }
 
     @Delete('/:id([0-9a-f]{24})/member')
     async removeMember(@Param('id') id: string, @Body() dto: ConversationUserDto, @Req() request, @CurrentUser() currentUser) {
-        await this.service.removeMember(id,[dto.user]);            
-        return await this.getById(id) ;
+        await this.service.removeMember(id, [dto.user], currentUser.id);
+        return await this.getById(id);
     }
 
-    
+
 }

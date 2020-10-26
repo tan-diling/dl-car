@@ -5,16 +5,15 @@ import { logger } from '@app/config';
 import { Container } from 'typedi';
 import { ChatContext, ChatProcessor, ChatMessageTopic, chatContextArray } from './message.socket.service';
 import { ConversationService } from '../conversation.service';
+import { MessageModel } from '@app/models';
 
-const userService = Container.get(UserService) ;
+const userService = Container.get(UserService);
 const conversationService = Container.get(ConversationService)
 
 const chatProcessor = new ChatProcessor();
 
-
-
 export const chatBot = async (socket: ServerIO.Socket) => {
-    console.log("Connected socket.id %s.", socket.id);
+    console.log("socket connected  %s.", socket.id);
 
     const id = socket.handshake.query['token'];
     const user = await userService.getByToken(id);
@@ -24,8 +23,8 @@ export const chatBot = async (socket: ServerIO.Socket) => {
         return;
     }
 
-    const ctx = new ChatContext(user._id);
-    chatContextArray.push(ctx) ;
+    const ctx = new ChatContext(user._id, socket);
+    chatContextArray.push(ctx);
     ctx.callback = (error, data) => {
         if (!error) {
             const ev = data?.event || data?.topic;
@@ -34,7 +33,7 @@ export const chatBot = async (socket: ServerIO.Socket) => {
         }
     }
 
-
+    await ctx.processMessageUnsent();
 
     const logChatMessage = async (topic: string, body: any) => {
         const socket_id = socket.id;
@@ -49,15 +48,13 @@ export const chatBot = async (socket: ServerIO.Socket) => {
         // });
     };
 
-    await conversationService.processUserMessageUnSent(ctx.user,async doc=>{}) ;
-
     socket.on(ChatMessageTopic.REQUEST, async (m) => {
         console.log("[server](message): %s --", socket.id, JSON.stringify(m));
 
         await logChatMessage(ChatMessageTopic.REQUEST, m);
 
         const ret = await chatProcessor.process(ctx, m);
-        if ( ret ) {
+        if (ret) {
             // if(ret.error==null){
             //     chatContextArray.forEach(x => {
             //         if(String( x.user ) == String(ret.._id)) {
@@ -66,17 +63,17 @@ export const chatBot = async (socket: ServerIO.Socket) => {
             //         }    
             //     });
             // }else{            
-            socket.emit(ChatMessageTopic.RESPONSE, ret);            
+            socket.emit(ChatMessageTopic.RESPONSE, ret);
             await logChatMessage(ChatMessageTopic.RESPONSE, ret);
         }
     });
 
     socket.on("disconnect", () => {
-        console.log("socket.id disconnected %s", socket.id);
+        console.log("socket disconnected %s", socket.id);
 
-        const i = chatContextArray.indexOf(ctx) ;
-        if(i>=0){
-            delete chatContextArray[i] ;
+        const i = chatContextArray.indexOf(ctx);
+        if (i >= 0) {
+            delete chatContextArray[i];
         }
     });
 };
@@ -86,14 +83,4 @@ export const useChatBot = (io: ServerIO.Server) => {
         .of('/api/notification')
         .on('connect', chatBot);
 
-        // Visitor.on('updated',visitor=>{
-        //     console.log(visitor) ;
-        //     chatContextArray.forEach(x => {
-        //         if(String(x.visitor)== String(visitor._id)) {
-        //             x.client = visitor.user ;
-        //             console.log("visitor.updated");
-        //         }    
-        //     });
-            
-        // })
 }

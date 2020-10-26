@@ -23,17 +23,17 @@ export class ConversationService {
      * get conversation list 
      * @param userId user id
      */
-    async listByUser(user:Types.ObjectId) {
-        const cms = await ConversationMemberModel.find({user,isDeleted:false}).exec() ;
-        return ConversationModel.find().where("_id").in(cms.map(x=>x.conversation)).populate('members').exec() ;        
+    async listByUser(user: Types.ObjectId) {
+        const cms = await ConversationMemberModel.find({ user, isDeleted: false }).exec();
+        return ConversationModel.find().where("_id").in(cms.map(x => x.conversation)).populate('members').exec();
     }
 
     /**
      * get conversation by id 
      * 
      */
-    async getById(id:string|Types.ObjectId) {
-        return await ConversationModel.findById(id).populate('members').exec() ;        
+    async getById(id: string | Types.ObjectId) {
+        return await ConversationModel.findById(id).populate('members').exec();
     }
 
     // async appendTextMessage(data:{sender:string|Types.ObjectId, conversation:string|Types.ObjectId,text:string}) {
@@ -42,16 +42,16 @@ export class ConversationService {
 
 
     async listMessage(query) {
-        return await DbService.list(MessageModel,query) ;
+        return await DbService.list(MessageModel, query);
     }
 
     /**
      * create an new group conversation
      * @param dto 
      */
-    async createGroupConversation(data:{title:string,image?:string}) {
-        const conversation = await ConversationModel.create({...data,isGroup:true}) ;
-        return conversation ;        
+    async createGroupConversation(data: { title: string, image?: string }) {
+        const conversation = await ConversationModel.create({ ...data, isGroup: true });
+        return conversation;
     }
 
     /**
@@ -59,13 +59,13 @@ export class ConversationService {
      * @param id 
      * @param data 
      */
-    async updateConversation(id:string|Types.ObjectId,data:{title:string,image?:string}) {
-        const conversation = await ConversationModel.findById(id).exec() ;
-        if(conversation){
-            conversation.title = data.title ;
-            conversation.image = data.image ;
+    async updateConversation(id: string | Types.ObjectId, data: { title: string, image?: string }) {
+        const conversation = await ConversationModel.findById(id).exec();
+        if (conversation) {
+            conversation.title = data.title;
+            conversation.image = data.image;
             await conversation.save();
-            return conversation ;
+            return conversation;
         }
     }
 
@@ -74,31 +74,31 @@ export class ConversationService {
      * @param id conversation id
      * @param users 
      */
-    async appendMember(id:string|Types.ObjectId,users:string[]){
-        const conversation = await ConversationModel.findById(id).exec() ;
-        if(conversation ){
-            if(! conversation.isGroup){
+    async appendMember(id: string | Types.ObjectId, users: string[], sender: string) {
+        const conversation = await ConversationModel.findById(id).exec();
+        if (conversation) {
+            if (!conversation.isGroup) {
                 throw new NotAcceptableError('not group conversation error');
             }
 
-            for(const user of users){
-                let member = await ConversationMemberModel.findOne({user:user,conversation:conversation._id}).exec() ;
-                if(member==null){
-                    member = await ConversationMemberModel.create({user:user,conversation:conversation._id}) ;
-                    
-                    
+            for (const user of users) {
+                let member = await ConversationMemberModel.findOne({ user: user, conversation: conversation._id }).exec();
+                if (member == null) {
+                    member = await ConversationMemberModel.create({ user: user, conversation: conversation._id });
+
+
                 } else {
-                    if(member.isDeleted){                       
+                    if (member.isDeleted) {
                         member.enterAt = new Date();
-                        member.isDeleted = false ;
-                        await member.save() ;                        
+                        member.isDeleted = false;
+                        await member.save();
                     }
                 }
 
-                await this.createActionMessage({ conversation:id, type:'enter', time:member.enterAt, sender:user}) ;
+                await this.createActionMessage({ conversation: id, type: 'enter', time: member.enterAt, sender, user });
             }
 
-            return conversation ;
+            return conversation;
         }
     }
 
@@ -107,24 +107,24 @@ export class ConversationService {
      * @param id conversation id
      * @param users 
      */
-    async removeMember(id:string|Types.ObjectId,users:string[]){
-        const conversation = await ConversationModel.findById(id).exec() ;
-        if(conversation){
-            if(! conversation.isGroup){
+    async removeMember(id: string | Types.ObjectId, users: string[], sender: string) {
+        const conversation = await ConversationModel.findById(id).exec();
+        if (conversation) {
+            if (!conversation.isGroup) {
                 throw new NotAcceptableError('not group conversation error');
             }
 
-            for(const user of users){
-                const member = await ConversationMemberModel.findOne({user:user,conversation:conversation._id}).exec() ;
-                if(member){
+            for (const user of users) {
+                const member = await ConversationMemberModel.findOne({ user: user, conversation: conversation._id }).exec();
+                if (member) {
                     member.leaveAt = new Date();
-                    member.isDeleted = true ;
-                    await member.save() ;
-                    await this.createActionMessage({ conversation:id, type:'leave', time:member.leaveAt, sender:user}) ;
+                    member.isDeleted = true;
+                    await member.save();
+                    await this.createActionMessage({ conversation: id, type: 'leave', time: member.leaveAt, sender, user });
                 }
             }
-            
-            return conversation ;
+
+            return conversation;
         }
     }
 
@@ -133,91 +133,102 @@ export class ConversationService {
      * @param user1 user id
      * @param user2 user id
      */
-    async getUserConversation(user1:string|Types.ObjectId,user2:string|Types.ObjectId) {
-        const conversationList = await ConversationModel.find({isGroup:false}).populate('members').exec() ;        
-        for(const conversation of conversationList){
-            const members = conversation.members as Array<ConversationMember> ;
-            const user1Member = members.find(x=>String(x.user)==String(user1)) ;
-            const user2Member = members.find(x=>String(x.user)==String(user2)) ;
+    async getUserConversation(user1: string | Types.ObjectId, user2: string | Types.ObjectId) {
+        const conversationList = await ConversationModel.find({ isGroup: false }).populate('members').exec();
+        for (const conversation of conversationList) {
+            const members = conversation.members as Array<ConversationMember>;
+            const user1Member = members.find(x => String(x.user) == String(user1));
+            const user2Member = members.find(x => String(x.user) == String(user2));
 
-            if(user1  && user2){
-                return conversation ;
+            if (user1 && user2) {
+                return conversation;
             }
         }
- 
-        const conversation = await ConversationModel.create({isGroup:false})
 
-        await ConversationMemberModel.create({user:user1,conversation:conversation._id}) ;
-        await ConversationMemberModel.create({user:user2,conversation:conversation._id}) ;
+        const conversation = await ConversationModel.create({ isGroup: false })
 
-        return conversation ;
+        await ConversationMemberModel.create({ user: user1, conversation: conversation._id });
+        await ConversationMemberModel.create({ user: user2, conversation: conversation._id });
+
+        return conversation;
     }
 
-    private async createMessage(data:CreateQuery<DocumentType<Message>>){
-        const conversation = await ConversationModel.findById(data.conversation).populate('members').exec() ;
-        if(conversation){
-            const userStatus = new Map() ;
-            for(const member of conversation.members){
-                userStatus.set(String((member as ConversationMember).user),0) ;
+    private async createMessage(data: CreateQuery<DocumentType<Message>>) {
+        const conversation = await ConversationModel.findById(data.conversation).populate('members').exec();
+        if (conversation) {
+            const userStatus = new Map();
+            for (const member of conversation.members) {
+                userStatus.set(String((member as ConversationMember).user), 0);
             }
-            const message =  await MessageModel.create({...data,userStatus}) ;        
 
-            conversation.lastMessageTime = message.sendAt ;
-            conversation.lastMessageSeq = message.seq ;
+            const message = await MessageModel.create({ ...data, userStatus });
 
-            
+            conversation.lastMessageTime = message.sendAt;
+            conversation.lastMessageSeq = message.seq;
 
-            await conversation.save() ;
 
-            return message ;
+
+            await conversation.save();
+
+            return message;
         }
     }
 
-    async createTextMessage(dto:{conversation:string|Types.ObjectId, text:string ,sender:string|Types.ObjectId}){
-        const {conversation,sender,...data} = dto ;
-        return await this.createMessage({conversation,sender,type:'text',data}) ;        
+    async createTextMessage(dto: { conversation: string | Types.ObjectId, text: string, sender: string | Types.ObjectId }) {
+        const { conversation, sender, ...data } = dto;
+        return await this.createMessage({ conversation, sender, type: 'text', data });
 
     }
 
-    
-    async createImageMessage(dto:{conversation:string|Types.ObjectId, url:string ,sender:string|Types.ObjectId}){
-        const {conversation,sender,...data} = dto ;
-        return await this.createMessage({conversation,sender,type:'image',data}) ;        
+
+    async createImageMessage(dto: { conversation: string | Types.ObjectId, url: string, sender: string | Types.ObjectId }) {
+        const { conversation, sender, ...data } = dto;
+        return await this.createMessage({ conversation, sender, type: 'image', data });
     }
 
-    
-    async createActionMessage(dto:{conversation:string|Types.ObjectId,sender:string|Types.ObjectId, time:Date,type:"enter"|"leave"|"read"|"typing"|string }){
-        const {conversation,sender,...data} = dto ;
-        return await this.createMessage({conversation,sender,type:'action',data}) ;        
+
+    async createActionMessage(dto: { conversation: string | Types.ObjectId, sender: string | Types.ObjectId, user: string | Types.ObjectId, time: Date, type: "enter" | "leave" | "read" | "typing" | string }) {
+        const { conversation, sender, ...data } = dto;
+        return await this.createMessage({ conversation, sender, type: 'action', data });
+    }
+
+
+    //
+    async updateMessageAsRead(dto: { conversation: string | Types.ObjectId, user: string | Types.ObjectId, time: Date }) {
+        const { conversation, user, time } = dto;
+        await ConversationMemberModel.findOneAndUpdate({ conversation, user }, { readAt: time }).exec();
+        // await ConversationMemberModel.findOneAndUpdate({conversation,user},{readAt:time}).exec() ;
+        // return await this.createMessage({ conversation, sender, type: 'action', data });
     }
 
     /**
      * query user unsent messages;
      * @param user user id
      */
-    async processUserMessageUnSent(user:string|Types.ObjectId,callback){
+    async processUserMessageUnSent(user: string | Types.ObjectId, callback) {
 
-        const idString = String(user) ;
-        
-        const messageList =  await MessageModel.find().where('userStatus.'+idString, 0).sort('seq').exec() ;
-        
-        for(const message of messageList){
-            callback(message) ;
-            
-            await this.updateMessageSent(message._id,idString) ;            
+        console.log(`processUserMessageUnSent ${user}`);
+        const idString = String(user);
+
+        const messageList = await MessageModel.find().where('userStatus.' + idString, 0).sort('seq').exec();
+
+        for (const message of messageList) {
+            callback(message);
+
+            await this.updateMessageSent(message._id, idString);
         }
     }
 
-    async updateMessageSent(messageId:string|Types.ObjectId, user:string|Types.ObjectId){
+    async updateMessageSent(messageId: string | Types.ObjectId, user: string | Types.ObjectId) {
 
-        const idString = String(user) ;
-        
-        const message =  await MessageModel.findById(messageId).exec() ;
+        const idString = String(user);
 
-        if(message ){
-            if(message.userStatus?.get(idString)==0){
-                message.userStatus.set(idString,1) ;
-                await message.save() ;
+        const message = await MessageModel.findById(messageId).exec();
+
+        if (message) {
+            if (message.userStatus?.get(idString) == 0) {
+                message.userStatus.set(idString, 1);
+                await message.save();
             }
         }
     }
