@@ -1,3 +1,4 @@
+import { ProjectRole } from '@app/defines';
 
 export interface Entity {
     parents: Entity[];
@@ -26,11 +27,17 @@ export interface CurrentUser {
 }
 
 
-// export enum EntityContextMacro {
-//     'CURRENT_USER' = 'user',
-//     'ENTITY' = 'entity',
-//     'ENTITY_PARENT' = 'entity.parent',
-// }
+export const entityContextMacro = {
+    // 'PARENT': ctx => ctx.user.projectRole,
+    'USER_PROJECT_ROLE': ctx => ctx.user.projectRole,
+    'USER_ID': ctx => ctx.user.id,
+    'MEMBER': ctx => ctx.members.map(x => x.user),
+    'MEMBER_QA': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.QualityAssurance).map(x => x.user),
+    'MEMBER_DESIGNER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.Designer).map(x => x.user),
+    'MEMBER_DEVELOPER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.Developer).map(x => x.user),
+    'MEMBER_PM': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectManager).map(x => x.user),
+    'MEMBER_OWNER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectOwner).map(x => x.user),
+};
 
 export interface EntityContext<T extends Entity> {
     user: CurrentUser;

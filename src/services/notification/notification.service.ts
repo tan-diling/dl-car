@@ -54,7 +54,7 @@ export class NotificationService {
             let v = ev;
             for (const k of keys) {
                 v = v[k];
-                if (v==null) {
+                if (v == null) {
                     return false;
                 }
             }

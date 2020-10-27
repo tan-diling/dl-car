@@ -485,7 +485,7 @@ export const entityConfig: ExpressionRule[] = [
             }
         ],
         actions: [{
-            receiver: "entity.assignee",
+            receiver: "MEMBER",
             channel: "db,mail"
         }],
     },

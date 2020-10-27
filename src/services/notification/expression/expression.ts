@@ -1,5 +1,9 @@
 import { ResourceType } from '@app/defines';
-import { ResourceModel } from '@app/models';
+import { ResourceModel, Resource, ProjectModel, TaskModel, RequirementModel, GoalModel, DeliverableModel } from '@app/models';
+import { entityContextMacro } from './entityContext';
+import { IsMongoId } from 'class-validator';
+import { Types, Model, Document } from 'mongoose';
+import { DbService } from '@app/services/db.service';
 
 
 type SimpleValueType = boolean | string | number | object;
@@ -35,7 +39,15 @@ export type Expression = {
     params: Array<Expression | ValueType>;
 };
 
-
+const projectMemberObject = {
+    "_id": "5f61601e0351f54d17574942",
+    "status": "confirmed",
+    "projectId": "5f61601e0351f54d17574941",
+    "userId": "5f5897f916ac8902ed769e60",
+    "projectRole": "project_manager",
+    "createdAt": "2020-09-16T00:45:18.085Z",
+    "updatedAt": "2020-09-16T00:45:18.088Z"
+};
 const projectObject = {
     "parents": [],
     "assignees": [],
@@ -55,28 +67,7 @@ const projectObject = {
     "children": [],
     "comments": [],
     "attachments": [],
-    "members": [
-        {
-            "_id": "5f8ccc782a9baf1cddfaf75b",
-            "user": {
-                "name": "Site Admin",
-                "email": "onwards.admin@testmvp.com",
-                "image": "",
-                "_id": "5f850dbf3a6f8f16f6acb44c"
-            },
-            "projectRole": "project_manager"
-        },
-        {
-            "_id": "5f8cceafa64f1514c8b89da4",
-            "user": {
-                "name": "New User",
-                "email": "kuhantao@gmail.com",
-                "image": "",
-                "_id": "5f8cccac2a9baf1cddfaf75c"
-            },
-            "projectRole": "project_qa"
-        }
-    ]
+
 }
 
 
@@ -133,35 +124,55 @@ export type ExpressionRule = {
 // };
 
 
-export const getEntityContext = async (req, entityId, method: 'created' | 'updated' | 'deleted') => {
-    const entity = await ResourceModel.findById(entityId).exec();
-    switch (entity.type) {
+export const getEntityContext = async (req, entityType: string, entityId, method: 'created' | 'updated' | 'deleted', ) => {
+    let entity = null;
+    let populate = "";
+    switch (entityType.toLowerCase()) {
         case ResourceType.Project:
-            entity.populate("children,comments,attachments");
+            populate = "children,comments,attachments";
+            entity = await DbService.get(ProjectModel, { _id: entityId, populate: populate });
             break;
         case ResourceType.Goal:
-            entity.populate("children,parents,comments,attachments");
+            populate = "children,parents,comments,attachments";
+
+            entity = await DbService.get(GoalModel, { _id: entityId, populate: populate });
             break;
         case ResourceType.Requirement:
-            entity.populate("children,parents,comments,attachments");
+            populate = "children,parents,comments,attachments";
+
+            entity = await DbService.get(RequirementModel, { _id: entityId, populate: populate });
             break;
         case ResourceType.Deliverable:
-            entity.populate("children,parents,comments,attachments,checklist");
+            populate = "children,parents,comments,attachments,checklist";
+
+            entity = await DbService.get(DeliverableModel, { _id: entityId, populate: populate });
             break;
         case ResourceType.Task:
-            entity.populate("parents,comments,attachments");
+            populate = "parents,comments,attachments";
+            entity = await DbService.get(TaskModel, { _id: entityId, populate: populate });
             break;
+        default:
+            entity = await DbService.get(ProjectModel, { _id: entityId, populate: populate });
+
     }
 
-    await entity.execPopulate();
+
     const members = await entity.getMembers();
 
     const userId: string = req.user.id;
     const projectRole = members.find(x => String(x.userId) == userId)?.projectRole;
     const entityJSON = entity.toJSON();
-    const list = [...entityJSON.parents, entityJSON];
-    for (let i = 1; i < list.length; i++) {
-        list[i].parent = list[i - 1];
+
+
+    let currentEntity = entityJSON;
+    while (currentEntity && (currentEntity.parents.length > 0)) {
+        const parent = entityJSON.parents[currentEntity.parents.length - 1];
+        if (parent == null) {
+            break;
+        }
+        currentEntity.parent = parent;
+        currentEntity = parent;
+
     }
 
     return {
@@ -220,8 +231,11 @@ export class EntityNotifyExecutor {
             if (!Array.isArray(rets)) { rets = [rets] }
 
             for (const item of rets) {
-                if (typeof (item) == typeof ('')) {
-                    userSet.add(item);
+                if (IsMongoId(item)) {
+                    const userId: string = typeof (item) == typeof ("") ? item : String(new Types.ObjectId(item));
+                    userSet.add(userId);
+                } else {
+                    console.error("receiver error:" + receiver);
                 }
             }
 
@@ -242,25 +256,47 @@ export class EntityNotifyExecutor {
                 return p;
             }
         });
+        const binaryOperate = (x, y, func: (x, y) => {}) => {
+            if (typeof (x) == "number" && typeof (y) == "number") {
+                return func(x, y);
+            } else if (typeof (x) == "boolean" || typeof (y) == "boolean") {
+                return func(x, y);
+            } else if (typeof (x) == "string" || typeof (y) == "string") {
+                return func(String(x), String(y));
+            } else {
+                return func(JSON.stringify(x), JSON.stringify(y));
+            }
+        }
         switch (exp.operator) {
             case ExpressionOperator.AND:
-                return params[0] && params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x && y);
             case ExpressionOperator.OR:
-                return params[0] || params[1];
+                // return params[0] || params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x || y);
             case ExpressionOperator.EQ:
-                return params[0] == params[1];
+                // return params[0] == params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x == y);
             case ExpressionOperator.NE:
-                return params[0] != params[1];
+                // return params[0] != params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x != y);
             case ExpressionOperator.GT:
-                return params[0] > params[1];
+                // return params[0] > params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x > y);
             case ExpressionOperator.GE:
-                return params[0] >= params[1];
+                // return params[0] >= params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x >= y);
             case ExpressionOperator.LT:
-                return params[0] < params[1];
+                // return params[0] < params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x < y);
             case ExpressionOperator.LE:
-                return params[0] <= params[1];
+                // return params[0] <= params[1];
+                return binaryOperate(params[0], params[1], (x, y) => x <= y);
             case ExpressionOperator.IN:
-                return params[0] <= params[1];
+                if (Array.isArray(params[1])) {
+                    return Array.from(params[1]).includes(x => binaryOperate(x, params[0], (x, y) => x == y));
+                } else {
+                    return false;
+                }
             case ExpressionOperator.MAP:
                 return Array.isArray(params) ?
                     params[0].map(x => x[params[1]]) :
@@ -287,8 +323,11 @@ export class EntityNotifyExecutor {
     evalVariable(ctx: any, params: string[]) {
         let obj = ctx;
         for (const key of params) {
-
-            obj = obj[key];
+            if (key in entityContextMacro) {
+                obj = entityContextMacro[key](ctx);
+            } else {
+                obj = obj[key];
+            }
             if (obj == null) {
                 return null;
             }

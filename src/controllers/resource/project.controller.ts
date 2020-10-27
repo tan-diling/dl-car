@@ -22,6 +22,7 @@ export class ProjectController extends AbstractResourceController {
     }
 
     @Post()
+    @UseInterceptor(entityNotificationInterceptor('created'))
     async create(@Body() dto: ProjectCreateDto, @Req() request) {
         const obj = { ...dto, creator: request?.user?.id };
         return await this.process(request, {
@@ -76,6 +77,7 @@ export class ProjectController extends AbstractResourceController {
         });
     }
 
+    @UseInterceptor(entityNotificationInterceptor('deleted'))
     @Delete('/:id([0-9a-f]{24})')
     async delete(@Param('id') id: string, @Req() request, ) {
         return await this.process(request, {

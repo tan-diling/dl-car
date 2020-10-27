@@ -9,7 +9,7 @@ import { Container } from 'typedi';
 import { NotificationService } from '../notification';
 
 
-const notificationService= Container.get(NotificationService) ;
+const notificationService = Container.get(NotificationService);
 
 export class ResourceService<T extends Resource | ResourceRelatedBase> implements RepoCRUDInterface {
 
@@ -21,11 +21,11 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
             const parentResource = await ResourceModel.findById(parent).exec();
             if (parentResource) {
                 const p = parentResource.parents;
-                if(this.model.schema.path('parents')){
+                if (this.model.schema.path('parents')) {
                     obj = { ...obj, parents: [...p, parentResource._id] };
                 }
 
-                if(this.model.schema.path('parent')){
+                if (this.model.schema.path('parent')) {
                     obj = { ...obj, parent: parentResource._id };
                 }
             } else {
@@ -44,10 +44,10 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
 
     async get(filter) {
         const doc = await DbService.get(this.model, filter);
-        const effortPath = 'totalEffort' ;
-        if(doc){
-            if (this.model.schema.path(effortPath)){
-                doc[effortPath] = await EffortModel.getTotalEffort(doc._id) ;
+        const effortPath = 'totalEffort';
+        if (doc) {
+            if (this.model.schema.path(effortPath)) {
+                doc[effortPath] = await EffortModel.getTotalEffort(doc._id);
             }
         }
         return doc
@@ -57,8 +57,8 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
         const m = await this.model.findById(id).exec();
         if (m) {
             if (this.model.schema.path('parents')) {
-                
-                const childCount = await DbService.count(ResourceModel, { parents:m._id,deleted:false});
+
+                const childCount = await DbService.count(ResourceModel, { parents: m._id, deleted: false });
                 if (childCount > 0) {
                     throw new NotAcceptableError('child exists');
                 }
@@ -85,8 +85,8 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
 
             for (const uid of assignees) {
                 // const userId =  Types.ObjectId(uid) ;
-                
-                const member = members.find(x => (x.userId as Types.ObjectId).equals(uid)); 
+
+                const member = members.find(x => (x.userId as Types.ObjectId).equals(uid));
                 if (null == member) {
                     throw new NotAcceptableError('assignees_error');
                 }
@@ -164,16 +164,16 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
         throw new Error(`${method} not support!`);
     };
 
-    async publishNotification(id:Types.ObjectId,sender:Types.ObjectId,action: NotificationAction){
-        const doc = await ResourceModel.findById(id).populate('parents').exec() ;
+    // async publishNotification(id:Types.ObjectId,sender:Types.ObjectId,action: NotificationAction){
+    //     const doc = await ResourceModel.findById(id).populate('parents').exec() ;
 
-        const data = {...doc.toJSON(),members: await doc.getMembers()};
+    //     const data = {...doc.toJSON(),members: await doc.getMembers()};
 
 
-        await notificationService.publish(NotificationTopic.Project, action, data , sender ) ;
+    //     await notificationService.publish(NotificationTopic.Project, action, data , sender ) ;
 
-    }
-    
+    // }
+
 }
 
 

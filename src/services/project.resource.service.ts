@@ -1,8 +1,8 @@
 import { Model, Document, Types } from 'mongoose';
 import { RepoCRUDInterface, MemberStatus, ActionStatus, NotificationTopic, NotificationAction } from '@app/defines';
 import { ResourceType, ProjectRole, RepoOperation } from '@app/defines';
-import { ProjectModel, ProjectMemberModel, Project, ProjectMember,  InvitationProjectModel, Resource } from '../models';
-import { ModelQueryService  } from '../modules/query';
+import { ProjectModel, ProjectMemberModel, Project, ProjectMember, InvitationProjectModel, Resource } from '../models';
+import { ModelQueryService } from '../modules/query';
 import { ReturnModelType, types } from '@typegoose/typegoose';
 import { ForbiddenError, NotAcceptableError } from 'routing-controllers';
 import { UserModel } from '@app/models/user';
@@ -12,13 +12,13 @@ import { NotificationService } from './notification';
 import { ActionService } from './action.service';
 
 export class ProjectResourceService extends ResourceService<Project>{
-    
 
-    private actionService= Container.get(ActionService) ;
+
+    private actionService = Container.get(ActionService);
 
     constructor() {
         super();
-        this.model = ProjectModel ;        
+        this.model = ProjectModel;
     }
 
 
@@ -27,30 +27,31 @@ export class ProjectResourceService extends ResourceService<Project>{
      * @param docs project documents
      * @return project documents with members info
      */
-    async getProjectMembers(docs:(Project&Document) []){
+    async getProjectMembers(docs: (Project & Document)[]) {
 
-        const ids = docs.map(x=>x._id) ;
+        const ids = docs.map(x => x._id);
 
-        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId','name email image').exec() ;
+        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId', 'name email image').exec();
 
-        const convert = (projects:(Project&Document) [],member:(ProjectMember&Document)[])=>{
-            return projects.map(x=>{
-                return {... x.toJSON(),
-                    members:member
-                        .filter(y=>y.projectId==x.id)
-                        .map(z=>{
+        const convert = (projects: (Project & Document)[], member: (ProjectMember & Document)[]) => {
+            return projects.map(x => {
+                return {
+                    ...x.toJSON(),
+                    members: member
+                        .filter(y => y.projectId == x.id)
+                        .map(z => {
                             return {
-                                "_id":z._id,
-                                "user":z.userId,
-                                "projectRole":z.projectRole,
+                                "_id": z._id,
+                                "user": z.userId,
+                                "projectRole": z.projectRole,
                                 // "status":z.status,
                             };
                         })
                 };
-                }) ;      
+            });
         };
 
-        return convert(docs,pms) ;        
+        return convert(docs, pms);
 
     }
 
@@ -59,33 +60,33 @@ export class ProjectResourceService extends ResourceService<Project>{
      * @param doc project document
      * @return project document with members info
      */
-    async getProjectMember(doc:(Project&Document) ){
-        return (await this.getProjectMembers([doc]))[0] ;        
+    async getProjectMember(doc: (Project & Document)) {
+        return (await this.getProjectMembers([doc]))[0];
     }
 
     /** list project info */
     async list(filter) {
-        let {memberUserId,...query} = filter ;
+        let { memberUserId, ...query } = filter;
 
-        if(memberUserId){
-            const pmList = await ProjectMemberModel.find({userId:memberUserId}).exec() ;
-            if (pmList.length == 0) return [] ;
-            const projectIds = pmList.map(x=>x.projectId) ;
-            query = {...query,_id:projectIds};
+        if (memberUserId) {
+            const pmList = await ProjectMemberModel.find({ userId: memberUserId }).exec();
+            if (pmList.length == 0) return [];
+            const projectIds = pmList.map(x => x.projectId);
+            query = { ...query, _id: projectIds };
         }
 
-        const l = await super.list(query) ;
+        const l = await super.list(query);
 
-        return await this.getProjectMembers(l) ;
+        return await this.getProjectMembers(l);
 
     }
 
     /** get project info */
     async get(filter) {
-   
-        const l = await super.get(filter) ;
-        if(l){
-            return await this.getProjectMember(l) ;
+
+        const l = await super.get(filter);
+        if (l) {
+            return await this.getProjectMember(l);
         }
 
     }
@@ -95,55 +96,55 @@ export class ProjectResourceService extends ResourceService<Project>{
      * @param project project document
      * @param member members
      */
-    async setProjectMember(project:Project&Document,member:{userId,projectRole}[]){
+    async setProjectMember(project: Project & Document, member: { userId, projectRole }[]) {
 
         // check user validate
-        const userIds = member.map(x=>Types.ObjectId(x.userId)) ;
-        
-        if (member.length != await UserModel.find({}).where('_id').in(userIds).countDocuments().exec()){
+        const userIds = member.map(x => Types.ObjectId(x.userId));
+
+        if (member.length != await UserModel.find({}).where('_id').in(userIds).countDocuments().exec()) {
             throw new NotAcceptableError('member_invalid');
         }
 
         // make sure project.creator is project manager        
-            {
-                member.push({
-                    userId:project.creator, 
-                    projectRole:ProjectRole.ProjectManager,
-                }) ;
-            } 
+        {
+            member.push({
+                userId: project.creator,
+                projectRole: ProjectRole.ProjectManager,
+            });
+        }
 
-            userIds.push(project.creator) ;
-                
+        userIds.push(project.creator);
+
         // remove project member        
-        for(const pm  of await ProjectMemberModel.find({projectId:project._id}).where('userId').nin(userIds).exec()) {            
-            await pm.remove() ;            
+        for (const pm of await ProjectMemberModel.find({ projectId: project._id }).where('userId').nin(userIds).exec()) {
+            await pm.remove();
         };
 
         // append or insert
-        for(const projectMember of member ){
-            const projectMemberFilter = {projectId:project._id,userId:projectMember.userId} ;
-            let pm = await ProjectMemberModel.findOne(projectMemberFilter).exec() ;
+        for (const projectMember of member) {
+            const projectMemberFilter = { projectId: project._id, userId: projectMember.userId };
+            let pm = await ProjectMemberModel.findOne(projectMemberFilter).exec();
 
-            if(pm) {
-                if(pm.projectRole != projectMember.projectRole) {                
-                    pm.projectRole = projectMember.projectRole ;                
+            if (pm) {
+                if (pm.projectRole != projectMember.projectRole) {
+                    pm.projectRole = projectMember.projectRole;
                     await pm.save();
                 }
-            }else{
+            } else {
 
-                pm = await ProjectMemberModel.create( {...projectMemberFilter,projectRole:projectMember.projectRole});
-            
-                ProjectMemberModel.emit(RepoOperation.Created, pm) ;
+                pm = await ProjectMemberModel.create({ ...projectMemberFilter, projectRole: projectMember.projectRole });
+
+                ProjectMemberModel.emit(RepoOperation.Created, pm);
             }
 
             // if(pm.userId == project.creator && pm.status!=MemberStatus.Confirmed ){
             //     pm.status = MemberStatus.Confirmed ;
             //     await pm.save() ;                
             // }
-            
-        }        
 
-    }    
+        }
+
+    }
 
 
 
@@ -152,13 +153,13 @@ export class ProjectResourceService extends ResourceService<Project>{
      * @param project project document
      * @param member members
      */
-    async inviteProjectMember(dto:{projectId:Types.ObjectId,userId:Types.ObjectId,projectRole:string},sender:string){
+    async inviteProjectMember(dto: { projectId: Types.ObjectId, userId: Types.ObjectId, projectRole: string }, sender: string) {
 
-        const project = await ProjectModel.findById(dto.projectId).exec() ;
+        const project = await ProjectModel.findById(dto.projectId).exec();
 
-        const pm = await ProjectMemberModel.findOne({projectId:dto.projectId,userId:dto.userId}).exec() ;
-        
-        if (pm != null){
+        const pm = await ProjectMemberModel.findOne({ projectId: dto.projectId, userId: dto.userId }).exec();
+
+        if (pm != null) {
             throw new NotAcceptableError('project member already exists');
         }
 
@@ -168,58 +169,58 @@ export class ProjectResourceService extends ResourceService<Project>{
                 userId: dto.userId,
                 projectId: dto.projectId,
             },
-            status:ActionStatus.Pending,
-        }).exec() ;
-        if (invitation!=null){
-            throw new NotAcceptableError("Invitation Exists") ;            
+            status: ActionStatus.Pending,
+        }).exec();
+        if (invitation != null) {
+            throw new NotAcceptableError("Invitation Exists");
         }
 
-        return await this.actionService.create( InvitationProjectModel,{
-            receiver:dto.userId,
-            data:{...dto,name:project.title,image:project.logo},
+        return await this.actionService.create(InvitationProjectModel, {
+            receiver: dto.userId,
+            data: { ...dto, name: project.title, image: project.logo },
             sender,
-        }) ;     
-            
-    }    
+        });
 
-       /**
-     * config project members
-     * @param project project document
-     * @param member members
-     */
-    async getProjectMemberById(id){
-        return await ProjectMemberModel.findById(id).exec() ;                           
-    }    
+    }
+
+    /**
+  * config project members
+  * @param project project document
+  * @param member members
+  */
+    async getProjectMemberById(id) {
+        return await ProjectMemberModel.findById(id).exec();
+    }
 
 
     /** create project  */
-    async create(dto){
-        const project = await super.create(dto) ;
+    async create(dto) {
+        const project = await super.create(dto);
 
         const members = [];
 
-        await this.setProjectMember(project,members);
+        await this.setProjectMember(project, members);
 
-        await this.publishNotification(project._id, project.creator, NotificationAction.Created) ;
-        
-        return await this.getProjectMember(project)  ;
+        // await this.publishNotification(project._id, project.creator, NotificationAction.Created) ;
 
-    }    
+        return await this.getProjectMember(project);
+
+    }
 
     /** update project info */
-    async update(id,dto) {
-        const {member,...projectDto} = dto ;
+    async update(id, dto) {
+        const { member, ...projectDto } = dto;
 
-        const project = await super.update(id,projectDto) ;
+        const project = await super.update(id, projectDto);
 
-        if (project && member){
-            await this.setProjectMember(project, member);   
-            
-            return await this.getProjectMember(project)  ;
+        if (project && member) {
+            await this.setProjectMember(project, member);
+
+            return await this.getProjectMember(project);
         } else {
-            return project ;
+            return project;
         }
-               
+
     };
 
     // async memberConfirm(dto:{id:string,userId:string,status}){

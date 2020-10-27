@@ -1,13 +1,14 @@
 import { processEntityNotification } from '@app/services/notification/expression';
 import { Action } from 'routing-controllers';
 
-export function entityNotificationInterceptor(method: 'created' | 'updated' | 'deleted' = 'updated') {
+export function entityNotificationInterceptor(method: 'created' | 'updated' | 'deleted' | 'status' | 'member' = 'updated') {
     const it = async (action: Action, content: any) => {
         if (content) {
             const id = content._id;
-            console.log(`entityInterceptor ${content.type}: ${id}, ${method}`);
+            const type = content.type;
+            console.log(`entityInterceptor ${type}: ${id}, ${method}`);
 
-            await processEntityNotification(action.request, id, method);
+            await processEntityNotification(action.request, type, id, method);
         }
 
         return content;
