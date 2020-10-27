@@ -14,10 +14,13 @@ class MailNotificationSender implements NotificationSenderInterface {
     async buildMailInfo(data: NotificationSenderOptions) {
         const user = await UserModel.findById(data.receiver).exec();
 
-        const mailTemplateFunction: (ctx) => { subject: string, html: string } = mailTemplateConfig[data.mailTemplate];
+        const template = data.mailTemplate
+        const mailTemplateFunction: (ctx) => { subject: string, html: string } = mailTemplateConfig[template];
         if (user && mailTemplateFunction) {
-            const mailInfo = mailTemplateFunction({ user,server:WebServer, doc: data.event.data });
+            const mailInfo = mailTemplateFunction({ user, server: WebServer, doc: data.event.data });
             return { email: user.email, ...mailInfo };
+        } else {
+            console.error(`mail template error ${data.receiver}--${template}.`)
         }
     }
 
@@ -25,7 +28,7 @@ class MailNotificationSender implements NotificationSenderInterface {
 
         const mailInfo = await this.buildMailInfo(data);
         const { email, subject, html } = mailInfo;
-        sendMail(email, html, subject,).catch(error => {
+        sendMail(email, html, subject).catch(error => {
             console.log(`send mail error ${error}`);
         });
     }

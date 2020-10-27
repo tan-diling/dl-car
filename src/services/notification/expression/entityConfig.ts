@@ -491,6 +491,48 @@ export const entityConfig: ExpressionRule[] = [
     },
     {
         comment: 'SEND EMAIL & NOTIFICATION',
+        type: 'goal',
+        expressions: [
+            // return true, if its current user is site admin  
+            // {
+            //     operator: 'EQ',
+            //     params: [
+            //         {
+            //             operator: "VAR",
+            //             params: ["user", "role"],
+            //         },
+            //         "admin",
+            //     ]
+            // }
+        ],
+        actions: [{
+            receiver: "MEMBER_PM",
+            channel: "db,mail"
+        }],
+    },
+    {
+        comment: 'SEND EMAIL & NOTIFICATION',
+        type: 'requirement',
+        expressions: [
+            // return true, if its current user is site admin  
+            // {
+            //     operator: 'EQ',
+            //     params: [
+            //         {
+            //             operator: "VAR",
+            //             params: ["user", "role"],
+            //         },
+            //         "admin",
+            //     ]
+            // }
+        ],
+        actions: [{
+            receiver: "MEMBER_PM",
+            channel: "db,mail"
+        }],
+    },
+    {
+        comment: 'SEND EMAIL & NOTIFICATION',
         type: 'deliverable',
         expressions: [
             // return true ,if its parent(Requirement) status is “InProgress” 
@@ -591,6 +633,27 @@ export const entityConfig: ExpressionRule[] = [
         ],
         actions: [{
             receiver: "entity.assignee",
+            channel: "db,mail"
+        }],
+    },
+    {
+        comment: 'SEND EMAIL & NOTIFICATION',
+        type: 'task',
+        expressions: [
+            // return true, if its current user is site admin  
+            // {
+            //     operator: 'EQ',
+            //     params: [
+            //         {
+            //             operator: "VAR",
+            //             params: ["user", "role"],
+            //         },
+            //         "admin",
+            //     ]
+            // }
+        ],
+        actions: [{
+            receiver: "MEMBER_PM",
             channel: "db,mail"
         }],
     },

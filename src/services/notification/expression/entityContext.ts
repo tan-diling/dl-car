@@ -16,7 +16,7 @@ export interface Entity {
 }
 
 export interface ProjectMember {
-    user: string;
+    userId: string;
     projectRole: string;
 }
 
@@ -27,17 +27,6 @@ export interface CurrentUser {
 }
 
 
-export const entityContextMacro = {
-    // 'PARENT': ctx => ctx.user.projectRole,
-    'USER_PROJECT_ROLE': ctx => ctx.user.projectRole,
-    'USER_ID': ctx => ctx.user.id,
-    'MEMBER': ctx => ctx.members.map(x => x.user),
-    'MEMBER_QA': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.QualityAssurance).map(x => x.user),
-    'MEMBER_DESIGNER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.Designer).map(x => x.user),
-    'MEMBER_DEVELOPER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.Developer).map(x => x.user),
-    'MEMBER_PM': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectManager).map(x => x.user),
-    'MEMBER_OWNER': ctx => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectOwner).map(x => x.user),
-};
 
 export interface EntityContext<T extends Entity> {
     user: CurrentUser;
@@ -49,4 +38,16 @@ export interface EntityContext<T extends Entity> {
     req,
 }
 
+
+export const entityContextMacro = {
+    // 'PARENT': ctx => ctx.user.projectRole,
+    'USER_PROJECT_ROLE': (ctx: EntityContext<Entity>) => ctx.user.projectRole,
+    'USER_ID': (ctx: EntityContext<Entity>) => ctx.user.id,
+    'MEMBER': (ctx: EntityContext<Entity>) => ctx.members.map(x => x.userId),
+    'MEMBER_QA': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.QualityAssurance).map(x => x.userId),
+    'MEMBER_DESIGNER': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.Designer).map(x => x.userId),
+    'MEMBER_DEVELOPER': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.Developer).map(x => x.userId),
+    'MEMBER_PM': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectManager).map(x => x.userId),
+    'MEMBER_OWNER': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectOwner).map(x => x.userId),
+};
 

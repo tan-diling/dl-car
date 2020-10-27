@@ -5,6 +5,8 @@ import { InvitationContact, InvitationGroup, InvitationProject, Resource, Projec
 import Container from 'typedi';
 import { NotificationTopic, NotificationAction, ProjectRole } from '@app/defines';
 import { executeNotificationSend } from './sender';
+import { Entity, EntityContext } from './expression/entityContext';
+import { entityEntityExecuteEval } from './expression';
 
 interface EventHandler {
     (ev: DocumentType<Event>): Promise<void>;
@@ -63,6 +65,44 @@ const invitationGroupNotifyForMailAction = invitationNotifyForMailAction();
 const invitationProjectNotifyForMailAction = invitationNotifyForMailAction();
 
 
+
+//send notification to entity
+const entityNotifyAction = async (ev: DocumentType<Event>) => {
+    const ctx = (ev.data as EntityContext<Entity>);
+
+    const configs = await entityEntityExecuteEval(ctx);
+
+    for (const cfg of configs) {
+        if (cfg.channel.includes('db')) {
+            for (const user of cfg.receiver) {
+                await executeNotificationSend(
+                    {
+                        executor: 'db',
+                        receiver: new Types.ObjectId(user),
+                        event: ev,
+
+                    }
+
+                );
+            }
+        }
+
+        if (cfg.channel.includes('mail')) {
+            for (const user of cfg.receiver) {
+                await executeNotificationSend(
+                    {
+                        executor: 'mail',
+                        receiver: new Types.ObjectId(user),
+                        event: ev,
+                        mailTemplate: 'entity'
+
+                    }
+
+                );
+            }
+        }
+    }
+};
 
 
 //send notification to project_manager
@@ -164,12 +204,12 @@ notificationConfig.push(
     // },
 
     {
-        topic: NotificationTopic.Project,
+        topic: NotificationTopic.Entity,
         actions: [
             {
                 expressions: [],
                 action: async (ev: DocumentType<Event>) => {
-                    await projectNotifyToProjectManagerAction(ev);
+                    await entityNotifyAction(ev);
                 },
             },
             // {

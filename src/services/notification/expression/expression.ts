@@ -190,6 +190,7 @@ export class EntityNotifyExecutor {
     constructor() { }
 
     async executeEval(ctx, rules: Array<ExpressionRule>) {
+        const ret: Array<{ receiver: string[], channel: string[] }> = [];
         for (const rule of rules) {
             if (rule.type.toLowerCase() != ctx.entityType.toLowerCase()) {
                 continue;
@@ -201,8 +202,14 @@ export class EntityNotifyExecutor {
                 }
             }
 
-            await this.evalRule(ctx, rule);
+            const ruleEvalResult = await this.evalRule(ctx, rule);
+            if (ruleEvalResult) {
+
+                const ruleActionResult = await this.execAction(ctx, rule);
+                ret.push(...ruleActionResult);
+            }
         }
+        return ret;
 
     }
 
@@ -217,11 +224,11 @@ export class EntityNotifyExecutor {
             }
         };
 
-        await this.execAction(ctx, rule);
         return true;
     }
 
     async execAction(ctx, rule: ExpressionRule) {
+        const ret = [];
         console.log("exec action :" + rule.type)
         for (const action of rule.actions) {
 
@@ -231,7 +238,7 @@ export class EntityNotifyExecutor {
             if (!Array.isArray(rets)) { rets = [rets] }
 
             for (const item of rets) {
-                if (IsMongoId(item)) {
+                if (item && IsMongoId(item)) {
                     const userId: string = typeof (item) == typeof ("") ? item : String(new Types.ObjectId(item));
                     userSet.add(userId);
                 } else {
@@ -241,7 +248,11 @@ export class EntityNotifyExecutor {
 
             const l = [...userSet];
             console.log(`send by ${action.channel} count:${l.length}`);
+            if (l.length > 0) {
+                ret.push({ receiver: l, channel: action.channel.split(',') });
+            }
         }
+        return ret;
     }
 
     eval(
