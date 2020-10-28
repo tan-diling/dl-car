@@ -1,4 +1,4 @@
-import { EntityContext, Entity, ProjectEntity } from '../expression/entityContext';
+import { EntityContext, Entity, ProjectEntity } from '../entity/entityContext';
 import { ResourceType } from '@app/defines';
 
 /**

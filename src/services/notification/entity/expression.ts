@@ -176,7 +176,7 @@ export const getEntityContext = async (req, entityType: string, entityId, method
             entity = await DbService.get(TaskModel, { _id: entityId, populate: populate });
             break;
         default:
-            entity = await DbService.get(ProjectModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(ResourceModel, { _id: entityId, populate: populate });
 
     }
 

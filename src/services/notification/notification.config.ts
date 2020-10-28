@@ -5,8 +5,8 @@ import { InvitationContact, InvitationGroup, InvitationProject, Resource, Projec
 import Container from 'typedi';
 import { NotificationTopic, NotificationAction, ProjectRole } from '@app/defines';
 import { executeNotificationSend } from './sender';
-import { Entity, EntityContext } from './expression/entityContext';
-import { entityEntityExecuteEval } from './expression';
+import { Entity, EntityContext } from './entity/entityContext';
+import { entityEntityExecuteEval } from './entity';
 
 interface EventHandler {
     (ev: DocumentType<Event>): Promise<void>;

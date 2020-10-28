@@ -25,7 +25,14 @@ export class ConversationService {
      */
     async listByUser(user: Types.ObjectId) {
         const cms = await ConversationMemberModel.find({ user, isDeleted: false }).exec();
-        return ConversationModel.find().where("_id").in(cms.map(x => x.conversation)).populate('members').exec();
+        return ConversationModel.find().where("_id").in(cms.map(x => x.conversation))
+            .populate({
+                path: 'members',
+                populate: {
+                    select: 'email name image',
+                    path: 'user',
+                }
+            }).exec();
     }
 
     /**
