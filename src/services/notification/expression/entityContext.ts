@@ -1,10 +1,11 @@
 import { ProjectRole } from '@app/defines';
-
+// base entity define
 export interface Entity {
-    parents: Entity[];
-    parent: Entity;
+    parents: Entity[] | string[];
+    paren?: Entity;
     assignees: string[];
     deleted: boolean;
+    // 0-draft,1-pending approval,2-update pending,10-in process,11-in review,12-rework pending,100-completed,101-canceled
     status: number;
     _id: string;
     title: string;
@@ -13,13 +14,55 @@ export interface Entity {
     createdAt: string;
     updatedAt: string;
     type: string;
+    seq?: number;
+
+    children: Entity[];
 }
 
+// project 
+export interface ProjectEntity extends Entity {
+    key: string;
+    logo?: string;
+}
+
+// goal
+export interface GoalEntity extends Entity {
+    roi?: number;
+
+    notes?: string;
+
+    approvedAt?: Date;
+
+}
+
+// requirement
+export interface RequirementEntity extends Entity {
+
+}
+
+// deliverable
+export interface DeliverableEntity extends Entity {
+    severity?: number;
+
+    priority?: number;
+
+    tags?: string[];
+
+}
+
+// task
+export interface TaskEntity extends Entity {
+
+}
+
+
+// project member
 export interface ProjectMember {
     userId: string;
     projectRole: string;
 }
 
+// user
 export interface CurrentUser {
     id: string;
     name: string;
@@ -27,7 +70,7 @@ export interface CurrentUser {
 }
 
 
-
+// entity notification object, for expression ctx
 export interface EntityContext<T extends Entity> {
     user: CurrentUser;
     members: ProjectMember[];
@@ -38,7 +81,7 @@ export interface EntityContext<T extends Entity> {
     req,
 }
 
-
+// expression eval macro 
 export const entityContextMacro = {
     // 'PARENT': ctx => ctx.user.projectRole,
     'USER_PROJECT_ROLE': (ctx: EntityContext<Entity>) => ctx.user.projectRole,

@@ -2,13 +2,13 @@ import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEm
 import { Type } from 'class-transformer';
 
 /** user name rule: <first> [middle] <last> */
-const RULE_USER_NAME_REGEX = /^[a-zA-Z0-9]+\s{1}([a-zA-Z0-9\.]{1,}\s{1}){0,1}[a-zA-Z0-9]{1,}$/ ;
+const RULE_USER_NAME_REGEX = /^[a-zA-Z0-9]+\s{1}([a-zA-Z0-9\.]{1,}\s{1}){0,1}[a-zA-Z0-9]{1,}$/;
 
 /** phone rule  */
-const RULE_PHONE_REGEX = /^(\+?1)?[2-9]\d{2}[2-9](?!11)\d{6}$/ ;
+const RULE_PHONE_REGEX = /^(\+?1)?[2-9]\d{2}[2-9](?!11)\d{6}$/;
 
 /** password rule , min length 8 ,valid chars [a-zA-Z0-9:;!@#$%^&*()-=+_~.]  */
-const RULE_PASSWORD_REGEX =  /^([a-zA-Z0-9:;!@#$%^&*()-=+_~.]{8,64})$/ ; 
+const RULE_PASSWORD_REGEX = /^([a-zA-Z0-9:;!@#$%^&*()-=+_~.]{8,64})$/;
 
 
 enum UserCreateRole {
@@ -56,7 +56,7 @@ export class ChangePasswordDto {
     newPassword: string;
 }
 
-export class UserCreateDto  {
+export class UserCreateDto {
     @IsString()
     @Matches(RULE_USER_NAME_REGEX)
     name: string;
@@ -86,7 +86,7 @@ export class UserCreateDto  {
 
 
 export class EmailExistDto {
-    
+
     @IsEmail()
     email: string;
 }
@@ -156,4 +156,26 @@ export class UserUpdateDto {
     @IsOptional()
     defaultContact?: boolean;
 
+}
+
+
+
+export class PasswordForgetDto {
+
+    @IsEmail()
+    email: string;
+
+}
+
+export class PasswordResetDto {
+
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @Matches(RULE_PASSWORD_REGEX)
+    password: string;
+
+    @IsString()
+    code: string;
 }

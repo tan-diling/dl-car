@@ -1,4 +1,5 @@
-import { EntityContext, Entity } from '../expression/entityContext';
+import { EntityContext, Entity, ProjectEntity } from '../expression/entityContext';
+import { ResourceType } from '@app/defines';
 
 /**
  * mail template define
@@ -61,17 +62,55 @@ Thank you for joining us!
     entity: (ctx: any) => {
         const { user, server, doc } = ctx;
         const entityContext = doc as EntityContext<Entity>;
-        // const action =  doc.
-        return {
-            "subject": `Please check ${entityContext.entityType} ${entityContext.entity.title} `,
-            "html": `
-Hi Sir/Madam,
+        const entity = entityContext.entity;
+        const project = (entity.parents[0] || entity) as ProjectEntity;
+        const entityKey = entity.parents.length == 0 ? `${project.key}` : `${project.key}-${entity.seq}`;
+        const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${entityContext.method}`;
+        const desc = entityContext.req?.body?._desc;
+        let url = '';
+        const entityType = entity.type.toLowerCase();
+        switch (entityType) {
+            case ResourceType.Project:
+                url = `${server}/project/detail/${entity._id}`;
+                break;
+            case ResourceType.Goal:
+            case ResourceType.Requirement:
+            case ResourceType.Deliverable:
+            case ResourceType.Task:
+                url = `${server}/project/${project._id}/${entityType}/${entity._id}`;
+                break;
 
-project entity ${entityContext.entityType} ${entityContext.entity.title}
-method: ${entityContext.method}
+        }
+        return {
+            "subject": subject,
+            "html": `
+Hi ${user.name},
+
+${subject} ${desc}
+
+url: ${url}
 
 - Gestalter`
         };
 
+    },
+
+    forgetPassword: (ctx: any) => {
+        const { user, server, doc } = ctx;
+        return {
+            "subject": "Reset your password",
+            "html": `
+Hi ${user.name},
+We received a request to reset your password after confirming the verification code. Your GCP verification code is:
+
+${doc.pin}
+
+Please do not forward or give this code to anyone.
+
+Thank you,
+
+-Gestalter`
+        };
     }
+
 }

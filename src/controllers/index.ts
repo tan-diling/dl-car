@@ -17,20 +17,22 @@ import { GroupMemberController } from './group/groupMember.controller';
 import { ProjectMemberController } from './resource/projectMember.controller';
 import { NotificationController } from './notification/notificationController';
 import { ConversationController } from './conversation/conversation.controller';
+import { PasswordController } from './user/password.controller';
 
 export const controllers = [
     AdminController,
 
     LoginController,
     UserController,
+    PasswordController,
     PhotoController,
     ImageController,
-    GroupController,  
+    GroupController,
     GroupMemberController,
-    
-    
+
+
     ProjectController,
-    ProjectMemberController,    
+    ProjectMemberController,
     GoalController,
     RequirementController,
     DeliverableController,
@@ -48,4 +50,4 @@ export const controllers = [
 
     ConversationController,
 
-] ;
+];

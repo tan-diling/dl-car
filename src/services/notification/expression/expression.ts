@@ -10,25 +10,49 @@ type SimpleValueType = boolean | string | number | object;
 type ArrayValueType = Array<SimpleValueType>;
 type ValueType = SimpleValueType | ArrayValueType;
 
+/**
+ * expression operator define {operator:string,params[]}
+ * 
+ * operator type string ,define as bellow
+ * params type array, 
+ */
 enum ExpressionOperator {
+    // one params operator
+    // string(x)
     STRING = "STRING",
+    // number(x)
     NUMBER = "NUMBER",
+    // new Date(x).valueOf()
     DATE = "DATE",
 
+    // x && y
     AND = "AND",
+    // x || y
     OR = "OR",
 
+    // x > y
     GT = "GT",
+    // x < y
     LT = "LT",
+    // x == y
     EQ = "EQ",
+    // x >= y
     GE = "GE",
+    // x <= y
     LE = "LE",
+    // x != y
     NE = "NE",
 
+    // Array.isArray(y) && y.contains(x)
     IN = "IN",
+
+    // Array.isArray(x) && x.map(x[y])
     MAP = "MAP",
     // FILTER = "FILTER",
 
+    // get EntityContext value
+    // entity macro: USER_PROJECT_ROLE, USER_ID, MEMBER, MEMBER_QA, MEMBER_DESIGNER,,MEMBER_DEVELOPER, MEMBER_PM, MEMBER_OWNER
+    // ctx[x][y]..[n]
     VAR = "VAR"
 }
 
@@ -124,7 +148,7 @@ export type ExpressionRule = {
 // };
 
 
-export const getEntityContext = async (req, entityType: string, entityId, method: 'created' | 'updated' | 'deleted', ) => {
+export const getEntityContext = async (req, entityType: string, entityId, method: 'created' | 'updated' | 'deleted' | string, ) => {
     let entity = null;
     let populate = "";
     switch (entityType.toLowerCase()) {
@@ -214,8 +238,6 @@ export class EntityNotifyExecutor {
     }
 
     async evalRule(ctx, rule: ExpressionRule) {
-
-
 
         console.log("eval :" + rule.type)
         for (const exp of rule.expressions) {
