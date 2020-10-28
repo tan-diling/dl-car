@@ -73,6 +73,7 @@ Thank you for joining us!
         if (body) {
             for (const k of Object.keys(body)) {
                 if (k.startsWith('_')) continue;
+                if (k == 'id') continue;
                 updateList.push(`${k}: ${body[k]}`);
             }
         }
@@ -108,6 +109,9 @@ ${entityKey} ${action} by ${entityContext.user.name}
 ${desc}
 
 url: ${url}
+
+
+Thank you,
 
 - Gestalter`
         };
