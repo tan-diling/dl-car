@@ -32,6 +32,9 @@ export class ConversationService {
                     select: 'email name image',
                     path: 'user',
                 }
+            })
+            .populate({
+                path: "lastMessage"
             }).exec();
     }
 

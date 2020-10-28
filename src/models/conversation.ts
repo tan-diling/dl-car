@@ -36,6 +36,20 @@ export class Conversation {
     })
     members?: Ref<ConversationMember>[];
 
+
+    @prop({
+        ref: 'Message',
+        localField: "_id",
+        foreignField: "conversation",
+        justOne: true,
+        options: {
+            sort: { _id: -1 },
+        },
+
+    })
+    lastMessage?: Ref<Message>;
+
+
 }
 
 export class ConversationMember {
