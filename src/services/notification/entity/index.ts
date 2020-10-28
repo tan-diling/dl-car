@@ -12,8 +12,7 @@ const executor = new EntityNotifyExecutor();
 export const processEntityNotification = async (request, type, id, method) => {
     const ctx = await getEntityContext(request, type, id, method);
 
-
-    {
+    if (ctx != null) {
         const { req, ...data } = ctx;
         const requestInfo = { method: request.method, body: request.body, url: request.url };
 
@@ -26,7 +25,6 @@ export const processEntityNotification = async (request, type, id, method) => {
                 }
             }
         }
-
 
         const notificationService = Container.get(NotificationService);
         await notificationService.publish(NotificationTopic.Entity, ctx.method, { ...data, req: requestInfo }, ctx.user.id);

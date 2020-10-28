@@ -3,7 +3,7 @@ import { Action } from 'routing-controllers';
 
 type EntityMethodType = 'created' | 'updated' | 'deleted' | 'status' | 'assignee.append' | 'assignee.remove' | 'member.append' | 'member.remove';
 
-export function entityNotificationInterceptor(method: EntityMethodType = 'updated', options: { id?, type?} = {}) {
+export function entityNotificationInterceptor(method: EntityMethodType = 'updated', options: { id?, type?: string, desc?: string } = {}) {
     const it = async (action: Action, content: any) => {
         if (content) {
             const id = content[options.id || "_id"];

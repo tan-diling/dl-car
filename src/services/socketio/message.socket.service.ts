@@ -8,7 +8,6 @@ import { logger } from '@app/config';
 import { ConversationService } from '../conversation.service';
 import { Container } from 'typedi';
 import { Type } from 'class-transformer';
-import { MessageModel } from '@app/models';
 
 
 const conversationService = Container.get(ConversationService)
@@ -16,11 +15,39 @@ const conversationService = Container.get(ConversationService)
  * chat context
  */
 export class ChatContext {
+    static chatContextArray: ChatContext[] = [];
+
+    static remove(ctx: ChatContext) {
+        const i = ChatContext.chatContextArray.indexOf(ctx);
+        if (i >= 0) {
+            delete ChatContext.chatContextArray[i];
+        }
+
+    }
+    static append(ctx: ChatContext) {
+        const i = ChatContext.chatContextArray.indexOf(ctx);
+        if (i < 0) {
+            ChatContext.chatContextArray.push(ctx);
+        };
+    }
+
+    static sendUserMessage = async (user: string | Types.ObjectId, data: { event: string, message }) => {
+        for (const ctx of ChatContext.chatContextArray) {
+            if (String(ctx.user) == String(user)) {
+                ctx.socket.emit(data.event, data.message);
+            }
+        }
+    }
 
     constructor(
         public user: Types.ObjectId,
-        public socket
+        public socket: ServerIO.Socket,
     ) {
+        ChatContext.append(this);
+    }
+
+    remove() {
+        ChatContext.remove(this);
     }
 
     callback: (error: any, data: { event: string, message: any } | any) => any;
@@ -29,13 +56,47 @@ export class ChatContext {
     async processMessageUnsent() {
         await conversationService.processUserMessageUnSent(this.user, async doc => {
 
-            this.socket.emit(ChatMessageTopic.MESSAGE, doc);
+            ChatContext.sendUserMessage(this.user, { event: ChatMessageTopic.MESSAGE, message: doc });
 
+        });
+    }
+
+    async bindEvent() {
+
+        const socket = this.socket;
+        const ctx = this;
+
+
+        const chatProcessor = Container.get(ChatProcessor);
+        // const logChatMessage = async (topic: string, body: any) => {
+        //     const socket_id = socket.id;
+        //     const user = ctx.user;
+
+        //     // await MeetingService.appendChatLog({
+        //     //     socket_id,
+        //     //     session: session,
+        //     //     topic,
+        //     //     body,
+        //     //     client: user,
+        //     // });
+        // };
+
+        socket.on(ChatMessageTopic.REQUEST, async (m) => {
+
+            console.log("[server](message): %s --", socket.id, JSON.stringify(m));
+
+            // await logChatMessage(ChatMessageTopic.REQUEST, m);
+
+            const ret = await chatProcessor.process(ctx, m);
+            if (ret) {
+
+                socket.emit(ChatMessageTopic.RESPONSE, ret);
+                // await logChatMessage(ChatMessageTopic.RESPONSE, ret);
+            }
         });
     }
 }
 
-export const chatContextArray: ChatContext[] = [];
 
 interface ChatProcessFunction {
     (ctx: ChatContext, data): any
@@ -98,19 +159,6 @@ enum ChatMessageType {
 };
 
 
-// const sendUserMessage = async (user: string | Types.ObjectId, message) => {
-//     for (const ctx of chatContextArray) {
-//         if (String(ctx.user) == String(user)) {
-//             ctx.socket.emit(ChatMessageTopic.MESSAGE, message);
-
-//             await conversationService.updateMessageSent(message._id,user);
-
-//         }
-//     }
-// }
-
-
-
 class ChatRequestDto {
     @IsOptional()
     context: ContextInterface;
@@ -140,7 +188,7 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
         const sender = ctx.user;
         const req = await conversationService.createTextMessage({ sender, conversation, text });
 
-        return req;
+        return { ...req.toJSON(), context: msg.context };
     });
 
     /**image process */
@@ -149,7 +197,7 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
         const { conversation, url } = msg.data;
         const sender = ctx.user;
         const req = await conversationService.createImageMessage({ sender, conversation, url });
-        return req;
+        return { ...req.toJSON(), context: msg.context };
     });
 
     /**action process */
@@ -162,7 +210,7 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
             await conversationService.updateMessageAsRead({ conversation, user: sender, time });
             const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
 
-            return req;
+            return { ...req.toJSON(), context: msg.context };
         }
 
         // if(type=="enter"){
@@ -192,12 +240,12 @@ export class ChatProcessor extends EventEmitter {
         configChatProcessMap(this.chatProcessorMap);
 
 
-        MessageModel.on('created', async msg => {
-            console.log(msg);
-            for (const ctx of chatContextArray) {
-                await ctx.processMessageUnsent();
-            }
-        });
+        // MessageModel.on('created', async msg => {
+        //     console.log(msg);
+        //     for (const ctx of chatContextArray) {
+        //         await ctx.processMessageUnsent();
+        //     }
+        // });
     }
 
     getProcessorFunction(actions: Array<string>) {

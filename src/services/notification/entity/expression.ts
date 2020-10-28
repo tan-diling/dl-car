@@ -180,6 +180,11 @@ export const getEntityContext = async (req, entityType: string, entityId, method
 
     }
 
+    if (entity == null) {
+        console.error(`entity id not found ${entityId}`);
+        return;
+    }
+
 
     const members = await entity.getMembers();
 

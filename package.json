@@ -84,6 +84,7 @@
     "@types/passport": "^1.0.4",
     "@types/passport-jwt": "^3.0.2",
     "@types/request-ip": "0.0.35",
+    "@types/socket.io": "^2.1.11",
     "@types/supertest": "^2.0.9",
     "@types/underscore": "^1.10.21",
     "@typescript-eslint/eslint-plugin": "^2.26.0",

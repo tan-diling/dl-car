@@ -66,7 +66,25 @@ Thank you for joining us!
         const project = (entity.parents[0] || entity) as ProjectEntity;
         const entityKey = entity.parents.length == 0 ? `${project.key}` : `${project.key}-${entity.seq}`;
         const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${entityContext.method}`;
-        const desc = entityContext.req?.body?._desc;
+        const body = entityContext.req?.body;
+        let desc = body?._desc;
+
+        const updateList = [];
+        if (body) {
+            for (const k of Object.keys(body)) {
+                if (k.startsWith('_')) continue;
+                updateList.push(`${k}: ${body[k]}`);
+            }
+        }
+
+        desc = desc || updateList.join('\n') || "";
+
+        let action = entityContext.method;
+        if (action == "member.append") action = "append member";
+        if (action == "member.remove") action = "remove member";
+        if (action == "assignee.append") action = "append assignee";
+        if (action == "assignee.remove") action = "remove assignee";
+
         let url = '';
         const entityType = entity.type.toLowerCase();
         switch (entityType) {
@@ -86,7 +104,8 @@ Thank you for joining us!
             "html": `
 Hi ${user.name},
 
-${subject} ${desc}
+${entityKey} ${action} by ${entityContext.user.name}
+${desc}
 
 url: ${url}
 
@@ -101,9 +120,10 @@ url: ${url}
             "subject": "Reset your password",
             "html": `
 Hi ${user.name},
+
 We received a request to reset your password after confirming the verification code. Your GCP verification code is:
 
-${doc.pin}
+${doc.code}
 
 Please do not forward or give this code to anyone.
 
