@@ -37,19 +37,29 @@ export class ChatContext {
         logger.info(`append clients count ${ChatContext.chatContextArray.length} `);
     }
 
-    static sendUserMessage = async (user: string | Types.ObjectId, data: { event: string, message }) => {
-        for (const ctx of ChatContext.chatContextArray) {
-            if (String(ctx.user) == String(user)) {
+    static messageQueue: { user: string | Types.ObjectId, event: string, message: any }[] = [];
+    static postMessage = async (user: string | Types.ObjectId, data: { event: string, message }) => {
+        ChatContext.messageQueue.push({ user, ...data });
+    }
+
+    static sendMessages = async () => {
+        while (true) {
+            const data = ChatContext.messageQueue.pop();
+            if (data === undefined) return;
+
+            for (const ctx of ChatContext.chatContextArray.filter(x => String(x.user) == String(data.user))) {
                 ctx.socket.emit(data.event, data.message);
             }
         }
+
+
     }
 
     static processUnsentMessage = async () => {
         const userList = ChatContext.chatContextArray.map(x => x.user);
         for (const user of userList) {
             await conversationService.processUserMessageUnSent(user, async doc => {
-                await ChatContext.sendUserMessage(user, { event: ChatMessageTopic.MESSAGE, message: doc });
+                await ChatContext.postMessage(user, { event: ChatMessageTopic.MESSAGE, message: doc });
             });
         }
     }
@@ -63,6 +73,7 @@ export class ChatContext {
         while (true) {
             try {
                 await ChatContext.processUnsentMessage();
+                await ChatContext.sendMessages();
                 await sleep(1000);
             } catch (err) {
                 console.error(err);
@@ -233,9 +244,16 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
         if (type == "read") {
 
             await conversationService.updateMessageAsRead({ conversation, user: sender, time });
-            const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
+            const req = await conversationService.createActionMessage({ sender, user, conversation, time, type }, false);
 
-            return { ...req.toJSON(), context: msg.context };
+            const { userStatus, ...data } = req.toJSON();
+
+            for (const user of req.userStatus.keys()) {
+                await ChatContext.postMessage(user, { event: ChatMessageTopic.MESSAGE, message: data });
+            }
+
+
+            return { ...data, context: msg.context };
         }
 
         // if(type=="enter"){

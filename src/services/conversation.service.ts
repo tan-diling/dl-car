@@ -202,7 +202,7 @@ export class ConversationService {
         return conversation;
     }
 
-    private async createMessage(data: CreateQuery<DocumentType<Message>>) {
+    private async createMessage(data: CreateQuery<DocumentType<Message>>, save: boolean = true) {
         const conversation = await ConversationModel.findById(data.conversation).populate('members').exec();
         if (conversation) {
             const userStatus = new Map();
@@ -210,18 +210,25 @@ export class ConversationService {
                 userStatus.set(String((member as ConversationMember).user), 0);
             }
 
-            const message = await MessageModel.create({ ...data, userStatus });
+            if (save == false) {
+                const message = new MessageModel({ ...data, userStatus });
+                return message;
+            } else {
 
-            conversation.lastMessageTime = message.sendAt;
-            conversation.lastMessageSeq = message.seq;
+                const message = await MessageModel.create({ ...data, userStatus });
+
+                conversation.lastMessageTime = message.sendAt;
+                conversation.lastMessageSeq = message.seq;
 
 
 
-            await conversation.save();
+                await conversation.save();
 
-            MessageModel.emit('created', message);
+                MessageModel.emit('created', message);
 
-            return message;
+                return message;
+            }
+
         }
     }
 
@@ -238,9 +245,10 @@ export class ConversationService {
     }
 
 
-    async createActionMessage(dto: { conversation: string | Types.ObjectId, sender: string | Types.ObjectId, user: string | Types.ObjectId, time: Date, type: "enter" | "leave" | "read" | "typing" | string }) {
+    async createActionMessage(dto: { conversation: string | Types.ObjectId, sender: string | Types.ObjectId, user: string | Types.ObjectId, time: Date, type: "enter" | "leave" | "read" | "typing" | string }, save = true) {
         const { conversation, sender, ...data } = dto;
-        return await this.createMessage({ conversation, sender, type: 'action', data });
+        // const save = data.type == 'enter' || 'leave' == data.type;
+        return await this.createMessage({ conversation, sender, type: 'action', data }, save);
     }
 
 
@@ -261,7 +269,7 @@ export class ConversationService {
         logger.info(`processUserMessageUnSent ${user}`);
         const idString = String(user);
 
-        const messageList = await MessageModel.find().where('userStatus.' + idString, 0).sort('seq').exec();
+        const messageList = await MessageModel.find().where('userStatus.' + idString, 0).select('-userStatus').sort('seq').exec();
 
         for (const message of messageList) {
             callback(message);

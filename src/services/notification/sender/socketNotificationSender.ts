@@ -10,7 +10,7 @@ import { ChatContext, ChatMessageTopic } from '@app/services/socketio/message.so
 
 class SocketNotificationSender implements NotificationSenderInterface {
     async execute(data: NotificationSenderOptions) {
-        await ChatContext.sendUserMessage(data.receiver, { event: ChatMessageTopic.NOTIFICATION, message: data.event });
+        await ChatContext.postMessage(data.receiver, { event: ChatMessageTopic.NOTIFICATION, message: data.event });
     }
 }
 
