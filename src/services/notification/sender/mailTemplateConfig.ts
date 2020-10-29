@@ -81,10 +81,19 @@ Thank you for joining us!
         desc = desc || updateList.join('\n') || "";
 
         let action = entityContext.method;
-        if (action == "member.append") action = "append member";
-        if (action == "member.remove") action = "remove member";
-        if (action == "assignee.append") action = "append assignee";
-        if (action == "assignee.remove") action = "remove assignee";
+        if (action == "member.append") {
+            action = "append member";
+            action = action + ` ${body._user.name}`;
+        } else if (action == "member.remove") {
+            action = "remove member";
+            action = action + ` ${body._user.name}`;
+        } else if (action == "assignee.append") {
+            action = "append assignee";
+            action = action + ` ${body._user.name}`;
+        } else if (action == "assignee.remove") {
+            action = "remove assignee";
+            action = action + ` ${body._user.name}`;
+        }
 
         let url = '';
         const entityType = entity.type.toLowerCase();

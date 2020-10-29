@@ -40,6 +40,7 @@ export const processEntityNotification = async (request, type, id, method) => {
                     _id: user._id,
                     name: user.name,
                     email: user.email,
+                    image: user.image,
                 };
             } else {
                 requestInfo.body._user = null;
