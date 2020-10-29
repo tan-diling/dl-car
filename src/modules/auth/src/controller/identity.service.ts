@@ -13,15 +13,15 @@ import { IIdentityServiceToken, IIdentityService, IUserToken } from '../interfac
 
 @Service(IIdentityServiceToken)
 export class IdentityService implements IIdentityService {
-    UserModel = mongoose.model< any & mongoose.Document> ('User') ;
-    LoginSessionModel = mongoose.model< any & mongoose.Document>('LoginSession') ;
+    UserModel = mongoose.model<any & mongoose.Document>('User');
+    LoginSessionModel = mongoose.model<any & mongoose.Document>('LoginSession');
 
 
     async userRefreshToken(dto: { refresh_token: string; }) {
-        const session = await this.LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec(); 
+        const session = await this.LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
             // const err = new UnauthorizedError('refresh_invalid');            
-            
+
             throw new UnauthorizedError('refresh_invalid');
         }
         if (new Date() > session.refreshTime) {
@@ -34,18 +34,20 @@ export class IdentityService implements IIdentityService {
         // update session info
         session.accessTime = new Date();
         await session.save();
-        return {id:user.id,role:user.role, name:user.name, email:user.email};
+        return { id: user.id, role: user.role, name: user.name, email: user.email };
     }
 
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
-        const user = await this.UserModel.findOne({ email: { $regex: new RegExp('^'+dto.email+'$', "i") } }).exec();
-        if (user == null ) {
+        const user = await this.UserModel.findOne({
+            email: { $regex: new RegExp('^' + dto.email + '$', "i") },
+        }).exec();
+        if (user == null) {
             throw new UnauthorizedError('account_invalid');
         }
         if (user.password != dto.password) {
             throw new UnauthorizedError('password_invalid');
         }
-        if (! user.isNormal()) {
+        if (!user.isNormal()) {
             throw new UnauthorizedError('account_forbidden');
         }
         // save user session info
@@ -59,6 +61,6 @@ export class IdentityService implements IIdentityService {
         session.refreshToken = randToken.uid(64);
         session.ip = dto.ip;
         await session.save();
-        return { user:{id:user.id,role:user.role,name:user.name,email:user.email}, session };
+        return { user: { id: user.id, role: user.role, name: user.name, email: user.email }, session };
     }
 }

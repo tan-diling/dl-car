@@ -1,4 +1,4 @@
-import { prop,  Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
+import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
 import { SiteRole } from '@app/defines';
@@ -12,83 +12,88 @@ import { Contact } from './contact';
 
 // }
 
-@index({ name: "text", email: "text",})
-@plugin(mongooseHidden({ defaultHidden: {  password: true } }))
+@index({ name: "text", email: "text", })
+@plugin(mongooseHidden({ defaultHidden: { password: true } }))
 export class User {
   @prop()
   name: string;
 
-  @prop({ unique: true })
-  email: string;    
+  @prop({ index: true })
+  email: string;
 
   // @prop({default:UserRole.client, enum: UserRole })
-  @prop({default:SiteRole.Client})
+  @prop({ default: SiteRole.Client })
   role?: string;
 
   @prop()
-  password: string ;
+  password: string;
 
-  @prop({default:""})
-  image?: string;  
+  @prop({ default: "" })
+  image?: string;
 
   @prop()
   company?: string;
-  
-  @prop({default:""})
-  job?: string;    
 
-  @prop({default:""})
-  phone?: string;  
-  
-  @prop({default:""})
+  @prop({ default: "" })
+  job?: string;
+
+  @prop({ default: "" })
+  phone?: string;
+
+  @prop({ default: "" })
   department?: string;
-  
+
   @prop()
-  emailValidated : boolean ;
+  emailValidated: boolean;
 
-  @prop({ required: false, default: false})
-  deleted?: boolean ;
+  @prop({ required: false, default: false })
+  deleted?: boolean;
 
-  @prop({ required: false, default: false})
-  defaultContact?: boolean ;
+  @prop({ required: false, default: false })
+  defaultContact?: boolean;
 
-  @prop({ required: false, default: true})
-  defaultContactAccept?: boolean ;
+  @prop({ required: false, default: true })
+  defaultContactAccept?: boolean;
 
-  @prop({ 
-    ref:"Contact",
-    localField:"_id",
-    foreignField:"user",
+  @prop({
+    ref: "Contact",
+    localField: "_id",
+    foreignField: "user",
     // match:{ 
     //   deleted:false,    
     // },
-    options:{
-      populate:"contact",
+    options: {
+      populate: "contact",
     },
 
   })
   contacts: Ref<Contact>[];
 
   isNormal() {
-    return (this.emailValidated && (!this.deleted));
+    return this.emailValidated &&
+      (!this.deleted) &&
+      this.role != '';
   }
 
 
-  static 
-  async findByMail(email:string){
-    return await UserModel.findOne({email:{$regex:new RegExp('^'+email+'$','i')}}).exec() ;
+  static
+    async findByMail(email: string) {
+    return await UserModel.findOne({
+      email: { $regex: new RegExp('^' + email + '$', 'i') },
+      deleted: false,
+    }).exec();
   }
-  
+
 }
 
-export class LoginSession{
+export class LoginSession {
 
   @prop({ ref: User })
   user: Ref<User>;
- 
+
   @prop()
   device: string;
-  
+
   @prop()
   refreshToken: string;
 
@@ -97,10 +102,10 @@ export class LoginSession{
 
   @prop()
   accessTime?: Date;
-  
+
   @prop()
   refreshTime?: Date;
-  
+
 };
 
 

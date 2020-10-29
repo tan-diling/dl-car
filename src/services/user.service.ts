@@ -36,15 +36,23 @@ export class UserService {
 
         let user = await User.findByMail(dto.email);
         if (user != null) {
-            throw new NotAcceptableError('account_exists');
+            if (user.role != '') {
+                throw new NotAcceptableError('account_exists');
+            } else {
+                user = await UserModel.findByIdAndUpdate(user._id, dto).exec();
+            }
+        } else {
+            user = new UserModel(dto);
         }
 
-        user = new UserModel(dto);
-        user.emailValidated = false;
-        if (!user.password) user.password = process.env.GCP_DEFAULT_PASSWORD || randToken.uid(8);
+        if (user.role != '') {
+            user.emailValidated = false;
+            if (!user.password) user.password = process.env.GCP_DEFAULT_PASSWORD || randToken.uid(8);
 
-        await user.save();
-        UserModel.emit(RepoOperation.Created, user);
+            await user.save();
+
+            UserModel.emit(RepoOperation.Created, user);
+        }
         return user;
     }
 
@@ -128,12 +136,12 @@ export class UserService {
     }
 
     /**
-     * get user by email ,if not exist,create a new user 
+     * get user by email ,if not exist,create a new user (inviter user fro sign up,)
      * @param email 
      * @param options 
      */
     async getUserByEmailForce(email: string, options?: Partial<User>) {
-        const defaultInvitationUser = { name: 'New User', company: '', role: SiteRole.Client };
+        const defaultInvitationUser = { name: 'New User', company: '', role: '' };
         let user = await User.findByMail(email);
 
         if (user == null) {

@@ -81,7 +81,8 @@ export class ProjectMemberController {
                 throw new NotAcceptableError('project member delete self not allowed');
             }
 
-            await pm.remove();
+            pm.deleted = true;
+            await pm.save();
 
             return pm;
         }

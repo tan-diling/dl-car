@@ -10,14 +10,18 @@ import { WebServer } from '@app/config';
 import { mailTemplateConfig } from './mailTemplateConfig';
 
 
+const findUserById = async (id) => {
+    return await UserModel.findById(id).exec();
+}
+
 class MailNotificationSender implements NotificationSenderInterface {
     async buildMailInfo(data: NotificationSenderOptions) {
-        const user = await UserModel.findById(data.receiver).exec();
+        const user = await findUserById(data.receiver);
 
         const template = data.mailTemplate
-        const mailTemplateFunction: (ctx) => { subject: string, html: string } = mailTemplateConfig[template];
+        const mailTemplateFunction: (ctx) => Promise<{ subject: string, html: string }> = mailTemplateConfig[template];
         if (user && mailTemplateFunction) {
-            const mailInfo = mailTemplateFunction({ user, server: WebServer, doc: data.event.data });
+            const mailInfo = await mailTemplateFunction({ user, server: WebServer, doc: data.event.data, findUserById });
             return { email: user.email, ...mailInfo };
         } else {
             console.error(`mail template error ${data.receiver}--${template}.`)
