@@ -21,29 +21,23 @@ export const chatBot = async (socket: ServerIO.Socket) => {
 
     const ctx = new ChatContext(user._id, socket);
 
-    // ctx.callback = (error, data) => {
-    //     if (!error) {
-    //         const ev = data?.event || data?.topic;
-    //         const msg = data?.message || data?.body;
-    //         socket.emit(ev, msg);
-    //     }
-    // }
-
-    await ctx.processMessageUnsent();
-
-    await ctx.bindEvent();
-
     socket.on("disconnect", () => {
         console.log("socket disconnected %s", socket.id);
 
         ctx.remove();
 
     });
+
+    // await ChatContext.processUnsentMessage();
+
+    await ctx.bindEvent();
 };
 
 export const useChatBot = (io: ServerIO.Server) => {
     io
         .of('/api/notification')
         .on('connect', chatBot);
+
+    ChatContext.startMessageProcess();
 
 }

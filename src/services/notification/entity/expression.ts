@@ -1,8 +1,9 @@
 import { ResourceType } from '@app/defines';
-import { ResourceModel, Resource, ProjectModel, TaskModel, RequirementModel, GoalModel, DeliverableModel } from '@app/models';
+import { ResourceModel, Resource, ProjectModel, TaskModel, RequirementModel, GoalModel, DeliverableModel, Project } from '@app/models';
 import { entityContextMacro } from './entityContext';
 import { IsMongoId } from 'class-validator';
 import { Types, Model, Document } from 'mongoose';
+import { DocumentType } from '@typegoose/typegoose';
 import { DbService } from '@app/services/db.service';
 
 
@@ -149,34 +150,34 @@ export type ExpressionRule = {
 
 
 export const getEntityContext = async (req, entityType: string, entityId, method: 'created' | 'updated' | 'deleted' | string, ) => {
-    let entity = null;
+    let entity: DocumentType<Resource> = null;
     let populate = "";
     switch (entityType.toLowerCase()) {
         case ResourceType.Project:
             populate = "children,comments,attachments";
-            entity = await DbService.get(ProjectModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(ProjectModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
             break;
         case ResourceType.Goal:
             populate = "children,parents,comments,attachments";
 
-            entity = await DbService.get(GoalModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(GoalModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
             break;
         case ResourceType.Requirement:
             populate = "children,parents,comments,attachments";
 
-            entity = await DbService.get(RequirementModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(RequirementModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
             break;
         case ResourceType.Deliverable:
             populate = "children,parents,comments,attachments,checklist";
 
-            entity = await DbService.get(DeliverableModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(DeliverableModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
             break;
         case ResourceType.Task:
             populate = "parents,comments,attachments";
-            entity = await DbService.get(TaskModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(TaskModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
             break;
         default:
-            entity = await DbService.get(ResourceModel, { _id: entityId, populate: populate });
+            entity = await DbService.get(ResourceModel, { _id: entityId, populate: populate }) as DocumentType<Resource>;
 
     }
 
@@ -186,7 +187,9 @@ export const getEntityContext = async (req, entityType: string, entityId, method
     }
 
 
-    const members = await entity.getMembers();
+    const entityMembers = await entity.getMembers();
+
+    const members = entityMembers.map(x => { return { userId: x.userId, projectRole: x.projectRole, deleted: x.deleted } });
 
     const userId: string = req.user.id;
     const projectRole = members.find(x => String(x.userId) == userId)?.projectRole;
@@ -211,7 +214,7 @@ export const getEntityContext = async (req, entityType: string, entityId, method
         entity: entityJSON,
         entityType: entity.type,
         method,
-        members: members.map(x => x.toJSON()),
+        members,
     }
 }
 

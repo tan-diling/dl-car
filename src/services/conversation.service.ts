@@ -9,6 +9,7 @@ import { Message, ConversationModel, MessageModel, ConversationMemberModel, Conv
 import { compileFunction } from 'vm';
 import { timingSafeEqual } from 'crypto';
 import { DbService } from './db.service';
+import { logger } from '@app/config';
 
 /**
  * user service
@@ -257,7 +258,7 @@ export class ConversationService {
      */
     async processUserMessageUnSent(user: string | Types.ObjectId, callback) {
 
-        console.log(`processUserMessageUnSent ${user}`);
+        logger.info(`processUserMessageUnSent ${user}`);
         const idString = String(user);
 
         const messageList = await MessageModel.find().where('userStatus.' + idString, 0).sort('seq').exec();

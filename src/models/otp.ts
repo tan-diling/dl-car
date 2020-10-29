@@ -1,5 +1,6 @@
 import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 
+import * as moment from 'moment';
 import * as randToken from 'rand-token';
 
 const OTP_EXPIRES = 20;
@@ -19,9 +20,12 @@ export class OneTimePin {
         async validateCode(key: string, code: string) {
         const otp = await OneTimePinModel.findOne({ key }).exec();
 
-        if (otp != null) {
+        if (otp != null && otp.pin == code) {
             await otp.remove();
-            return otp.pin == code;
+            if (moment().add(-OTP_EXPIRES, 'minutes').valueOf() < otp.createTime.valueOf()) {
+                return true;
+            }
+            return false;
         }
 
         return false;

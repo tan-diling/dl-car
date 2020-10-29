@@ -18,10 +18,14 @@ export class ChatContext {
     static chatContextArray: ChatContext[] = [];
 
     static remove(ctx: ChatContext) {
-        const i = ChatContext.chatContextArray.indexOf(ctx);
-        if (i >= 0) {
-            delete ChatContext.chatContextArray[i];
-        }
+        // const a = ChatContext.chatContextArray
+        ChatContext.chatContextArray = ChatContext.chatContextArray.filter(x => x != ctx);
+        // const i = a.indexOf(ctx);
+        // if (i >= 0) {
+        //     a. a[i];
+        // }
+
+        logger.info(`remove clients count ${ChatContext.chatContextArray.length} `);
 
     }
     static append(ctx: ChatContext) {
@@ -29,6 +33,8 @@ export class ChatContext {
         if (i < 0) {
             ChatContext.chatContextArray.push(ctx);
         };
+
+        logger.info(`append clients count ${ChatContext.chatContextArray.length} `);
     }
 
     static sendUserMessage = async (user: string | Types.ObjectId, data: { event: string, message }) => {
@@ -37,6 +43,32 @@ export class ChatContext {
                 ctx.socket.emit(data.event, data.message);
             }
         }
+    }
+
+    static processUnsentMessage = async () => {
+        const userList = ChatContext.chatContextArray.map(x => x.user);
+        for (const user of userList) {
+            await conversationService.processUserMessageUnSent(user, async doc => {
+                await ChatContext.sendUserMessage(user, { event: ChatMessageTopic.MESSAGE, message: doc });
+            });
+        }
+    }
+
+    static async startMessageProcess() {
+        const sleep = function (ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        console.log('startMessageProcess...');
+        while (true) {
+            try {
+                await ChatContext.processUnsentMessage();
+                await sleep(1000);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
     }
 
     constructor(
@@ -53,13 +85,6 @@ export class ChatContext {
     callback: (error: any, data: { event: string, message: any } | any) => any;
     [k: string]: any;
 
-    async processMessageUnsent() {
-        await conversationService.processUserMessageUnSent(this.user, async doc => {
-
-            ChatContext.sendUserMessage(this.user, { event: ChatMessageTopic.MESSAGE, message: doc });
-
-        });
-    }
 
     async bindEvent() {
 

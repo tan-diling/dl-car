@@ -179,6 +179,26 @@ export class UserService {
     }
 
     /**
+     * check OTP
+     * @param dto 
+     */
+    async checkValidateCodeOfForget(dto: { email: string, code: string, }) {
+        const user = await User.findByMail(dto.email);
+        if (user) {
+            const key = `forget_${user._id}`
+            const success = await OneTimePin.validateCode(key, dto.code);
+            if (success) {
+                const code = await OneTimePin.generateCode(key);
+                return { code };
+            } else {
+                return { error: 'OTP validation failure' };
+            }
+        }
+
+        return { error: 'user not found' };
+    }
+
+    /**
      * user reset password with OTP 
      * @param email 
      */

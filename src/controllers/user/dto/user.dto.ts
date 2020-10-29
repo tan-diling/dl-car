@@ -167,6 +167,17 @@ export class PasswordForgetDto {
 
 }
 
+
+export class ValidationOTPDto {
+
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    code: string;
+
+}
+
 export class PasswordResetDto {
 
     @IsEmail()
