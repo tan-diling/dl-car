@@ -1,7 +1,8 @@
 import { processEntityNotification } from '@app/services/notification/entity';
 import { Action } from 'routing-controllers';
+import { ResourceType } from '@app/defines';
 
-type EntityMethodType = 'created' | 'updated' | 'deleted' | 'status' | 'assignee.append' | 'assignee.remove' | 'member.append' | 'member.remove';
+type EntityMethodType = 'created' | 'updated' | 'deleted' | 'status' | 'assignee.append' | 'assignee.remove';
 
 export function entityNotificationInterceptor(method: EntityMethodType = 'updated', options: { id?, type?: string, desc?: string } = {}) {
     const it = async (action: Action, content: any) => {
@@ -17,4 +18,14 @@ export function entityNotificationInterceptor(method: EntityMethodType = 'update
     }
 
     return it;
+}
+
+export const projectMemberNotification = async (method: "member.append" | "member.remove", req, project, user) => {
+
+    const id = project;
+    const type = ResourceType.Project;
+    console.log(`projectMemberNotification  ${id}, ${method} ${user}`);
+
+    await processEntityNotification({ ...req, body: { ...req.body, _user: user } }, type, id, method);
+
 }

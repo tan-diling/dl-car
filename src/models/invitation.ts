@@ -8,7 +8,7 @@ import { Contact } from './contact';
 import { GroupMember } from './group';
 import { ProjectMember } from './resource';
 
-@modelOptions({ options: { allowMixed:0}})
+@modelOptions({ options: { allowMixed: 0 } })
 export class PendingAction {
 
   @prop({ alias: 'type' })
@@ -17,9 +17,9 @@ export class PendingAction {
   @prop({ ref: () => User })
   receiver: Ref<User>;
 
-  @prop({ 
+  @prop({
     ref: () => User,
-    options: { projection:{ name:1, email:1}}
+    options: { projection: { name: 1, email: 1 } }
   })
   sender?: Ref<User>;
 
@@ -71,8 +71,8 @@ interface BaseInvitationData {
   image?: string;
 }
 
-interface ContactInvitationData extends BaseInvitationData {  
-  contact: Types.ObjectId;  
+interface ContactInvitationData extends BaseInvitationData {
+  contact: Types.ObjectId;
 }
 
 interface GroupInvitationData extends BaseInvitationData {
@@ -100,15 +100,15 @@ export class InvitationContact extends PendingAction {
     await super.changeStatus(status);
 
     if (status == ActionStatus.Accepted) {
-      
-            const { userId, contact } = this.data;
-            await Contact.appendContact(userId, contact);            
+
+      const { userId, contact } = this.data;
+      await Contact.appendContact(userId, contact);
     }
 
     await this.save();
   }
 
- 
+
 }
 
 export class InvitationGroup extends PendingAction {
@@ -123,16 +123,16 @@ export class InvitationGroup extends PendingAction {
   async changeStatus(this: DocumentType<InvitationGroup>, status: ActionStatus) {
     await super.changeStatus(status);
 
-    if (status == ActionStatus.Accepted) {                
+    if (status == ActionStatus.Accepted) {
       const { userId, groupId, groupRole } = this.data;
-      await GroupMember.appendMember(groupId, userId, groupRole);          
-        
+      await GroupMember.appendMember(groupId, userId, groupRole);
+
     }
 
     await this.save();
   }
 
- 
+
 }
 
 export class InvitationProject extends PendingAction {
@@ -147,15 +147,15 @@ export class InvitationProject extends PendingAction {
   async changeStatus(this: DocumentType<InvitationProject>, status: ActionStatus) {
     await super.changeStatus(status);
 
-    if (status == ActionStatus.Accepted) {                
-            const { userId, projectId, projectRole } = this.data ;
-            await ProjectMember.appendMember(projectId, userId, projectRole);                
+    if (status == ActionStatus.Accepted) {
+      const { userId, projectId, projectRole } = this.data;
+      await ProjectMember.appendMember(projectId, userId, projectRole);
     }
 
     await this.save();
   }
 
- 
+
 }
 
 

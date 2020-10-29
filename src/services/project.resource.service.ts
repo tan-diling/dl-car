@@ -184,6 +184,31 @@ export class ProjectResourceService extends ResourceService<Project>{
     }
 
     /**
+     * config project members
+     * @param project project document
+     * @param member members
+     */
+    async removeProjectMember(dto: { projectId: Types.ObjectId, userId: Types.ObjectId }, sender: string) {
+
+        const pm = await ProjectMemberModel.findOne(dto).exec();
+        if (pm) {
+
+            const userId = pm.userId as Types.ObjectId;
+
+            if (userId.equals(sender)) {
+                throw new NotAcceptableError('project member delete self not allowed');
+            }
+
+            pm.deleted = true;
+            await pm.save();
+
+            return pm;
+        }
+
+
+    }
+
+    /**
   * config project members
   * @param project project document
   * @param member members

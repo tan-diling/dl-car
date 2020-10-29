@@ -7,7 +7,7 @@ import { ResourceType, RequestOperation, ProjectRole, SiteRole } from '@app/defi
 import { Container } from 'typedi';
 import { ProjectPermissionService } from '@app/services/projectPermission.service';
 import { Types } from 'mongoose';
-import { entityNotificationInterceptor } from '@app/middlewares/entity.interceptor';
+import { entityNotificationInterceptor, projectMemberNotification } from '@app/middlewares/entity.interceptor';
 
 @Authorized()
 @JsonController('/resource/member')
@@ -67,7 +67,6 @@ export class ProjectMemberController {
     }
 
 
-    @UseInterceptor(entityNotificationInterceptor("member.remove", { type: 'project', id: "projectId" }))
     @Delete('/:id([0-9a-f]{24})')
     async delete(@Param('id') id: string, @Req() request, @CurrentUser() currentUser) {
         const pm = await this.service.getProjectMemberById(id);
@@ -83,6 +82,8 @@ export class ProjectMemberController {
 
             pm.deleted = true;
             await pm.save();
+
+            await projectMemberNotification('member.remove', request, pm.projectId, pm.userId);
 
             return pm;
         }
