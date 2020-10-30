@@ -5,18 +5,20 @@ import { ForbiddenError, UseBefore } from 'routing-controllers';
 import { ProjectPermissionService } from '@app/services/projectPermission.service';
 import { RequestOperation, RequestContext } from '@app/defines';
 import { ResourceModel } from '@app/models';
+import { userCheckMiddleware } from './userCheck.middleware';
+import { jwtAuthenticate } from './jwt.middleware';
 // async function checkGroupMember(userId,groupId)
 
 
 export function checkResourcePermission(options: { id?: string, type?: string, method?: RequestOperation, } = {}) {
     function resourcePermissionMiddleware(request: Request, response: any, next?: (err?: any) => any): any {
         console.log("resource permission check ...");
-        const resourceId: string = request.params[options.id || "id"];
+        const resourceId = request.params[options.id || "id"];
 
-        if (resourceId == null) {
-            next(new ForbiddenError('no resource id'));
-            return;
-        }
+        // if (resourceId == null) {
+        //     next(new ForbiddenError('no resource id'));
+        //     return;
+        // }
 
         let resourceType = options.type;
         // if (resourceType == null){
@@ -30,7 +32,7 @@ export function checkResourcePermission(options: { id?: string, type?: string, m
         //     resourceType = resource.type ;
         // }
 
-        const userId: string = (request.user as any).id;
+        // const userId: string = (request.user as any).id;
 
         const service = Container.get(ProjectPermissionService);
 
@@ -58,5 +60,5 @@ export function checkResourcePermission(options: { id?: string, type?: string, m
             });
     }
 
-    return resourcePermissionMiddleware;
+    return [jwtAuthenticate, userCheckMiddleware(), resourcePermissionMiddleware];
 }

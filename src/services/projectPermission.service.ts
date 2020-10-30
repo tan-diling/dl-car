@@ -1,8 +1,9 @@
 import { MethodNotAllowedError, InternalServerError } from 'routing-controllers';
 import { SiteRole, ResourceType, RequestContext, RequestOperation, PermissionOperation } from '@app/defines';
 import { PermissionPolicyModel, PermissionPolicy } from '@app/models/permission';
-import { ProjectMemberModel, ResourceModel } from '@app/models';
+import { ProjectMemberModel, ResourceModel, CommentModel, ResourceRelatedBase, AttachmentModel, CheckListModel, EffortModel } from '@app/models';
 import { Types } from 'mongoose';
+import { DocumentType } from '@typegoose/typegoose';
 
 /**
  * Project Permission Service
@@ -15,7 +16,8 @@ export class ProjectPermissionService {
      */
     async checkPermission(ctx: RequestContext) {
 
-        const checkMethodList = [this.checkSiteAdminPolicy, this.checkProjectCreatePolicy, this.checkProjectRetrievePolicy, this.checkCurrentCURDPolicy];
+        const checkMethodList = [this.checkSiteAdminPolicy, this.checkProjectCreatePolicy, this.checkRelatedPolicy, this.checkProjectRetrievePolicy, this.checkCurrentCURDPolicy];
+
 
         let checkResult = false;
         for (const func of checkMethodList) {
@@ -24,33 +26,6 @@ export class ProjectPermissionService {
         }
         return checkResult == true;
 
-
-        // switch(ctx.method)
-        // {
-        //     case Operation.CREATE:
-        //         break ;
-        //     case Operation.RETRIEVE:
-        //         break ;
-        //     case Operation.UPDATE:
-        //         // 'admin' site_user can update all
-        //         if (ctx.user?.role == 'admin')
-        //             return ;
-
-        //         // other site_user can update his/her self information
-        //         if( ctx.user?.id != ctx.filter?.id)                    
-        //             throw new MethodNotAllowedError('permission_forbidden') ;
-
-        //         // user info:"role" , "defaultContact" maintained by 'admin'
-        //         if( ctx.dto?.role != null || ctx.dto?.defaultContact != null)                    
-        //             throw new MethodNotAllowedError('permission_forbidden') ;
-        //         break ;
-        //     case Operation.DELETE:   
-        //         if( ctx.user?.id == ctx.filter?.id )              
-        //             throw new MethodNotAllowedError('permission_forbidden') ;
-        //         break ;
-        //     default:
-        //         throw new InternalServerError('operation_error');
-        // }
     }
 
     /**
@@ -60,6 +35,38 @@ export class ProjectPermissionService {
     async checkSiteAdminPolicy(ctx: RequestContext) {
 
         if (ctx.user.role == SiteRole.Admin) return true;
+
+    }
+
+    async checkRelatedPolicy(ctx: RequestContext) {
+        // if is entity relate object , check current user  it's if it is member
+        let doc: DocumentType<ResourceRelatedBase> = null;
+        switch (ctx.resourceType) {
+            case ResourceType.Comment:
+                doc = await CommentModel.findById(ctx.resourceId).exec();
+                break;
+            case ResourceType.Attachment:
+                doc = await AttachmentModel.findById(ctx.resourceId).exec();
+                break;
+
+            case ResourceType.CheckList:
+                doc = await CheckListModel.findById(ctx.resourceId).exec();
+                break;
+            case ResourceType.Effort:
+                doc = await EffortModel.findById(ctx.resourceId).exec();
+                break;
+        }
+        if (doc) {
+            const resource = await ResourceModel.findById(doc.parent).exec();
+            if (resource) {
+                const members = await resource.getMembers();
+                return members.some(x => x.deleted != true && String(x.userId) == ctx.user.id);
+            }
+
+            return false;
+        }
+
+
 
     }
 

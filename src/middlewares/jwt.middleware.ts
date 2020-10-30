@@ -1,5 +1,5 @@
 
-import  passport = require( 'passport');
+import passport = require('passport');
 import { StrategyOptions, ExtractJwt, Strategy } from 'passport-jwt';
 import { logger, JWT_OPTION } from '@app/config';
 
@@ -35,4 +35,17 @@ const getStrategy = (): passport.Strategy => {
 
 passport.use('jwt', getStrategy());
 
-export const jwtAuthenticate = passport.authenticate('jwt',{ session: false, failWithError: true } ) ;
+export const jwtAuthenticate = (request: Request, response: any, next) => {
+    passport.authenticate('jwt', { session: false, failWithError: true }, (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user) {
+            next({ error: 'jwt user　error' });
+            return;
+        }
+
+        next();
+    })(request, response, next);
+}
