@@ -78,7 +78,7 @@ export interface EntityContext<T extends Entity> {
     entityType: string;
     method: string;
     timestamp: number;
-    req,
+    req: { url?, body?, method, },
 }
 
 // expression eval macro 
@@ -92,5 +92,9 @@ export const entityContextMacro = {
     'MEMBER_DEVELOPER': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.Developer).map(x => x.userId),
     'MEMBER_PM': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectManager).map(x => x.userId),
     'MEMBER_OWNER': (ctx: EntityContext<Entity>) => ctx.members.filter(x => x.projectRole == ProjectRole.ProjectOwner).map(x => x.userId),
+    'MEMBER_APPEND': (ctx: EntityContext<Entity>) => ctx.method == 'member.append' ? [ctx.req.body?._user?._id] : [],
+    'MEMBER_REMOVE': (ctx: EntityContext<Entity>) => ctx.method == 'member.remove' ? [ctx.req.body?._user?._id] : [],
+    'ASSIGNEE_APPEND': (ctx: EntityContext<Entity>) => ctx.method == 'assignee.append' ? [ctx.req.body?._user?._id] : [],
+    'ASSIGNEE_REMOVE': (ctx: EntityContext<Entity>) => ctx.method == 'assignee.remove' ? [ctx.req.body?._user?._id] : [],
 };
 

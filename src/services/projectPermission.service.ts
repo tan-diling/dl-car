@@ -81,9 +81,9 @@ export class ProjectPermissionService {
     async checkProjectRetrievePolicy(ctx: RequestContext) {
 
         if (ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.RETRIEVE) {
-            if(ctx.resourceId){
-                return true ;
-            } else {            
+            if (ctx.resourceId) {
+                return true;
+            } else {
                 return ctx.filter.memberUserId == ctx.user.id;
             }
         }
@@ -93,9 +93,9 @@ export class ProjectPermissionService {
      * query policy by resource and project_role
      * @param filter 
      */
-    async queryPolicy(filter: { resource:string, role:string }) {
+    async queryPolicy(filter: { resource: string, role: string }) {
 
-        return await PermissionPolicyModel.findOne({resource:filter.resource.toLowerCase(),role:filter.role.toLowerCase()}).exec();
+        return await PermissionPolicyModel.findOne({ resource: filter.resource.toLowerCase(), role: filter.role.toLowerCase() }).exec();
     }
 
     /**
@@ -105,7 +105,7 @@ export class ProjectPermissionService {
      */
     async validateInputField(ctx: RequestContext, policy: PermissionPolicy) {
         let checkResult = true;
-        if (ctx.dto  &&  policy.fields?.length ) {
+        if (ctx.dto && policy.fields?.length) {
             const op: number = Number(ctx.method);
             const allowFields = policy.fields.filter(x => (x.policy & op) == op).map(x => x.name);
             for (const fieldName in Object.keys(ctx.dto)) {
@@ -129,16 +129,16 @@ export class ProjectPermissionService {
 
         const { scope, fields } = policy;
         let op = 0;
-        if (ctx.method ==RequestOperation.RETRIEVE){
+        if (ctx.method == RequestOperation.RETRIEVE) {
             op = PermissionOperation.Retrieve;
         }
-        if (ctx.method ==RequestOperation.CREATE){
+        if (ctx.method == RequestOperation.CREATE) {
             op = PermissionOperation.Create;
         }
-        if (ctx.method ==RequestOperation.UPDATE){
+        if (ctx.method == RequestOperation.UPDATE) {
             op = PermissionOperation.Update;
         }
-        if (ctx.method ==RequestOperation.DELETE){
+        if (ctx.method == RequestOperation.DELETE) {
             op = PermissionOperation.Delete;
         }
 
@@ -154,17 +154,17 @@ export class ProjectPermissionService {
      * @param ctx 
      */
     async checkCurrentCURDPolicy(ctx: RequestContext) {
-        let resourceId = ctx.resourceId ;
-        if(!resourceId ){
-            if(ctx.method == RequestOperation.CREATE){
-                resourceId = ctx.dto.parent ;
+        let resourceId = ctx.resourceId;
+        if (!resourceId) {
+            if (ctx.method == RequestOperation.CREATE) {
+                resourceId = ctx.dto.parent;
             }
 
-            if(ctx.method == RequestOperation.RETRIEVE){
-                resourceId = ctx.filter.parents || ctx.filter.parent ;
+            if (ctx.method == RequestOperation.RETRIEVE) {
+                resourceId = ctx.filter.parents || ctx.filter.parent;
             }
         }
-        if (resourceId ) {
+        if (resourceId) {
             //check current
             const resource = await ResourceModel.findById(resourceId).exec();
             const projectId = resource?.parents?.[0] || resource?._id;
@@ -172,9 +172,9 @@ export class ProjectPermissionService {
 
             if (pm == null) return;
 
-            const resourceType =ctx.resourceType ||  (resource as any).__t;
+            const resourceType = ctx.resourceType || (resource as any).__t;
 
-            const policy = await this.queryPolicy({ resource:resourceType, role: pm.projectRole });
+            const policy = await this.queryPolicy({ resource: resourceType, role: pm.projectRole });
 
             if (!policy) {
                 return false;
@@ -186,10 +186,10 @@ export class ProjectPermissionService {
 
             // check assign
             if (policy.scope & PermissionOperation.Assign) {
-                const userObjectId = new Types.ObjectId(ctx.user.id) ;
+                const userObjectId = new Types.ObjectId(ctx.user.id);
                 const where = { _id: ctx.resourceId, assignee: Types.ObjectId(ctx.user.id) };
 
-                if (resource.assignees?.find( x => userObjectId==x ) ) {
+                if (resource.assignees?.find(x => userObjectId == x)) {
 
                     const policy = await this.queryPolicy({ resource: ctx.resourceType, role: "assign" });
 
@@ -202,22 +202,22 @@ export class ProjectPermissionService {
             }
 
             // check inherit
-            if (policy.scope & PermissionOperation.Inherit ) {
-                const parentId = Array(...(resource.parents)).pop() ;
+            if (policy.scope & PermissionOperation.Inherit) {
+                const parentId = Array(...(resource.parents)).pop();
 
                 if (parentId) {
                     // const parentResource = await ResourceModel.findById(ctx.resourceId).exec();
 
 
-                    if (await this.checkCurrentCURDPolicy({...ctx, resourceType:"" ,resourceId:String(parentId),dto:null})) {
+                    if (await this.checkCurrentCURDPolicy({ ...ctx, resourceType: "", resourceId: String(parentId), dto: null })) {
 
-                        const policy = await this.queryPolicy({ resource:resourceType, role: "assign" });
+                        const policy = await this.queryPolicy({ resource: resourceType, role: "assign" });
 
 
                         if (await this.checkPolicyScope(ctx, policy)) {
                             return true;
                         }
-                        
+
                     }
 
                 }
@@ -227,19 +227,19 @@ export class ProjectPermissionService {
 
     }
 
-    async validatePermissionRole(projectId:Types.ObjectId, userId:Types.ObjectId, ...roles:string[]){
-        const pm = await ProjectMemberModel.findOne({projectId,userId}).exec() ;
-        
-        if (pm){
-            if(roles.length == 0) return true ;
+    async validatePermissionRole(projectId: Types.ObjectId, userId: Types.ObjectId, ...roles: string[]) {
+        const pm = await ProjectMemberModel.findOne({ projectId, userId }).exec();
 
-            if( roles.includes(pm.projectRole)) {
+        if (pm) {
+            if (roles.length == 0) return true;
+
+            if (roles.includes(pm.projectRole)) {
                 return true;
             };
-            
-        }   
-        
-        return false ;
+
+        }
+
+        return false;
     }
 
 }

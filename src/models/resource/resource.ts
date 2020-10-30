@@ -155,7 +155,10 @@ export class Resource {
 
   async getMembers(this: DocumentType<Resource>) {
     const projectId = this.parents.length == 0 ? this._id : this.parents[0];
-    return await ProjectMemberModel.find({ projectId }).exec();
+
+    const members = await ProjectMemberModel.find({ projectId }).exec();
+
+    return members.filter(x => x.deleted != true);
   }
 
   async getChildren(this: DocumentType<Resource>) {

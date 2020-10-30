@@ -16,7 +16,7 @@
     "test:login": "mocha --exit  -r ts-node/register ./test/login.test.ts",
     "test:crud": "mocha --exit  -r ts-node/register ./test/crud.test.ts",
     "start": "node ./dist/src/index.js",
-    "dev": "ts-node-dev --watch ./src ./src/index.ts"
+    "dev": "ts-node ./src/index.ts"
   },
   "engines": {
     "node": ">= 10"
@@ -99,7 +99,6 @@
     "routing-controllers-openapi": "^1.8.1",
     "supertest": "^4.0.2",
     "ts-node": "^8.8.1",
-    "ts-node-dev": "^1.0.0-pre.63",
     "tsconfig-paths": "^3.9.0",
     "typedoc": "^0.17.3",
     "typedoc-plugin-external-module-name": "^3.1.0",

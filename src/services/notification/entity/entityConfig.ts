@@ -484,10 +484,16 @@ export const entityConfig: ExpressionRule[] = [
                 ]
             }
         ],
-        actions: [{
-            receiver: "MEMBER",
-            channel: "db,mail"
-        }],
+        actions: [
+            {
+                receiver: "MEMBER",
+                channel: "db,mail"
+            },
+            {
+                receiver: "MEMBER_REMOVE",
+                channel: "db"
+            },
+        ],
     },
     {
         comment: 'SEND EMAIL & NOTIFICATION',

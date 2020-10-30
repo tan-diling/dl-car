@@ -31,20 +31,20 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         const ids = docs.map(x => x._id);
 
-        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId', 'name email image').exec();
+        const pms = await ProjectMemberModel.find({}).where('projectId').in(ids).populate('userId', 'name email image deleted').exec();
 
         const convert = (projects: (Project & Document)[], member: (ProjectMember & Document)[]) => {
             return projects.map(x => {
                 return {
                     ...x.toJSON(),
                     members: member
-                        .filter(y => y.projectId == x.id)
+                        .filter(y => y.projectId == x.id && y.deleted != true)
                         .map(z => {
                             return {
                                 "_id": z._id,
                                 "user": z.userId,
                                 "projectRole": z.projectRole,
-                                // "status":z.status,
+                                "deleted": z.deleted,
                             };
                         })
                 };
