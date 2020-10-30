@@ -40,6 +40,7 @@ export class IdentityService implements IIdentityService {
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
         const user = await this.UserModel.findOne({
             email: { $regex: new RegExp('^' + dto.email + '$', "i") },
+            deleted: false,
         }).exec();
         if (user == null) {
             throw new UnauthorizedError('account_invalid');
