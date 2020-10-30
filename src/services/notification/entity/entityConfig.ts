@@ -473,16 +473,16 @@ export const entityConfig: ExpressionRule[] = [
         type: 'project',
         expressions: [
             // return true, if its current user is site admin  
-            {
-                operator: 'EQ',
-                params: [
-                    {
-                        operator: "VAR",
-                        params: ["user", "role"],
-                    },
-                    "admin",
-                ]
-            }
+            // {
+            //     operator: 'EQ',
+            //     params: [
+            //         {
+            //             operator: "VAR",
+            //             params: ["user", "role"],
+            //         },
+            //         "admin",
+            //     ]
+            // }
         ],
         actions: [
             {

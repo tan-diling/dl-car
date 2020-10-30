@@ -65,7 +65,7 @@ Thank you for joining us!
         const entity = entityContext.entity;
         const project = (entity.parents[0] || entity) as ProjectEntity;
         const entityKey = entity.parents.length == 0 ? `${project.key}` : `${project.key}-${entity.seq}`;
-        const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${entityContext.method}`;
+
         const body = entityContext.req?.body;
         let desc = body?._desc;
 
@@ -94,6 +94,8 @@ Thank you for joining us!
             action = "remove assignee";
             action = action + ` ${body._user.name}`;
         }
+
+        const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${action}`;
 
         let url = '';
         const entityType = entity.type.toLowerCase();

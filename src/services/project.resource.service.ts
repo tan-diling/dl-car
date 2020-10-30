@@ -160,7 +160,9 @@ export class ProjectResourceService extends ResourceService<Project>{
         const pm = await ProjectMemberModel.findOne({ projectId: dto.projectId, userId: dto.userId }).exec();
 
         if (pm != null) {
-            throw new NotAcceptableError('project member already exists');
+            if (pm.deleted == false) {
+                throw new NotAcceptableError('project member already exists');
+            }
         }
 
         const invitation = await InvitationProjectModel.findOne({
