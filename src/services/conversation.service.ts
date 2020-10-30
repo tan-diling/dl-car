@@ -44,7 +44,16 @@ export class ConversationService {
      * 
      */
     async getById(id: string | Types.ObjectId) {
-        return await ConversationModel.findById(id).populate('members').exec();
+        return await ConversationModel
+            .findById(id)
+            .populate({
+                path: 'members',
+                populate: {
+                    select: 'email name image',
+                    path: 'user',
+                }
+            })
+            .exec();
     }
 
     async listConversationStatisticsByUser(user: string | Types.ObjectId) {
