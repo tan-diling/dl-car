@@ -1,73 +1,55 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, Action, UseAfter } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, Action, UseAfter, UseBefore } from 'routing-controllers';
 import { AbstractResourceController, AbstractResourceRelatedController } from './abstractResource.controller';
 import { ResourceType, RequestOperation } from '@app/defines';
-import { Container } from 'typedi' ;
-import {  CommentUpdateDto, CommentCreateDto, CheckListUpdateDto, CheckListCreateDto } from './dto';
+import { Container } from 'typedi';
+import { CommentUpdateDto, CommentCreateDto, CheckListUpdateDto, CheckListCreateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
-import {  CommentResourceService } from '@app/services/resource';
+import { CommentResourceService } from '@app/services/resource';
 import { CheckListResourceService } from '@app/services/resource/checkList.resource.service';
+import { checkResourcePermission } from '@app/middlewares/resourcePermission.middleware';
 
-const type = ResourceType.CheckList ;
+const type = ResourceType.CheckList;
 @Authorized()
 @JsonController('/resource')
-export class CheckListController extends AbstractResourceRelatedController{
+export class CheckListController {
     /**
      *
      */
-    constructor() {
-        super();
-        this.resourceType = type;
-        this.repoService = Container.get(CheckListResourceService) ;
-    }
- 
+    repoService = Container.get(CheckListResourceService);
+
     @Post(`/:parent([0-9a-f]{24})/${type}`)
-    async create(@Param('parent') parent:string, @Body() dto:CheckListCreateDto, @Req() request) {  
-        const obj = { ...dto, creator: request?.user?.id} ;
-        return await this.process(request,{
-            method:RequestOperation.CREATE,
-            dto:{parent, ...obj,}
-        }) ;
+    @UseBefore(...checkResourcePermission({ id: 'parent' }))
+    async create(@Param('parent') parent: string, @Body() dto: CheckListCreateDto, @Req() request) {
+        const obj = { ...dto, creator: request?.user?.id };
+        return await this.repoService.create({ parent, ...obj, });
     }
-    
+
     @Get(`/:parent([0-9a-f]{24})/${type}`)
-    async list(@Param('parent') parent:string, @QueryParams() query:any, @Req() request) {
-        
-        return await this.process(request,{       
-            method:RequestOperation.RETRIEVE,
-            filter:{...query,parent:parent},
-            // dto
-        }) ;
+    @UseBefore(...checkResourcePermission({ id: 'parent' }))
+    async list(@Param('parent') parent: string, @QueryParams() query: any, @Req() request) {
+
+        return await this.repoService.list({ ...query, parent: parent });
 
     }
-        
+
     @Get(`/${type}/:id([0-9a-f]{24})`)
-    async getById(@Param('id') id:string, @Req() request) {
+    @UseBefore(...checkResourcePermission({ type, }))
+    async getById(@Param('id') id: string, @Req() request) {
         // return await this.repoService.get(id) ;
-        return await this.process(request,{ 
-            resourceId: id,      
-            method:RequestOperation.RETRIEVE,
-            filter:{_id:id, memberUserId:request.user.id},
-            // dto
-        }) ;
-
+        return await this.repoService.get(id);
     }
-    
+
     @Patch(`/${type}/:id([0-9a-f]{24})`)
-    async update(@Param('id') id:string, @Body() dto:CheckListUpdateDto, @Req() request, ) {
-        return await this.process(request,{         
-            resourceId: id,
-            method:RequestOperation.UPDATE,    
-            dto        
-        }) ;
+    @UseBefore(...checkResourcePermission({ type, }))
+    async update(@Param('id') id: string, @Body() dto: CheckListUpdateDto, @Req() request, ) {
+        return await this.repoService.update(id, dto);
     }
 
     @Delete(`/${type}/:id([0-9a-f]{24})`)
-    async delete(@Param('id') id:string, @Req() request,) {
-        return await this.process(request,{           
-            resourceId: id,
-            method:RequestOperation.DELETE,            
-        }) ;
+    @UseBefore(...checkResourcePermission({ type, }))
+    async delete(@Param('id') id: string, @Req() request, ) {
+        return await this.repoService.delete(id);
     }
 
 }
