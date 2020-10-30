@@ -189,7 +189,7 @@ export class ConversationService {
             const user1Member = members.find(x => String(x.user) == String(user1));
             const user2Member = members.find(x => String(x.user) == String(user2));
 
-            if (user1 && user2) {
+            if (user1Member != null && user2Member != null) {
                 return conversation;
             }
         }
