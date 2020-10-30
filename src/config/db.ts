@@ -20,7 +20,8 @@ dbInitData.push({
                 "password": "Dealing.123",
                 "emailValidated": true,
                 "company": "Gestalter",
-                "role": "admin"
+                "role": "admin",
+                "deleted": false,
             }
         }
     ]
