@@ -3,34 +3,40 @@ import { Type } from 'class-transformer';
 import { GroupRole, MemberStatus, ActionStatus } from '@app/defines';
 
 export class ConversationDto {
-        
+
     @IsString()
-    title: string;    
+    title: string;
 
     @IsString()
     @IsOptional()
-    image?: string;    
+    image?: string;
 
 
-    @IsMongoId({each:true})
-    users?: string[];    
+    @IsMongoId({ each: true })
+    users?: string[];
 }
 
 export class UpdateConversationDto {
-        
+
     @IsString()
-    title: string;    
+    title: string;
 
     @IsString()
     @IsOptional()
-    image?: string;    
+    image?: string;
 
 
 }
 
 
 export class ConversationUserDto {
-        
+
     @IsMongoId()
-    user: string;    
+    user: string;
+}
+
+export class ConversationUsersDto {
+
+    @IsMongoId({ each: true })
+    users?: string[];
 }

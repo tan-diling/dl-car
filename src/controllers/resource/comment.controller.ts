@@ -9,17 +9,12 @@ import { CommentResourceService } from '@app/services/resource';
 import { checkResourcePermission } from '@app/middlewares/resourcePermission.middleware';
 
 const type = ResourceType.Comment;
-// @Authorized()
 @JsonController('/resource')
-export class CommentController extends AbstractResourceRelatedController {
+export class CommentController {
     /**
      *
      */
-    constructor() {
-        super();
-        this.resourceType = type;
-        this.repoService = Container.get(CommentResourceService);
-    }
+    repoService = Container.get(CommentResourceService);
 
     @Post(`/:parent([0-9a-f]{24})/${type}`)
     @UseBefore(...checkResourcePermission({ id: 'parent' }))
@@ -27,21 +22,13 @@ export class CommentController extends AbstractResourceRelatedController {
 
         const obj = { ...dto, parent, creator: request?.user?.id };
         return await this.repoService.create(obj);
-        return await this.process(request, {
-            method: RequestOperation.CREATE,
-            dto: { parent, ...obj, }
-        });
+
     }
 
     @Get(`/:parent([0-9a-f]{24})/${type}`)
     @UseBefore(...checkResourcePermission({ id: 'parent' }))
     async list(@Param('parent') parent: string, @QueryParams() query: any, @Req() request) {
         return await this.repoService.list({ ...query, parent: parent });
-        return await this.process(request, {
-            method: RequestOperation.RETRIEVE,
-            filter: { ...query, parent: parent },
-            // dto
-        });
 
     }
 
@@ -50,12 +37,6 @@ export class CommentController extends AbstractResourceRelatedController {
     async getById(@Param('id') id: string, @Req() request) {
         // return await this.repoService.get(id) ;
         return await this.repoService.get(id);
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.RETRIEVE,
-            filter: { _id: id, memberUserId: request.user.id },
-            // dto
-        });
 
     }
 
@@ -63,21 +44,14 @@ export class CommentController extends AbstractResourceRelatedController {
     @UseBefore(...checkResourcePermission({ type }))
     async update(@Param('id') id: string, @Body() dto: CommentUpdateDto, @Req() request, ) {
         return this.repoService.update(id, dto)
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.UPDATE,
-            dto
-        });
+
     }
 
     @Delete(`/${type}/:id([0-9a-f]{24})`)
     @UseBefore(...checkResourcePermission({ type }))
     async delete(@Param('id') id: string, @Req() request, ) {
         return await this.repoService.delete(id);
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.DELETE,
-        });
+
     }
 
 }

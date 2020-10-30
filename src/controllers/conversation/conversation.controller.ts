@@ -4,7 +4,7 @@ import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryPara
 import * as moment from 'moment';
 import { SiteRole, RequestContext, RequestOperation } from '@app/defines';
 import { ConversationService } from '@app/services';
-import { ConversationDto, ConversationUserDto, UpdateConversationDto } from './dto/conversation.dto';
+import { ConversationDto, ConversationUserDto, UpdateConversationDto, ConversationUsersDto } from './dto/conversation.dto';
 
 
 
@@ -67,6 +67,20 @@ export class ConversationController {
         await this.service.removeMember(id, [dto.user], currentUser.id);
         return await this.getById(id);
     }
+
+
+    @Post('/:id([0-9a-f]{24})/members')
+    async appendMembers(@Param('id') id: string, @Body() dto: ConversationUsersDto, @Req() request, @CurrentUser() currentUser) {
+        await this.service.appendMember(id, dto.users, currentUser.id);
+        return await this.getById(id);
+    }
+
+    @Delete('/:id([0-9a-f]{24})/members')
+    async removeMembers(@Param('id') id: string, @Body() dto: ConversationUsersDto, @Req() request, @CurrentUser() currentUser) {
+        await this.service.removeMember(id, dto.users, currentUser.id);
+        return await this.getById(id);
+    }
+
 
 
 }
