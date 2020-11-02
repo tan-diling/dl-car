@@ -167,10 +167,8 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         const invitation = await InvitationProjectModel.findOne({
 
-            data: {
-                userId: dto.userId,
-                projectId: dto.projectId,
-            },
+            "data.userId": dto.userId,
+            "data.projectId": dto.projectId,
             status: ActionStatus.Pending,
         }).exec();
         if (invitation != null) {

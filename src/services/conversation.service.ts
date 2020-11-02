@@ -1,13 +1,9 @@
 import { DocumentType } from '@typegoose/typegoose';
 import { ModelQueryService } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
-import * as randToken from 'rand-token';
 import { UserModel, User } from '../models/user';
-import { RepoOperation, SiteRole } from '@app/defines';
 import { Types, CreateQuery } from 'mongoose';
 import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember, Conversation } from '@app/models';
-import { compileFunction } from 'vm';
-import { timingSafeEqual } from 'crypto';
 import { DbService } from './db.service';
 import { logger } from '@app/config';
 
@@ -255,9 +251,17 @@ export class ConversationService {
 
 
     async createActionMessage(dto: { conversation: string | Types.ObjectId, sender: string | Types.ObjectId, user: string | Types.ObjectId, time: Date, type: "enter" | "leave" | "read" | "typing" | string }, save = true) {
-        const { conversation, sender, ...data } = dto;
+        let { conversation, sender, ...data } = dto;
         // const save = data.type == 'enter' || 'leave' == data.type;
-        return await this.createMessage({ conversation, sender, type: 'action', data }, save);
+        if ('enter' == data.type) {
+            const user = await UserModel.findById(data.user).exec();
+
+            return await this.createMessage({ conversation, sender, type: 'action', data: { ...data, enter_user: user?.getBaseInfo() } }, save);
+
+        } else {
+            return await this.createMessage({ conversation, sender, type: 'action', data }, save);
+        }
+
     }
 
 

@@ -35,7 +35,7 @@ export const chatBot = async (socket: ServerIO.Socket) => {
 
 export const useChatBot = (io: ServerIO.Server) => {
     io
-        .of('/api/notification')
+        .of('/api/chatbot')
         .on('connect', chatBot);
 
     ChatContext.startMessageProcess();

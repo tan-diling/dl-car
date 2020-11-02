@@ -94,6 +94,7 @@ export class InvitationContact extends PendingAction {
   // @prop({ enum: InvitationType })
   // inviteType: InvitationType; //enum:group，contact, project ,
 
+  @prop()
   data: ContactInvitationData;
 
   async changeStatus(this: DocumentType<InvitationContact>, status: ActionStatus) {
@@ -118,6 +119,7 @@ export class InvitationGroup extends PendingAction {
   // @prop({ enum: InvitationType })
   // inviteType: InvitationType; //enum:group，contact, project ,
 
+  @prop()
   data: GroupInvitationData;
 
   async changeStatus(this: DocumentType<InvitationGroup>, status: ActionStatus) {
@@ -142,6 +144,7 @@ export class InvitationProject extends PendingAction {
   // @prop({ enum: InvitationType })
   // inviteType: InvitationType; //enum:group，contact, project ,
 
+  @prop()
   data: ProjectInvitationData;
 
   async changeStatus(this: DocumentType<InvitationProject>, status: ActionStatus) {

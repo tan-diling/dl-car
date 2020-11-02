@@ -1,4 +1,4 @@
-import { config_get } from './config';
+import { config_get, DEBUG } from './config';
 
 import { ResourceType, PermissionOperation, ProjectRole } from '@app/defines';
 
@@ -137,4 +137,6 @@ dbInitData.push({
 });
 
 export const DB_DATA_INIT = dbInitData;
+
+export const DB_DEBUG = DEBUG;
 

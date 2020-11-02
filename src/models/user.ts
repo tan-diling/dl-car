@@ -1,4 +1,4 @@
-import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
+import { prop, Ref, plugin, getModelForClass, DocumentType, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 
 import * as mongooseHidden from 'mongoose-hidden';
 import { SiteRole } from '@app/defines';
@@ -73,6 +73,15 @@ export class User {
     return this.emailValidated &&
       (!this.deleted) &&
       this.role != '';
+  }
+
+  getBaseInfo(this: DocumentType<User>) {
+    return {
+      _id: this._id,
+      name: this.name,
+      email: this.email,
+      image: this.image,
+    }
   }
 
 
