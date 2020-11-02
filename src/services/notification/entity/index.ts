@@ -48,7 +48,7 @@ export const processEntityNotification = async (request, type, id, method) => {
         }
 
         const notificationService = Container.get(NotificationService);
-        await notificationService.publish(NotificationTopic.Entity, ctx.method, { ...data, req: requestInfo }, ctx.user.id);
+        await notificationService.publish(NotificationTopic.Entity, ctx.method, { ...ctx, req: requestInfo }, ctx.user.id);
     }
     // await executor.executeEval(ctx, entityConfig);
 
