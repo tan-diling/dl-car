@@ -40,3 +40,13 @@ export class ConversationUsersDto {
     @IsMongoId({ each: true })
     users?: string[];
 }
+
+
+export class UpdateConversationMembersDto {
+
+    @IsMongoId({ each: true })
+    appendIds?: string[];
+
+    @IsMongoId({ each: true })
+    removeIds?: string[];
+}

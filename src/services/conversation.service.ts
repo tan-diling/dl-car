@@ -261,7 +261,6 @@ export class ConversationService {
         } else {
             return await this.createMessage({ conversation, sender, type: 'action', data }, save);
         }
-
     }
 
 

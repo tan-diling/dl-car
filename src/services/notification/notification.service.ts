@@ -10,6 +10,7 @@ import { Types } from 'mongoose';
 import { EventModel, NotificationModel } from '@app/models/notification';
 import { notificationConfig } from './notification.config';
 import { NotificationSenderInterface, executeNotificationSend } from './sender';
+import { logger } from '@app/config';
 
 /**
  * Notification service
@@ -46,6 +47,12 @@ export class NotificationService {
 
 
     async publish(type: NotificationTopic | string, action: NotificationAction | string, data: any, sender: Types.ObjectId) {
+
+        const user = await UserModel.findById(sender).exec();
+        if (user == null) {
+            logger.error("event publish sender error");
+            return;
+        }
 
         const ev = await EventModel.create({ sender, type, action, data })
         const expressionEval = (data) => {

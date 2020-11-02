@@ -67,7 +67,7 @@ Thank you for joining us!
         const entityKey = entity.parents.length == 0 ? `${project.key}` : `${project.key}-${entity.seq}`;
 
         const body = entityContext.req?.body;
-        let desc = body?._desc;
+        let desc = body?._desc || "";
 
         const updateList = [];
         if (body) {
@@ -78,21 +78,23 @@ Thank you for joining us!
             }
         }
 
-        desc = desc || updateList.join('\n') || "";
-
         let action = entityContext.method;
         if (action == "member.append") {
-            action = "append member";
+            action = "add member";
             action = action + ` ${body._user.name}`;
         } else if (action == "member.remove") {
-            action = "remove member";
+            action = "delete member";
             action = action + ` ${body._user.name}`;
         } else if (action == "assignee.append") {
-            action = "append assignee";
+            action = "add assignee";
             action = action + ` ${body._user.name}`;
         } else if (action == "assignee.remove") {
-            action = "remove assignee";
+            action = "delete assignee";
             action = action + ` ${body._user.name}`;
+        } else {
+            if (updateList.length > 0) {
+                desc = updateList.join('\n');
+            }
         }
 
         const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${action}`;

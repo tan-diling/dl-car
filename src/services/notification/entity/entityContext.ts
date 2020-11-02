@@ -66,6 +66,7 @@ export interface ProjectMember {
 export interface CurrentUser {
     id: string;
     name: string;
+    // email: string;
     projectRole: string;
 }
 
