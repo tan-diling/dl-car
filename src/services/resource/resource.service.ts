@@ -164,27 +164,6 @@ export class ResourceService<T extends Resource | ResourceRelatedBase> implement
         throw new Error(`${method} not support!`);
     };
 
-    // async publishNotification(id:Types.ObjectId,sender:Types.ObjectId,action: NotificationAction){
-    //     const doc = await ResourceModel.findById(id).populate('parents').exec() ;
-
-    //     const data = {...doc.toJSON(),members: await doc.getMembers()};
-
-
-    //     await notificationService.publish(NotificationTopic.Project, action, data , sender ) ;
-
-    // }
 
 }
-
-
-// export function createResourceRepoService(
-//     resourceType: ResourceType| string ,
-//   ): RepoCRUDInterface
-//   {
-//       if (resourceType == ResourceType.Project) {
-
-//           return new ProjectResourceService() ;
-//       }
-
-//   }  
 

@@ -8,6 +8,7 @@ import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 export const userCheckMiddleware = (...roles: string[]) => {
 
     function middle(request: Request, response: any, next?: (err?: any) => any): any {
+        console.log('user check ...');
         const id = (request.user as any)?.id;
         if (id) {
             const userService = Container.get(UserService);
@@ -16,13 +17,17 @@ export const userCheckMiddleware = (...roles: string[]) => {
                     if (x && x.isNormal()) {
                         console.log('user check ok ');
                         next();
-                    }
-                    else {
+                    } else {
                         next(new UnauthorizedError('user db check error'));
                     }
                 })
+                .catch(err => {
+                    next(err);
+                })
+        } else {
+            next(new UnauthorizedError('user not exist'));
         }
-        next();
+
     }
 
     return middle;

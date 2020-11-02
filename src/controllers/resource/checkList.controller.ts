@@ -10,7 +10,6 @@ import { CheckListResourceService } from '@app/services/resource/checkList.resou
 import { checkResourcePermission } from '@app/middlewares/resourcePermission.middleware';
 
 const type = ResourceType.CheckList;
-@Authorized()
 @JsonController('/resource')
 export class CheckListController {
     /**

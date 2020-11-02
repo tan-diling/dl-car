@@ -12,6 +12,7 @@ export function entityNotificationInterceptor(method: EntityMethodType = 'update
             console.log(`entityInterceptor ${type}: ${id}, ${method}`);
 
             await processEntityNotification(action.request, type, id, method);
+
         }
 
         return content;

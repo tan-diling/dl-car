@@ -2,6 +2,7 @@
 import passport = require('passport');
 import { StrategyOptions, ExtractJwt, Strategy } from 'passport-jwt';
 import { logger, JWT_OPTION } from '@app/config';
+import { UnauthorizedError } from 'routing-controllers';
 
 const jwtOption = JWT_OPTION;
 
@@ -42,7 +43,7 @@ export const jwtAuthenticate = (request: Request, response: any, next) => {
         }
 
         if (!user) {
-            next({ error: 'jwt user　error' });
+            next(new UnauthorizedError("jwt error"));
             return;
         }
 
