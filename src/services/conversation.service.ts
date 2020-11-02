@@ -256,7 +256,7 @@ export class ConversationService {
         if ('enter' == data.type) {
             const user = await UserModel.findById(data.user).exec();
 
-            return await this.createMessage({ conversation, sender, type: 'action', data: { ...data, enter_user: user?.getBaseInfo() } }, save);
+            return await this.createMessage({ conversation, sender, type: 'action', data: { ...data, enterUser: user?.getBaseInfo() } }, save);
 
         } else {
             return await this.createMessage({ conversation, sender, type: 'action', data }, save);
