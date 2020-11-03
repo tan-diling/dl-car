@@ -371,7 +371,7 @@ export class GroupService {
         }).exec();
 
         if (groupMember != null) {
-            throw new NotAcceptableError('group member already exists');
+            throw new NotAcceptableError('Group member already exists');
         }
 
 
@@ -381,7 +381,7 @@ export class GroupService {
             status: ActionStatus.Pending,
         }).exec();
         if (invitation != null) {
-            throw new NotAcceptableError("Invitation Exists");
+            throw new NotAcceptableError("Group invitation already sent out, pending for action.");
         }
 
         return await this.actionService.create(InvitationGroupModel, {

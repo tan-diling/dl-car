@@ -87,3 +87,59 @@ google username: dl@testmvp.com
 additional linked email alias: onwards.admin@testmvp.com
 
 pw:Zt:[1nY{/LDh4r
+
+```
+nginx config for socketio
+================================================================
+upstream socket_nodes{
+    ip_hash;
+    server localhost:3000 ;
+}
+
+
+server {
+    listen 80;
+    listen [::]:80;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name dev.onwards.ai _;
+
+  ...
+
+
+    location  /socket.io {
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_pass http://socket_nodes;
+    }
+
+    location  /api/chatbot {
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_pass http://socket_nodes;
+    }
+}    
+
+=============================================================
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c wss://dev.onwards.ai/socket.io/?transport=websocket
+error: Unexpected server response: 400
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://dev.onwards.ai/socket.io/?transport=websocket
+error: Unexpected server response: 301
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://127.0.0.1/socket.io/?transport=websocket
+Connected (press CTRL+C to quit)
+< 0{"sid":"ezaXyZnPQXnayw-hAAHm","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
+< 40
+> [tan@c1-mean-dl05-onwards-ai ~]$ ^C
+[tan@c1-mean-dl05-onwards-ai ~]$ ping dev.onwards.ai
+PING dev.onwards.ai (66.27.53.100) 56(84) bytes of data.
+64 bytes from mail.rysonate.com (66.27.53.100): icmp_seq=1 ttl=64 time=0.202 ms
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://66.27.53.100/socket.io/?transport=websocket
+error: Unexpected server response: 404
+```

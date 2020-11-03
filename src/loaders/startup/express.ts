@@ -6,28 +6,29 @@
  */
 
 import * as express from 'express';
-import * as httpContext from 'express-http-context' ;
+import * as httpContext from 'express-http-context';
 import * as bodyParser from 'body-parser';
-import { useExpressServer, Action ,useContainer } from 'routing-controllers';
+import { useExpressServer, Action, useContainer } from 'routing-controllers';
 import { ErrorMiddleware } from './errorMiddleware';
 import { BackendServer } from '../server';
-import * as jwt from 'jsonwebtoken' ;
-import {Container} from "typedi";
+import * as jwt from 'jsonwebtoken';
+import { Container } from "typedi";
 import { userCheck, initPassport } from './passport';
+// import { errorMiddleware } from '@app/middlewares/error.middleware';
 
-function useHttpContext(app:express.Application) {
-  function httpContextMiddleware(req,res,next){
+function useHttpContext(app: express.Application) {
+  function httpContextMiddleware(req, res, next) {
     httpContext.ns.bindEmitter(req);
     // httpContext.ns.bindEmitter(res);
-    httpContext.set("httpRequest",req) ;
+    httpContext.set("httpRequest", req);
     // httpContext.set("httpResponse",res) ;
     next();
   };
 
 
-  app.use(httpContext.middleware);  
+  app.use(httpContext.middleware);
 
-  app.use(httpContextMiddleware);  
+  app.use(httpContextMiddleware);
 };
 
 export default (server: BackendServer) => {
@@ -36,12 +37,12 @@ export default (server: BackendServer) => {
    * @TODO Explain why they are here
    */
 
-  useContainer(Container) ;
+  useContainer(Container);
 
-  const app = server.expressApp ;
+  const app = server.expressApp;
 
   // app.use(httpContext.middleware);
-  useHttpContext(app) ;
+  useHttpContext(app);
 
   app.get('/status', (req, res) => {
     res.status(200).end();
@@ -51,43 +52,43 @@ export default (server: BackendServer) => {
   // It shows the real origin IP in the heroku or Cloudwatch logs
   app.enable('trust proxy');
 
-//   // The magic package that prevents frontend developers going nuts
-//   // Alternate description:
-//   // Enable Cross Origin Resource Sharing to all origins by default
-//   app.use(cors());
+  //   // The magic package that prevents frontend developers going nuts
+  //   // Alternate description:
+  //   // Enable Cross Origin Resource Sharing to all origins by default
+  //   app.use(cors());
 
-//   // Some sauce that always add since 2014
-//   // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
-//   // Maybe not needed anymore ?
-//   app.use(require('method-override')());
+  //   // Some sauce that always add since 2014
+  //   // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
+  //   // Maybe not needed anymore ?
+  //   app.use(require('method-override')());
 
   // Middleware that transforms the raw string of req.body into json
-  app.use(bodyParser.json({limit: '5mb',}))
-  app.use(bodyParser.urlencoded({limit: '5mb', extended: true}))  
+  app.use(bodyParser.json({ limit: '5mb', }))
+  app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }))
 
-  initPassport(app) ;
+  initPassport(app);
   app.get("/", function (req: any, res: any) {
     res.send("hello express");
-});
+  });
 
 
-require('class-transformer')['classToPlain'] = function (obj: object)  {
+  require('class-transformer')['classToPlain'] = function (obj: object) {
     return obj == null ? "" : JSON.parse(JSON.stringify(obj))
-};
+  };
 
-useExpressServer(app, { // register created express server in routing-controllers
+  useExpressServer(app, { // register created express server in routing-controllers
     routePrefix: '/api',
     classTransformer: true,
     validation: {
-        whitelist: true,
-        validationError: { target: false },
+      whitelist: true,
+      validationError: { target: false },
     },
-    controllers: [  ...server.controllers ] , // and configure it the way you need (controllers, validation, etc.)
-    middlewares: [ ErrorMiddleware ],    
+    controllers: [...server.controllers], // and configure it the way you need (controllers, validation, etc.)
+    middlewares: [ErrorMiddleware],
     // controllers: [__dirname + "/../controller/*Controller.js"],
     // middlewares: [__dirname + "/../middleware/*Middleware.js"],
     defaultErrorHandler: false,
-    authorizationChecker: userCheck ,
+    authorizationChecker: userCheck,
     //  (action: Action) => new Promise<boolean>((resolve, reject) => {
     //   passport.authenticate('jwt', (err, user) => {
     //     if (err) {
@@ -118,7 +119,7 @@ useExpressServer(app, { // register created express server in routing-controller
     //   if (user) {
     //     if(user.exp && user.exp < Date.now()){
     //       action.response.status(401).json({error:'TokenExpiredError'}).end();     
-          
+
     //       return  ;        
     //     }
 
@@ -126,31 +127,31 @@ useExpressServer(app, { // register created express server in routing-controller
 
     //     const currentRole: string =  user?.permission || user?.role ;
     //     const userRoles:Array<string>  = [currentRole] ;
-         
+
     //     if (userRoles && roles.find(x => userRoles.indexOf(x) !== -1))
     //         return true;
 
     //   }
-            
+
     //   return false;
     // },
 
     defaults: {
       //with this option, null will return 404 by default
       nullResultCode: 404,
-      
+
       //with this option, void or Promise<void> will return 204 by default 
       undefinedResultCode: 204,
-      
+
       paramOptions: {
-          //with this option, argument will be required by default
-          required: true
+        //with this option, argument will be required by default
+        required: true
       }
-  }
+    }
 
-   
 
-});
+
+  });
 
 
 };

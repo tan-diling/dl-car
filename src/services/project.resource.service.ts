@@ -161,7 +161,7 @@ export class ProjectResourceService extends ResourceService<Project>{
 
         if (pm != null) {
             if (pm.deleted == false) {
-                throw new NotAcceptableError('project member already exists');
+                throw new NotAcceptableError('Project member already exists.');
             }
         }
 
@@ -172,7 +172,7 @@ export class ProjectResourceService extends ResourceService<Project>{
             status: ActionStatus.Pending,
         }).exec();
         if (invitation != null) {
-            throw new NotAcceptableError("Invitation Exists");
+            throw new NotAcceptableError("Project invitation already sent out, pending for action.");
         }
 
         return await this.actionService.create(InvitationProjectModel, {

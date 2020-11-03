@@ -43,6 +43,7 @@ export class UserService {
             }
         } else {
             user = new UserModel(dto);
+            await user.save();
         }
 
         if (user.role != '') {

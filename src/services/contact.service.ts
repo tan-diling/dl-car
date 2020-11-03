@@ -77,7 +77,7 @@ export class ContactService {
     private async inviteContactByUser(inviter: string, invitee: Types.ObjectId) {
         // const contactUserObjectId = Types.ObjectId(contactUser) ;
         if (inviter == String(invitee)) {
-            throw new NotAcceptableError("contact add self error");
+            throw new NotAcceptableError(" Can not add yourself into the contacts.");
         }
 
         const user = await this.userService.getById(inviter);
@@ -91,7 +91,7 @@ export class ContactService {
         const contact = await ContactModel.findOne({ userId: inviter, contact: invitee }).exec();
 
         if (contact != null) {
-            throw new NotAcceptableError("contact exists");
+            throw new NotAcceptableError("Contact already exists.");
         }
 
         const invitationData = {
@@ -108,7 +108,7 @@ export class ContactService {
         ).exec();
 
         if (invitation != null) {
-            throw new NotAcceptableError("Invitation Exists");
+            throw new NotAcceptableError("Contact invitation already sent out, pending for action.");
         }
 
         return await this.actionService.create(InvitationContactModel, {
@@ -129,8 +129,11 @@ export class ContactService {
      * invite sb to user's contact by email
      * @param dto 
      */
-    async inviteContact(dto: { userId, email }) {
+    async inviteContact(dto: { userId: string, email: string }) {
         const contactUser = await this.userService.getUserByEmailForce(dto.email);
+        if (contactUser == null) {
+            throw new NotFoundError('Contact not exists');
+        }
 
         return await this.inviteContactByUser(dto.userId, contactUser._id);
 
