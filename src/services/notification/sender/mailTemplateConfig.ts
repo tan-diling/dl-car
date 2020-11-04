@@ -92,8 +92,10 @@ Thank you for joining us!
             action = "delete assignee";
             action = action + ` ${body._user.name}`;
         } else {
-            if (updateList.length > 0) {
-                desc = updateList.join('\n');
+            if (desc == "") {
+                if (updateList.length > 0) {
+                    desc = updateList.join('\n');
+                }
             }
         }
 
