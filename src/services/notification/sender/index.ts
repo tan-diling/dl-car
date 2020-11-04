@@ -14,6 +14,7 @@ export async function executeNotificationSend(cfg: NotificationSenderConfigInter
     switch (executor) {
         case "db":
             await dbNotificationSender.execute(options);
+            break;
         case "socket":
             await socketNotificationSender.execute(options);
             break;
