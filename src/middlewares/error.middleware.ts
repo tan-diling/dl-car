@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpError } from 'routing-controllers';
 import { ValidationError } from 'class-validator';
-import { errorMessage } from '@app/config';
+import { errorMessage, logger } from '@app/config';
 
 export function errorMiddleware(error: any, request: Request, response: Response, next: NextFunction) {
     if (response.headersSent) return;
@@ -32,6 +32,7 @@ export function errorMiddleware(error: any, request: Request, response: Response
                 .end();
         }
     } else if (error instanceof Error) {
+        logger.error(error);
         response.status(500)
             .json({
                 errorCode: 'internal_server_error',
@@ -39,6 +40,7 @@ export function errorMiddleware(error: any, request: Request, response: Response
             })
             .end();
     } else {
+        logger.error(error);
         response.status(501)
             .json({
                 errorCode: 'unknown_error',

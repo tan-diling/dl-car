@@ -20,7 +20,7 @@ export class GroupCreateDto {
 
 
 export class CreateGroupMemberDto {
-    @IsEmail()    
+    @IsEmail()
     email: string;
 
     @IsEnum(GroupRole)
@@ -34,7 +34,7 @@ export class UpdateGroupMemberDto {
 }
 
 export class DeleteGroupMemberDto {
-    @IsEmail()    
+    @IsEmail()
     email: string;
 
 }
@@ -45,7 +45,7 @@ export class GroupMemberInvitedResponseDto {
 
     @IsString()
     @IsOptional()
-    status?:string ;
+    status?: string;
 }
 
 
@@ -62,5 +62,5 @@ export class GroupUpdateDto {
     // @Type(()=>GroupMemberDto)
     // @IsOptional()
     // members?: GroupMemberDto[]
-   
+
 }

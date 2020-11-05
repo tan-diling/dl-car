@@ -3,7 +3,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { NotFoundError, NotAcceptableError, UnauthorizedError, MethodNotAllowedError } from 'routing-controllers';
 import { GroupModel, Group, GroupMemberModel, GroupMember, InvitationGroupModel } from '../models';
 import { GroupRole, GroupMemberStatus, RequestContext, RequestOperation, SiteRole, RepoOperation, MemberStatus, ActionStatus, NotificationTopic, NotificationAction } from '@app/defines';
-import { model, Types } from 'mongoose';
+import { model, Types, UpdateQuery } from 'mongoose';
 import { UserModel } from '../models';
 import { Container } from 'typedi';
 import { NotificationService } from './notification';
@@ -149,19 +149,17 @@ export class GroupService {
      * create an new group
      * @param dto 
      */
-    async create(dto: { name: string, description: string, owner: string, email: string }) {
-        const { email, ...groupDto } = dto;
+    async create(dto: { name: string, description: string, owner: string }) {
+        // const  = dto;
         // groupDto.owner = groupDto.owner || user._id
 
-        const group = new GroupModel(groupDto);
+        const group = new GroupModel(dto);
         await group.save();
 
         await GroupMemberModel.create({
             groupId: group._id,
             userId: group.owner,
-            // email: dto.email,
             groupRole: GroupRole.Admin,
-            // status: GroupMemberStatus.Confirmed,
         });
 
         // GroupModel.emit(Operation.Created, group) ;
@@ -173,19 +171,25 @@ export class GroupService {
      * @param query 
      */
     async list(query: any) {
-        let { memberUserId, ...filter } = query;
-        if (memberUserId) {
-            const pms = await GroupMemberModel.find({ userId: memberUserId }).exec();
-            if (pms.length == 0)
-                return [];
-            const ids = pms.map(x => String(x.groupId));
-            filter = { ...filter, _id: ids };
-        }
-        const groupList = await this.queryService.list(GroupModel, filter);
+
+        const groupList = await this.queryService.list(GroupModel, query);
 
         return await this.getGroupMembers(groupList as DocumentType<Group>[]);
     }
 
+    /**
+     *  list by member
+     * @param query 
+     */
+    async listByMember(member: string, query: any) {
+        const pms = await GroupMemberModel.find({ userId: member }).exec();
+        if (pms.length == 0) {
+            return [];
+        }
+        const ids = pms.map(x => String(x.groupId));
+        return await this.list({ ...query, _id: ids });
+
+    }
 
 
     /**
@@ -206,7 +210,7 @@ export class GroupService {
      * @param id  id
      * @param dto 
      */
-    async update(id: string, dto: DocumentType<Group>) {
+    async update(id: string, dto: UpdateQuery<DocumentType<Group>>) {
         let doc = await this.getById(id);
         if (doc) {
             doc = GroupModel.findByIdAndUpdate(id, dto, { new: true }).exec();

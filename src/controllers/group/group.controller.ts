@@ -1,216 +1,84 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, OnNull, OnUndefined } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, OnNull, OnUndefined, UseBefore } from 'routing-controllers';
 
 import * as moment from 'moment';
 import { GroupUpdateDto, GroupCreateDto, CreateGroupMemberDto, DeleteGroupMemberDto, GroupMemberInvitedResponseDto } from './dto/group.dto';
 import { GroupService } from '../../services/group.service';
-import { SiteRole, RequestContext, RequestOperation } from '@app/defines';
+import { SiteRole, RequestContext, RequestOperation, GroupRole } from '@app/defines';
+import { checkGroupPermission } from '@app/middlewares/groupPermission.middleware';
 
 
-const resourceType = 'group' ;
+const resourceType = 'group';
 
-@Authorized()
+// @Authorized()
 @JsonController('/group')
 export class GroupController {
     constructor(private service: GroupService) {
     }
 
-    // async checkPermission(ctx: RequestContext) {
 
-    //     return await this.service.checkPermission(ctx) ;
-
-    //     switch (ctx.method) {
-    //         case RequestOperation.CREATE:
-    //             break;
-    //         case RequestOperation.RETRIEVE:
-    //             if (ctx.user?.role == 'admin')
-    //                 return;
-
-    //             if (ctx.user?.id != ctx.filter?.memberUserId)
-    //                 throw new MethodNotAllowedError('permission check error');
-
-    //             break;
-    //         case RequestOperation.UPDATE:
-    //             // 'admin' site_user can update all
-    //             if (ctx.user?.role == 'admin')
-    //                 return;
-
-    //             // // other site_user can update his/her self information
-    //             // if (ctx.user?.id != ctx.filter?.owner)
-    //             //     throw new MethodNotAllowedError('permission check error');
-
-    //             // // user info:"role" , "defaultContact" maintained by 'admin'
-    //             // if (ctx.dto?.role != null || ctx.dto?.defaultContact != null)
-    //             //     throw new MethodNotAllowedError('permission check error');
-    //             break;
-    //         case RequestOperation.DELETE:
-    //             if (ctx.user?.id == ctx.filter?.owner)
-    //                 throw new MethodNotAllowedError('permission check: cannot delete self');
-    //             break;
-    //         default:
-    //             throw new InternalServerError('check permission error');
-    //     }
-    // }
-
-    async processRequest(ctx: RequestContext) {
-        await this.service.checkPermission(ctx) ;
-
-        if (ctx.request.path.endsWith('/member')) {            
-            switch (ctx.method) {
-                case RequestOperation.CREATE:
-                    return await this.service.appendMember(ctx.filter.id, ctx.dto);
-                    break;
-                case RequestOperation.RETRIEVE:
-                    return this.service.listMember(ctx.filter.id);
-                    break;
-                case RequestOperation.DELETE:
-                    return await this.service.deleteMember(ctx.filter.id, ctx.dto);
-                    break;
-                case RequestOperation.UPDATE:
-
-
-                    break;
-            }
-
-        }
-        else 
-        {
-            switch (ctx.method) {
-                case RequestOperation.CREATE:
-
-                    return await this.service.create(ctx.dto);
-                    break;
-                case RequestOperation.RETRIEVE:
-                    if (ctx.resourceId){
-                        return await this.service.getById(ctx.resourceId) ;
-                    } else {
-                        return await this.service.list(ctx.filter);
-                    }
-                    break;
-                case RequestOperation.DELETE:
-
-                    return await this.service.delete(ctx.filter.id);
-                    break;
-                case RequestOperation.UPDATE:
-
-                    return await this.service.update(ctx.filter.id, ctx.dto);
-                    break;
-            }
-        }
-    }
-
+    @Authorized()
     @Post()
     async create(@Body() dto: GroupCreateDto, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.CREATE,
-            user: currentUser,
-            filter: query,
-            dto: { owner: currentUser.id, email: currentUser.email, ...dto }
-        });
+        return await this.service.create({ owner: currentUser.id, ...dto });
 
     }
 
+    @Authorized(SiteRole.Admin)
     @Get()
     async list(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.RETRIEVE,
-            user: currentUser,
-            filter: query,
-            // dto
-        });
-
+        return await this.service.list(query);
     }
 
+    @Authorized()
     @Get('/by_member')
-    async listByMember(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.RETRIEVE,
-            user: currentUser,
-            filter: {...query,memberUserId:currentUser.id},
-            // dto
-        });
-
+    async listByMember(@QueryParams() query: any, @Req() request, ) {
+        return await this.service.listByMember(request.user.id, query);
     }
 
+    @Authorized()
     @Get('/related_member')
-    async relatedMember(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser:any) {
-        return  await this.service.relatedMember({userId: currentUser.id as string,q:query.q}) ;
-        // return await this.processRequest({
-        //     resourceType,
-        //     request,
-        //     method: "relatedMember",
-        //     user: currentUser,
-        //     filter: {userId:currentUser.id},
-        //     // dto: {}
-        // });
-
+    async relatedMember(@QueryParams() query: any, @Req() request) {
+        return await this.service.relatedMember({ userId: request.user.id, q: query.q });
     }
 
+    @UseBefore(...checkGroupPermission())
     @Get('/:id([0-9a-f]{24})')
-    async byId(@Param('id') id: string, @Req() request, @CurrentUser() currentUser) {
-        // return await this.service.getById(id) ;
-        const doc = await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.RETRIEVE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-        });
-
-        return doc ;
+    async byId(@Param('id') id: string) {
+        return await this.service.getById(id);
     }
 
 
+    @UseBefore(...checkGroupPermission(GroupRole.Admin))
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: GroupUpdateDto, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.UPDATE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-            dto
-        });
-        // return await this.service.update(id,dto) ;
+        return await this.service.update(id, dto);
+
     }
 
+    @UseBefore(...checkGroupPermission(GroupRole.Admin))
     @Delete('/:id([0-9a-f]{24})')
     async delete(@Param('id') id: string, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.DELETE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-            // dto
-        });
-        // return await this.service.delete(id) ;
+        return await this.service.delete(id);
+
     }
 
 
-    @Get('/:id([0-9a-f]{24})/member')
-    async getMember(@Param('id') id: string, @QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
-        return await this.processRequest({
-            resourceType,
-            request,
-            method: RequestOperation.RETRIEVE,
-            user: currentUser,
-            resourceId: id,
-            filter: { id },
-            // dto
-        });
+    // @Get('/:id([0-9a-f]{24})/member')
+    // async getMember(@Param('id') id: string, @QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
 
-        // return await this.service.list(query) ;
-    }
+    //     return await this.processRequest({
+    //         resourceType,
+    //         request,
+    //         method: RequestOperation.RETRIEVE,
+    //         user: currentUser,
+    //         resourceId: id,
+    //         filter: { id },
+    //         // dto
+    //     });
+
+    //     // return await this.service.list(query) ;
+    // }
 
     // @Delete('/:id([0-9a-f]{24})/member')
     // @OnNull(400)
@@ -248,5 +116,5 @@ export class GroupController {
     // {
     //     return await this.service.memberConfirm({id, email:currentUser.email, ...dto}) ;
     // }
-    
+
 }
