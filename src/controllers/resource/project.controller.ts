@@ -34,7 +34,8 @@ export class ProjectController {
         return await this.repoService.list(query);
     }
 
-    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
+    // @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
+    @Authorized()
     @Get('/by_member')
     async listByMember(@QueryParams() query: any, @Req() request) {
 
