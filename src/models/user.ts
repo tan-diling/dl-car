@@ -55,6 +55,9 @@ export class User {
   @prop({ required: false, default: true })
   defaultContactAccept?: boolean;
 
+  @prop({ required: false, default: false })
+  forbiddenMailNotification?: boolean;
+
   @prop({
     ref: "Contact",
     localField: "_id",

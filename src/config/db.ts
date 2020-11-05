@@ -138,5 +138,5 @@ dbInitData.push({
 
 export const DB_DATA_INIT = dbInitData;
 
-export const DB_DEBUG = DEBUG;
+export const DB_DEBUG = String(config_get("DEBUG")).includes('db') && DEBUG;
 

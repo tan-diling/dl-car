@@ -99,7 +99,7 @@ const projectObject = {
 export type ExpressionRule = {
     comment: string;
     type: string;
-    method?: 'created' | 'updated' | 'deleted',
+    method?: 'created' | 'updated' | 'deleted' | string,
     expressions: Expression[];
     actions: Array<{ receiver: string, channel: string }>;
 };
@@ -224,8 +224,10 @@ export class EntityNotifyExecutor {
     async executeEval(ctx, rules: Array<ExpressionRule>) {
         const ret: Array<{ receiver: string[], channel: string[] }> = [];
         for (const rule of rules) {
-            if (rule.type.toLowerCase() != ctx.entityType.toLowerCase()) {
-                continue;
+            if (rule.type) {
+                if (rule.type.toLowerCase() != ctx.entityType.toLowerCase()) {
+                    continue;
+                }
             }
 
             if (rule.method) {

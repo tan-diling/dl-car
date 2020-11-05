@@ -118,6 +118,10 @@ export class UserProfileUpdateDto {
     @IsString()
     @IsOptional()
     department?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    forbiddenMailNotification?: boolean;
 }
 
 export class UserUpdateDto {
@@ -155,6 +159,10 @@ export class UserUpdateDto {
     @IsBoolean()
     @IsOptional()
     defaultContact?: boolean;
+
+    @IsBoolean()
+    @IsOptional()
+    forbiddenMailNotification?: boolean;
 
 }
 
