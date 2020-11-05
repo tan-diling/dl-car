@@ -10,7 +10,7 @@ import { userCheckMiddleware } from './userCheck.middleware';
 export function checkGroupPermission(...roles: string[]) {
     function groupPermissionMiddleware(request: Request, response: any, next?: (err?: any) => any): any {
         const currentUser: any = request.user;
-        console.log("group member check ...");
+        console.log("group permission check ...");
         if (currentUser.role == SiteRole.Admin) {
             return next();
         }
@@ -24,7 +24,7 @@ export function checkGroupPermission(...roles: string[]) {
                 if (x) {
                     next();
                 } else {
-                    next(new ForbiddenError('group_forbidden'));
+                    next(new ForbiddenError('group permission forbidden'));
                 }
             })
             .catch(reason => {

@@ -219,28 +219,3 @@ export class UserController {
 }
 
 
-
-@Authorized(SiteRole.Admin)
-@JsonController('/admin')
-export class AdminController {
-    constructor(private service: UserService) {
-    }
-
-
-    @Post('/user')
-    async create(@Body() dto: UserCreateDto) {
-        return await this.service.create(dto);
-    }
-
-
-    @Get('/user')
-    async list(@QueryParams() query: any) {
-        return await this.service.list(query);
-    }
-
-    @Delete('/user/:id([0-9a-f]{24})')
-    async delete(@Param('id') id: string, @Req() request, @CurrentUser() currentUser: IUser) {
-        return await this.service.delete(id);
-
-    }
-}

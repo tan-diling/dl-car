@@ -409,22 +409,40 @@ export class GroupService {
         return await GroupMemberModel.findById(id).exec();
     }
 
+    async getMember(filter) {
+        return await GroupMemberModel.findOne(filter).exec();
+    }
+
     /**
      *  child model delete
      */
-    async deleteMember(id: string, dto: { email }) {
+    async updateMember(dto: { group: string, user: string, groupRole: string }) {
 
-        const { email } = dto
-
-        const group = await GroupModel.findById(id).exec();
-
-        const groupMember = await GroupMemberModel.findOne({ groupId: id, email }).exec();
+        const groupMember = await GroupMemberModel.findOne({
+            groupId: new Types.ObjectId(dto.group),
+            userId: new Types.ObjectId(dto.user),
+        }).exec();
 
         if (groupMember) {
-            if (group && group.owner == groupMember._id) {
-                throw new MethodNotAllowedError("not_allowed");
-            }
+            groupMember.groupRole = dto.groupRole;
+            await groupMember.save();
+        }
+        return groupMember;
+    }
 
+
+
+    /**
+     *  child model delete
+     */
+    async deleteMember(dto: { group: string, user: string }) {
+
+        const groupMember = await GroupMemberModel.findOne({
+            groupId: new Types.ObjectId(dto.group),
+            userId: new Types.ObjectId(dto.user),
+        }).exec();
+
+        if (groupMember) {
             await groupMember.remove();
         }
         return groupMember;
