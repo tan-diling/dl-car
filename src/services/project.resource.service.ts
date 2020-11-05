@@ -65,20 +65,21 @@ export class ProjectResourceService extends ResourceService<Project>{
     }
 
     /** list project info */
-    async list(filter) {
-        let { memberUserId, ...query } = filter;
-
-        if (memberUserId) {
-            const pmList = await ProjectMemberModel.find({ userId: memberUserId }).exec();
-            if (pmList.length == 0) return [];
-            const projectIds = pmList.filter(x => x.deleted != true).map(x => x.projectId);
-            query = { ...query, _id: projectIds };
-        }
+    async list(query) {
 
         const l = await super.list(query);
 
         return await this.getProjectMembers(l);
 
+    }
+
+    /** list project by member */
+    async listByMember(member: string, query) {
+
+        const pmList = await ProjectMemberModel.find({ userId: member }).exec();
+        if (pmList.length == 0) return [];
+        const projectIds = pmList.filter(x => x.deleted != true).map(x => x.projectId);
+        return await this.list({ ...query, _id: projectIds });
     }
 
     /** get project info */

@@ -4,7 +4,7 @@
  * npm install ./packages/login
  * ```
  */
-require('dotenv').config() ;
+require('dotenv').config();
 import * as moduleAlias from 'module-alias';
 // import * as path from 'path';
 // const IS_DEV = process.env.NODE_ENV === 'development';
@@ -12,17 +12,17 @@ import * as moduleAlias from 'module-alias';
 // const rootPathDev = path.resolve(rootPath, 'src');
 // const rootPathProd = path.resolve(rootPath, 'dist/src');
 moduleAlias.addAliases({
-  '@app':__dirname+'/../src',
+  '@app': __dirname + '/../src',
 });
 
-import {sendMail } from '@app/modules/mail';
+import { sendMail } from '@app/modules/mail';
 
 
 async function run() {
-    const receiver = 'dealing790@gmail.com';
-   const ret = await sendMail(receiver,new Date().toISOString()) ;
+  const receiver = 'dealing790@gmail.com';
+  const ret = await sendMail(receiver, `<h1>new Date().toISOString()</h1>`);
 
-   console.log(`${receiver} result:${ret}`) ;
+  console.log(`${receiver} result:${ret}`);
 };
 
 run()
