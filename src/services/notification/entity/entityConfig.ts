@@ -469,77 +469,9 @@ const taskObject = {
 
 export const entityConfig: ExpressionRule[] = [
     {
-        comment: 'SEND EMAIL & NOTIFICATION',
-        type: 'project',
-        expressions: [
-            // return true, if its current user is site admin  
-            // {
-            //     operator: 'EQ',
-            //     params: [
-            //         {
-            //             operator: "VAR",
-            //             params: ["user", "role"],
-            //         },
-            //         "admin",
-            //     ]
-            // }
-        ],
-        actions: [
-            {
-                receiver: "MEMBER",
-                channel: "db,mail"
-            },
-            {
-                receiver: "MEMBER_REMOVE",
-                channel: "db"
-            },
-        ],
-    },
-    {
-        comment: 'SEND EMAIL & NOTIFICATION',
-        type: 'goal',
-        expressions: [
-            // return true, if its current user is site admin  
-            // {
-            //     operator: 'EQ',
-            //     params: [
-            //         {
-            //             operator: "VAR",
-            //             params: ["user", "role"],
-            //         },
-            //         "admin",
-            //     ]
-            // }
-        ],
-        actions: [{
-            receiver: "MEMBER_PM",
-            channel: "db,mail"
-        }],
-    },
-    {
-        comment: 'SEND EMAIL & NOTIFICATION',
-        type: 'requirement',
-        expressions: [
-            // return true, if its current user is site admin  
-            // {
-            //     operator: 'EQ',
-            //     params: [
-            //         {
-            //             operator: "VAR",
-            //             params: ["user", "role"],
-            //         },
-            //         "admin",
-            //     ]
-            // }
-        ],
-        actions: [{
-            receiver: "MEMBER_PM",
-            channel: "db,mail"
-        }],
-    },
-    {
-        comment: 'SEND EMAIL & NOTIFICATION',
+        comment: 'Entity(deliverable) "updated" SEND EMAIL & NOTIFICATION',
         type: 'deliverable',
+        method: 'updated',
         expressions: [
             // return true ,if its parent(Requirement) status is “InProgress” 
             {
@@ -643,24 +575,286 @@ export const entityConfig: ExpressionRule[] = [
         }],
     },
     {
-        comment: 'SEND EMAIL & NOTIFICATION',
-        type: 'task',
+        comment: 'Entity "created",SEND EMAIL & NOTIFICATION to PROJECT_MEMBER',
+        // type: 'project',
+        method: "created",
         expressions: [
-            // return true, if its current user is site admin  
-            // {
-            //     operator: 'EQ',
-            //     params: [
-            //         {
-            //             operator: "VAR",
-            //             params: ["user", "role"],
-            //         },
-            //         "admin",
-            //     ]
-            // }
         ],
-        actions: [{
-            receiver: "MEMBER_PM",
-            channel: "db,mail"
-        }],
+        actions: [
+            {
+                receiver: "MEMBER",
+                channel: "db,mail"
+            }
+        ],
     },
+    {
+        comment: 'Entity "deleted",SEND EMAIL & NOTIFICATION to MEMBER_PM,MEMBER_OWNER',
+        // type: 'project',
+        method: "deleted",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "MEMBER_PM",
+                channel: "db,mail"
+            },
+            {
+                receiver: "MEMBER_OWNER",
+                channel: "db,mail"
+            }
+        ],
+    },
+    {
+        comment: 'Entity "updated",SEND EMAIL & NOTIFICATION to MEMBER',
+        // type: 'project',
+        method: "updated",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "MEMBER",
+                channel: "db,mail"
+            }
+        ],
+    },
+    {
+        comment: 'Entity status ,SEND EMAIL & NOTIFICATION to MEMBER_PM,MEMBER_OWNER',
+        method: "status",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "MEMBER_PM",
+                channel: "db,mail"
+            },
+            {
+                receiver: "MEMBER_PM",
+                channel: "db,mail"
+            },
+        ],
+    },
+    {
+        comment: 'Entity member append ,SEND EMAIL & NOTIFICATION to MEMBER',
+        method: "member.append",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "MEMBER",
+                channel: "db,mail"
+            }
+        ],
+    },
+    {
+        comment: 'Entity member remove ,SEND EMAIL & NOTIFICATION to MEMBER,MEMBER_REMOVE',
+        method: "member.remove",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "MEMBER",
+                channel: "db,mail"
+            },
+            {
+                receiver: "MEMBER_REMOVE",
+                channel: "db,mail"
+            },
+        ],
+    },
+    {
+        comment: 'Entity assignee append ,SEND EMAIL & NOTIFICATION to ASSIGNEES',
+        method: "assignee.append",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "entity.assignees",
+                channel: "db,mail"
+            }
+        ],
+    },
+    {
+        comment: 'Entity assignee remove ,SEND EMAIL & NOTIFICATION to ASSIGNEES',
+        method: "assignee.remove",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "entity.assignees",
+                channel: "db,mail"
+            },
+            {
+                receiver: "ASSIGNEE_REMOVE",
+                channel: "db,mail"
+            },
+        ],
+    },
+    // {
+    //     comment: 'SEND EMAIL & NOTIFICATION',
+    //     type: 'goal',
+    //     expressions: [
+    //         // return true, if its current user is site admin  
+    //         // {
+    //         //     operator: 'EQ',
+    //         //     params: [
+    //         //         {
+    //         //             operator: "VAR",
+    //         //             params: ["user", "role"],
+    //         //         },
+    //         //         "admin",
+    //         //     ]
+    //         // }
+    //     ],
+    //     actions: [{
+    //         receiver: "MEMBER_PM",
+    //         channel: "db,mail"
+    //     }],
+    // },
+    // {
+    //     comment: 'SEND EMAIL & NOTIFICATION',
+    //     type: 'requirement',
+    //     expressions: [
+    //         // return true, if its current user is site admin  
+    //         // {
+    //         //     operator: 'EQ',
+    //         //     params: [
+    //         //         {
+    //         //             operator: "VAR",
+    //         //             params: ["user", "role"],
+    //         //         },
+    //         //         "admin",
+    //         //     ]
+    //         // }
+    //     ],
+    //     actions: [{
+    //         receiver: "MEMBER_PM",
+    //         channel: "db,mail"
+    //     }],
+    // },
+    // {
+    //     comment: 'SEND EMAIL & NOTIFICATION',
+    //     type: 'deliverable',
+    //     expressions: [
+    //         // return true ,if its parent(Requirement) status is “InProgress” 
+    //         {
+    //             operator: 'EQ',
+    //             params: [
+    //                 {
+    //                     operator: "VAR",
+    //                     params: ["entity", "parent", "status"],
+    //                 },
+    //                 10,//CONST_STATUS_IN_PROGRESS,
+    //             ],
+    //         },
+    //         // return true, if its parent' parent (Goal) status is “InProgress” and deadline time < ‘NOW’  
+    //         {
+    //             operator: 'AND',
+    //             params: [
+    //                 {
+    //                     operator: 'EQ',
+    //                     params: [
+    //                         {
+    //                             operator: "VAR",
+    //                             params: ["entity", "parent", "parent", "status"],
+    //                         },
+    //                         10,//CONST_STATUS_IN_PROGRESS,
+    //                     ]
+    //                 },
+    //                 {
+    //                     operator: 'GT',
+    //                     params: [
+    //                         {
+    //                             operator: "VAR",
+    //                             params: ["entity", "parent", "parent", "deadline"],
+    //                         },
+    //                         {
+    //                             operator: "DATE",
+    //                             params: [],
+    //                         },
+    //                     ]
+    //                 },
+
+    //             ],
+    //         },
+    //         //return true, if its parent' parent’ parent (Project) project members count >2 
+    //         {
+    //             operator: 'GT',
+    //             params: [
+    //                 {
+    //                     operator: "VAR",
+    //                     params: ["members", "length"],
+    //                 },
+    //                 2
+    //             ],
+    //         },
+    //         //return true, if its  project members one of is  “PO”
+    //         {
+    //             operator: 'IN',
+    //             params: [
+    //                 "project_manager",
+    //                 {
+    //                     operator: "MAP",
+    //                     params: [
+    //                         {
+    //                             operator: "VAR",
+    //                             params: ["members"],
+    //                         },
+    //                         "projectRole"
+    //                     ],
+    //                 },
+
+    //             ],
+    //         },
+    //         // return true if it’s child ‘Task’ is Exists
+    //         {
+    //             operator: 'GT',
+    //             params: [
+    //                 {
+    //                     operator: "VAR",
+    //                     params: ["entity", "children", "length"],
+    //                 },
+    //                 0
+    //             ],
+    //         },
+    //         // current user is one of  Deliverable 's  assignee
+    //         {
+    //             operator: 'IN',
+    //             params: [
+    //                 {
+    //                     operator: "VAR",
+    //                     params: ["user", "id"],
+    //                 },
+    //                 {
+    //                     operator: "VAR",
+    //                     params: ["entity", "assignee"],
+    //                 },
+    //             ],
+    //         },
+    //     ],
+    //     actions: [{
+    //         receiver: "entity.assignee,parent.assignee,parent.parent.assignee,MEMBER_PM",
+    //         channel: "db,mail"
+    //     }],
+    // },
+    // {
+    //     comment: 'SEND EMAIL & NOTIFICATION',
+    //     type: 'task',
+    //     expressions: [
+    //         // return true, if its current user is site admin  
+    //         // {
+    //         //     operator: 'EQ',
+    //         //     params: [
+    //         //         {
+    //         //             operator: "VAR",
+    //         //             params: ["user", "role"],
+    //         //         },
+    //         //         "admin",
+    //         //     ]
+    //         // }
+    //     ],
+    //     actions: [{
+    //         receiver: "MEMBER_PM",
+    //         channel: "db,mail"
+    //     }],
+    // },
 ];

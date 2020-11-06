@@ -97,5 +97,6 @@ export const entityContextMacro = {
     'MEMBER_REMOVE': (ctx: EntityContext<Entity>) => ctx.method == 'member.remove' ? [ctx.req.body?._user?._id] : [],
     'ASSIGNEE_APPEND': (ctx: EntityContext<Entity>) => ctx.method == 'assignee.append' ? [ctx.req.body?._user?._id] : [],
     'ASSIGNEE_REMOVE': (ctx: EntityContext<Entity>) => ctx.method == 'assignee.remove' ? [ctx.req.body?._user?._id] : [],
+    'CHILD_ASSIGNEE': (ctx: EntityContext<Entity>) => ctx.entity.children.map(x => x.assignees).reduce((x, y) => [...x, ...y]),
 };
 

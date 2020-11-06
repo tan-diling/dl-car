@@ -98,10 +98,11 @@ const projectObject = {
 
 export type ExpressionRule = {
     comment: string;
-    type: string;
+    type?: string;
     method?: 'created' | 'updated' | 'deleted' | string,
     expressions: Expression[];
     actions: Array<{ receiver: string, channel: string }>;
+    next?: boolean;
 };
 
 // const expressionExample: ExpressionRule = {
@@ -223,6 +224,7 @@ export class EntityNotifyExecutor {
 
     async executeEval(ctx, rules: Array<ExpressionRule>) {
         const ret: Array<{ receiver: string[], channel: string[] }> = [];
+        console.log(`ENTITY eval ${ctx.entityType} ${ctx.method} `);
         for (const rule of rules) {
             if (rule.type) {
                 if (rule.type.toLowerCase() != ctx.entityType.toLowerCase()) {
@@ -238,9 +240,14 @@ export class EntityNotifyExecutor {
 
             const ruleEvalResult = await this.evalRule(ctx, rule);
             if (ruleEvalResult) {
+                console.log(rule.comment + ' matched');
 
                 const ruleActionResult = await this.execAction(ctx, rule);
                 ret.push(...ruleActionResult);
+
+                if (!rule.next) {
+                    break;
+                }
             }
         }
         return ret;
@@ -249,7 +256,7 @@ export class EntityNotifyExecutor {
 
     async evalRule(ctx, rule: ExpressionRule) {
 
-        console.log("eval :" + rule.type)
+        // console.log("eval :" + rule.type)
         for (const exp of rule.expressions) {
             if (!this.eval(ctx, exp)) {
                 return false;
@@ -260,8 +267,8 @@ export class EntityNotifyExecutor {
     }
 
     async execAction(ctx, rule: ExpressionRule) {
-        const ret = [];
-        console.log("exec action :" + rule.type)
+        const ret = new Map<string, string[]>();
+        // console.log("exec action :" + rule.type)
         for (const action of rule.actions) {
 
             const { receiver, channel } = action;
@@ -279,12 +286,22 @@ export class EntityNotifyExecutor {
             }
 
             const l = [...userSet];
-            console.log(`send by ${action.channel} count:${l.length}`);
-            if (l.length > 0) {
-                ret.push({ receiver: l, channel: action.channel.split(',') });
-            }
+            const channelArray = action.channel.split(',');
+            console.log(`receiver by ${action.channel} count:${l.length}`);
+            l.forEach(x => {
+                ret.set(x, channelArray);
+            });
+            // ret.push({ receiver: l, channel: action.channel.split(',') });
         }
-        return ret;
+        const resultMap = [...ret.keys()].map(x => {
+            return {
+                receiver: [x],
+                channel: ret.get(x)
+            };
+        });
+
+        console.log(`total receiver count:${resultMap.length}`);
+        return resultMap;
     }
 
     eval(
