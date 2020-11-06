@@ -6,6 +6,7 @@ import { UserModel, User, LoginSessionModel } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
 import { OneTimePin } from '@app/models';
 import { executeNotificationSend } from './notification/sender';
+import { UpdateQuery } from 'mongoose';
 
 /**
  * user service
@@ -101,7 +102,7 @@ export class UserService {
      * @param id user id
      * @param dto 
      */
-    async update(id: string, dto: DocumentType<User>) {
+    async update(id: string, dto: UpdateQuery<DocumentType<User>>) {
         const doc = await this.getById(id);
         if (doc) {
             return UserModel.findByIdAndUpdate(id, dto, { new: true }).exec();
@@ -152,6 +153,9 @@ export class UserService {
         return user;
     }
 
+    async getByEmail(email: string) {
+        return await User.findByMail(email);
+    }
 
     /**
      * user attempt query forget password OTP by email,
