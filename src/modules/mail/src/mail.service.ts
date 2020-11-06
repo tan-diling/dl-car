@@ -60,7 +60,7 @@ export async function sendMail(email: string, html: string, subject: string = 'N
     from: transportOption.auth.user, // sender
     to: email, // receiver
     subject, // title
-    text: html,
+    html: html,
     // html,
   };
 

@@ -1,111 +1,66 @@
-import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor } from 'routing-controllers';
+import { Request, Response, NextFunction } from 'express';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, UseBefore } from 'routing-controllers';
 import { AbstractResourceController } from './abstractResource.controller';
 import { ProjectResourceService } from '../../services/project.resource.service';
 import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto, ProjectMemberDto } from './dto/project.dto';
-import { ResourceType, RequestOperation } from '@app/defines';
+import { ResourceType, RequestOperation, SiteRole } from '@app/defines';
 import { Container } from 'typedi';
 import { entityNotificationInterceptor } from '@app/middlewares/entity.interceptor';
+import { checkResourcePermission } from '@app/middlewares/resourcePermission.middleware';
 
-@Authorized()
+const type = ResourceType.Project;
+
+// @Authorized()
 @JsonController('/resource/project')
-export class ProjectController extends AbstractResourceController {
+export class ProjectController {
 
     /**
      *
      */
-    constructor() {
-        super();
-        this.resourceType = ResourceType.Project;
-        this.repoService = Container.get(ProjectResourceService);
-        this.queryOptions = { get: { populate: "children,comments,attachments" } };
-    }
+    repoService = Container.get(ProjectResourceService);
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.CREATE }))
     @Post()
     @UseInterceptor(entityNotificationInterceptor('created'))
     async create(@Body() dto: ProjectCreateDto, @Req() request) {
-        const obj = { ...dto, creator: request?.user?.id };
-        return await this.process(request, {
-            method: RequestOperation.CREATE,
-            dto: obj,
-        });
+        const obj = { ...dto, creator: request.user?.id };
+        return await this.repoService.create(obj);
+
     }
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
     @Get()
     async list(@QueryParams() query: any, @Req() request) {
-
-        return await this.process(request, {
-            method: RequestOperation.RETRIEVE,
-            filter: query,
-            // dto
-        });
-
+        return await this.repoService.list(query);
     }
 
+    // @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
+    @Authorized()
     @Get('/by_member')
     async listByMember(@QueryParams() query: any, @Req() request) {
 
-        return await this.process(request, {
-            method: RequestOperation.RETRIEVE,
-            filter: { ...query, memberUserId: request.user.id },
-            // dto
-        });
+        return await this.repoService.listByMember(request.user.id, query);
 
     }
 
-
+    @UseBefore(...checkResourcePermission({ type, }))
     @Get('/:id([0-9a-f]{24})')
     async getById(@Param('id') id: string, @Req() request) {
-        // return await this.repoService.get(id) ;
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.RETRIEVE,
-            filter: { _id: id, memberUserId: request.user.id },
-            // dto
-        });
-
+        return await this.repoService.get({ _id: id, populate: "children,comments,attachments" });
     }
 
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.UPDATE }))
     @UseInterceptor(entityNotificationInterceptor())
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: ProjectUpdateDto, @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.UPDATE,
-            dto
-        });
+        return await this.repoService.update(id, dto);
     }
 
-    @UseInterceptor(entityNotificationInterceptor('deleted'))
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.DELETE }))
     @Delete('/:id([0-9a-f]{24})')
+    @UseInterceptor(entityNotificationInterceptor('deleted'))
     async delete(@Param('id') id: string, @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.DELETE,
-        });
+        return await this.repoService.delete(id);
     }
-
-
-    @Patch('/:id([0-9a-f]{24})/member')
-    async updateMember(@Param('id') id: string, @Body({ type: ProjectMemberDto }) dto: ProjectMemberDto[], @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.UPDATE,
-            dto: { member: dto }
-        });
-    }
-
-
-    @Patch('/:id([0-9a-f]{24})/member_confirm')
-    async memberConfirm(@Param('id') id: string, @Req() request, @Body() dto: ProjectMemberConfirmDto) {
-
-        return await this.process(request, {
-            resourceId: id,
-            method: "memberConfirm",
-            dto: { userId: request.user.id, ...dto }
-        });
-
-    }
-
 }

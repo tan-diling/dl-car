@@ -89,9 +89,16 @@ export class ProjectPermissionService {
 
         if (ctx.resourceType == ResourceType.Project && ctx.method == RequestOperation.RETRIEVE) {
             if (ctx.resourceId) {
-                return true;
+                const pm = await ProjectMemberModel.findOne({ projectId: ctx.resourceId, userId: ctx.user.id }).exec();
+
+                if (pm == null) {
+                    return false;
+                }
+
+                return pm.deleted != true;
+
             } else {
-                return ctx.filter.memberUserId == ctx.user.id;
+                return ctx.user.role == SiteRole.Admin;
             }
         }
     }
