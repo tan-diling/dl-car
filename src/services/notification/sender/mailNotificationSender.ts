@@ -6,7 +6,7 @@ import Container from 'typedi';
 import { NotificationTopic, NotificationAction } from '@app/defines';
 import { NotificationSenderInterface, NotificationSenderOptions } from './types';
 import { sendMail } from '@app/modules/mail';
-import { WebServer } from '@app/config';
+import { WebServer, logger } from '@app/config';
 import { mailTemplateConfig } from './mailTemplateConfig';
 
 
@@ -18,13 +18,22 @@ class MailNotificationSender implements NotificationSenderInterface {
     async buildMailInfo(data: NotificationSenderOptions) {
         const user = await findUserById(data.receiver);
 
-        const template = data.mailTemplate
-        const mailTemplateFunction: (ctx) => Promise<{ subject: string, html: string }> = mailTemplateConfig[template];
-        if (user && mailTemplateFunction) {
-            const mailInfo = await mailTemplateFunction({ user, server: WebServer, doc: data.event.data, findUserById });
-            return { email: user.email, ...mailInfo };
+        if (user) {
+            if (user.forbiddenMailNotification == true) {
+                logger.debug(`mail forbidden  ${user.name} ,skipped `)
+                return;
+            }
+
+            const template = data.mailTemplate
+            const mailTemplateFunction: (ctx) => Promise<{ subject: string, html: string }> = mailTemplateConfig[template];
+            if (mailTemplateFunction) {
+                const mailInfo = await mailTemplateFunction({ user, server: WebServer, doc: data.event.data, findUserById });
+                return { email: user.email, ...mailInfo };
+            } else {
+                logger.error(`mail sender template error ${data.receiver}--${template}.`)
+            }
         } else {
-            console.error(`mail template error ${data.receiver}--${template}.`)
+            logger.error(`mail sender user not exists ${data.receiver}`);
         }
     }
 
@@ -33,7 +42,7 @@ class MailNotificationSender implements NotificationSenderInterface {
         const mailInfo = await this.buildMailInfo(data);
         const { email, subject, html } = mailInfo;
         sendMail(email, html, subject).catch(error => {
-            console.log(`send mail error ${error}`);
+            logger.error(`send mail error ${error}`);
         });
     }
 }

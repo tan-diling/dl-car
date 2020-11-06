@@ -1,26 +1,25 @@
+import { SettingModel } from '@app/models/setting';
 
+type SettingKeys = "AllowPublicRegistration" | "Mail";
 /**
- * user service
+ * setting service
  */
 export class SettingService {
-    static
-        readonly USER_MAIL_NOTIFICATION = 'mail.notification';
-    static
-        readonly SITE_ALLOW_PUBLIC_REGISTER = 'site.allow_public_register';
-    static
-        readonly SITE_MAIL_CONFIG = 'site.mail_config';
 
-
-    async get(k: string) {
-
+    async get(k: SettingKeys) {
+        const setting = await SettingModel.findOne({ key: k }).exec();
+        if (setting) {
+            return setting.val;
+        }
     }
 
     /**
      * create an new user
      * @param dto 
      */
-    async set(k: string, value) {
-
+    async set(k: SettingKeys, val) {
+        const setting = await SettingModel.findOneAndUpdate({ key: k }, { key: k, val: val }, { upsert: true, new: true }).exec();
+        return setting.val;
     }
 
 
