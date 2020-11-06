@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor } from 'routing-controllers';
-import { AbstractResourceController } from './abstractResource.controller';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, UseBefore } from 'routing-controllers';
+
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi';
 import { RequirementResourceService } from '@app/services/resource';
@@ -8,88 +8,61 @@ import { RequirementCreateDto, RequirementUpdateDto } from './dto';
 import { StatusDto } from './dto/project.dto';
 import { CheckList } from '@app/models';
 import { entityNotificationInterceptor } from '@app/middlewares/entity.interceptor';
+import { checkResourcePermission } from '@app/middlewares/resourcePermission.middleware';
 
-const type = 'requirement';
-@Authorized()
+const type = ResourceType.Requirement;
 @JsonController('/resource')
-export class RequirementController extends AbstractResourceController {
+export class RequirementController {
     /**
      *
      */
-    constructor() {
-        super();
-        this.resourceType = ResourceType.Requirement;
-        this.repoService = Container.get(RequirementResourceService);
-        this.queryOptions = { get: { populate: "children,parents,comments,attachments" } };
-    }
+    service = Container.get(RequirementResourceService);
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.CREATE }))
     @UseInterceptor(entityNotificationInterceptor('created'))
     @Post(`/:parent([0-9a-f]{24})/${type}`)
     async create(@Param('parent') parent: string, @Body() dto: RequirementCreateDto, @Req() request) {
         const obj = { ...dto, creator: request?.user?.id };
-        return await this.process(request, {
-            method: RequestOperation.CREATE,
-            dto: { parent, ...obj, }
-        });
+        return await this.service.create({ parent, ...obj, });
     }
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
     @Get(`/:parent([0-9a-f]{24})/${type}`)
     async list(@Param('parent') parent: string, @QueryParams() query: any, @Req() request) {
 
-        return await this.process(request, {
-            method: RequestOperation.RETRIEVE,
-            filter: { ...query, parents: parent },
-            // dto
-        });
+        return await this.service.list({ ...query, parents: parent });
 
     }
 
-
-
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.RETRIEVE }))
     @Get(`/${type}/:id([0-9a-f]{24})`)
     async getById(@Param('id') id: string, @Req() request) {
-        // return await this.repoService.get(id) ;
-        const doc = await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.RETRIEVE,
-            filter: { _id: id, memberUserId: request.user.id },
-            // dto
+        return await this.service.get({
+            _id: id,
+            populate: "children,parents,comments,attachments",
         });
 
-        if (doc != null) {
-            return { ...doc.toJSON(), completion: await CheckList.getCompletion(doc._id) };
-        }
-
-        return doc;
     }
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.UPDATE }))
     @UseInterceptor(entityNotificationInterceptor('updated'))
     @Patch(`/${type}/:id([0-9a-f]{24})`)
     async update(@Param('id') id: string, @Body() dto: RequirementUpdateDto, @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.UPDATE,
-            dto
-        });
+        return await this.service.update(id, dto);
     }
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.UPDATE }))
     @UseInterceptor(entityNotificationInterceptor('status'))
     @Patch(`/${type}/:id([0-9a-f]{24})/status`)
     async status(@Param('id') id: string, @Body() dto: StatusDto, @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: 'status',
-            dto: { ...dto, userId: request.user.id }
-        });
+        return await this.service.status({ id, ...dto, userId: request.user.id });
     }
 
+    @UseBefore(...checkResourcePermission({ type, method: RequestOperation.DELETE }))
     @UseInterceptor(entityNotificationInterceptor('deleted'))
     @Delete(`/${type}/:id([0-9a-f]{24})`)
     async delete(@Param('id') id: string, @Req() request, ) {
-        return await this.process(request, {
-            resourceId: id,
-            method: RequestOperation.DELETE,
-        });
+        return await this.service.delete(id);
     }
 
 }

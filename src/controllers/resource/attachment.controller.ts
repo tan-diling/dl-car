@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, Res, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, Action, UseAfter, UploadedFile, NotAcceptableError, UseBefore } from 'routing-controllers';
-import { AbstractResourceController, AbstractResourceRelatedController } from './abstractResource.controller';
+
 import { ResourceType, RequestOperation } from '@app/defines';
 import { Container } from 'typedi';
 import { AttachmentResourceService } from '@app/services/resource';

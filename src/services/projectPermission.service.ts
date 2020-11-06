@@ -169,13 +169,10 @@ export class ProjectPermissionService {
      */
     async checkCurrentCURDPolicy(ctx: RequestContext) {
         let resourceId = ctx.resourceId;
-        if (!resourceId) {
-            if (ctx.method == RequestOperation.CREATE) {
-                resourceId = ctx.dto.parent;
-            }
 
+        if (!resourceId) {
             if (ctx.method == RequestOperation.RETRIEVE) {
-                resourceId = ctx.filter.parents || ctx.filter.parent;
+                resourceId = ctx.request.params.parent;
             }
         }
         if (resourceId) {

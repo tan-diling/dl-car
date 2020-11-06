@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor, UseBefore } from 'routing-controllers';
-import { AbstractResourceController } from './abstractResource.controller';
+
 import { ProjectResourceService } from '../../services/project.resource.service';
 import { ProjectCreateDto, ProjectUpdateDto, ProjectMemberConfirmDto, ProjectMemberDto } from './dto/project.dto';
 import { ResourceType, RequestOperation, SiteRole } from '@app/defines';

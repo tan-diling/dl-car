@@ -77,8 +77,9 @@ export class ProjectResourceService extends ResourceService<Project>{
     async listByMember(member: string, query) {
 
         const pmList = await ProjectMemberModel.find({ userId: member }).exec();
-        if (pmList.length == 0) return [];
+
         const projectIds = pmList.filter(x => x.deleted != true).map(x => x.projectId);
+        if (projectIds.length == 0) return [];
         return await this.list({ ...query, _id: projectIds });
     }
 

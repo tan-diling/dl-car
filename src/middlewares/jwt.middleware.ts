@@ -47,6 +47,8 @@ export const jwtAuthenticate = (request: Request, response: any, next) => {
             return;
         }
 
+
+
         next();
     })(request, response, next);
 }

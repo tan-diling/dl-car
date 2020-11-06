@@ -3,7 +3,6 @@ import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, mod
 import { User } from './user';
 import { Types } from 'mongoose';
 import { DocumentType } from '@typegoose/typegoose';
-import { text } from 'body-parser';
 
 @modelOptions({ options: { allowMixed: 0 } })
 export class Conversation {
