@@ -606,13 +606,26 @@ export const entityConfig: ExpressionRule[] = [
     },
     {
         comment: 'Entity "updated",SEND EMAIL & NOTIFICATION to MEMBER',
-        // type: 'project',
+        type: 'project',
         method: "updated",
         expressions: [
         ],
         actions: [
             {
                 receiver: "MEMBER",
+                channel: "db,mail"
+            }
+        ],
+    },
+    {
+        comment: 'Entity "updated",SEND EMAIL & NOTIFICATION to entity.assignees',
+        // type: 'project',
+        method: "updated",
+        expressions: [
+        ],
+        actions: [
+            {
+                receiver: "entity.assignees",
                 channel: "db,mail"
             }
         ],

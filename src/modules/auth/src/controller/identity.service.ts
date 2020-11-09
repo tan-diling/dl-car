@@ -17,24 +17,35 @@ export class IdentityService implements IIdentityService {
     LoginSessionModel = mongoose.model<any & mongoose.Document>('LoginSession');
 
 
-    async userRefreshToken(dto: { refresh_token: string; }) {
+    async userRefreshToken(dto: { user: string, refresh_token: string; }) {
         const session = await this.LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
-            // const err = new UnauthorizedError('refresh_invalid');            
-
             throw new UnauthorizedError('refresh_invalid');
         }
         if (new Date() > session.refreshTime) {
             throw new UnauthorizedError('refresh_expired');
         }
+        if (String(dto.user) > String(session.user)) {
+            throw new UnauthorizedError('user_invalid');
+        }
         const user = await this.UserModel.findById(session.user).exec();
-        if (session == null) {
-            throw new UnauthorizedError('account_invalid');
+        if (user == null) {
+            throw new UnauthorizedError('user_invalid');
         }
         // update session info
         session.accessTime = new Date();
         await session.save();
         return { id: user.id, role: user.role, name: user.name, email: user.email };
+    }
+
+    async userLogout(dto: { user: string; device: string; }) {
+
+        const session = await this.LoginSessionModel.findOne({ user: dto.user, device: dto.device }).exec();
+        if (session != null) {
+            await session.remove();
+        }
+
+        return { message: "user logout!" };
     }
 
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {

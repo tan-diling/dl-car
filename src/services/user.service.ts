@@ -7,6 +7,8 @@ import { RepoOperation, SiteRole } from '@app/defines';
 import { OneTimePin } from '@app/models';
 import { executeNotificationSend } from './notification/sender';
 import { UpdateQuery } from 'mongoose';
+import { SettingService } from './setting.service';
+import { Container } from 'typedi';
 
 /**
  * user service
@@ -14,6 +16,7 @@ import { UpdateQuery } from 'mongoose';
 export class UserService {
 
     private queryService = new ModelQueryService();
+    private settingService = Container.get(SettingService);
     constructor() {
     }
 
@@ -28,6 +31,15 @@ export class UserService {
 
         throw new NotAcceptableError("password_check_error");
     }
+
+    async signUp(dto: Partial<User>) {
+        const allowed = await this.settingService.allowPublicRegistration();
+        if (!allowed) {
+            throw new NotAcceptableError('Account registration is disabled.');
+        }
+        return await this.create(dto);
+    }
+
 
     /**
      * create an new user

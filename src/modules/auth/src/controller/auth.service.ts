@@ -7,7 +7,7 @@ import { JWT_OPTION } from '@app/config';
 
 // const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
 
-const jwtOptions = JWT_OPTION ;
+const jwtOptions = JWT_OPTION;
 
 export const createJwtToken = (user: IUserToken) => {
     const payload = {
@@ -20,15 +20,15 @@ export const createJwtToken = (user: IUserToken) => {
     return sign(
         payload,
         jwtOptions.secretOrKey,
-        {expiresIn: jwtOptions.expiresIn } ,
+        { expiresIn: jwtOptions.expiresIn } ,
     );
 
 };
 
 @Service()
 export class AuthService {
-    @Inject() 
-    service: IdentityService ;
+    @Inject()
+    service: IdentityService;
     /**
      * user login
      * @param dto 
@@ -50,12 +50,20 @@ export class AuthService {
         return { ...userInfo, access_token, refresh_token: session.refreshToken };
     }
 
+    /**
+     * user logout
+     * @param dto 
+     */
+    async logout(dto: { user: string; device: string; }) {
+
+        return await this.service.userLogout(dto);
+    }
 
     /**
      * user refresh token 
      * @param dto 
      */
-    async refreshToken(dto: { refresh_token: string }) {
+    async refreshToken(dto: { user: string, refresh_token: string }) {
         // check token is valid
         const user = await this.service.userRefreshToken(dto);
 

@@ -3,26 +3,16 @@
  * @packageDocumentation
  */
 import { createTransport, TransportOptions } from 'nodemailer';
-import { logger } from '@app/config';
-
-import { Mail_Server_Host, Mail_Server_User, Mail_Server_Password } from '@app/config';
-
-
-
-// mail: mail.nicjob.com
-// username: do-not-reply@nicjob.com
-// pass: 4Il0IIlHR2KpHP5AOtV7gRMiU7wlz
-// smtp: my.modestlab.com:587
-// imap: my.modestlab.com:993 
-
+import { logger, mailConfig } from '@app/config';
 
 const transportOption = {
-  host: Mail_Server_Host,
-  // port: 465,
+  host: mailConfig.host,
+  port: mailConfig.port,
+  connectionTimeout: 20 * 1000,
   // secure: true, // true for 465, false for other ports
   auth: {
-    user: Mail_Server_User,
-    pass: Mail_Server_Password,
+    user: mailConfig.user,
+    pass: mailConfig.password,
   },
   debug: true,
   log: true,
@@ -30,19 +20,6 @@ const transportOption = {
 };
 
 logger.info(transportOption.auth.user);
-
-// const transportOption_google = {
-//   host: 'gmail.google.com',
-//   port: 465,
-//   secure: true, // true for 465, false for other ports
-//   auth: {
-//     user: 'dev@nicjob.com',
-//     pass: 'gvE85vZblylGB*qp4%ZXJwRV', 
-//   },
-//   debug: true ,
-//   log : true ,
-//   transactionLog: true ,
-// };
 
 
 /**
@@ -67,8 +44,7 @@ export async function sendMail(email: string, html: string, subject: string = 'N
   try {
     const mailResult = await transporter.sendMail(mailOptions);
     return mailResult;
-  }
-  catch (err) {
+  } catch (err) {
     console.error(`mail send error ${err}`);
     return { error: err };
   }

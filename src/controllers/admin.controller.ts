@@ -1,11 +1,46 @@
-import { UserService, GroupService } from '@app/services';
+import { UserService, GroupService, SettingService } from '@app/services';
 import { Container } from 'typedi';
-import { Authorized, JsonController, Post, Get, Delete, QueryParams, Req, CurrentUser, Param, Body, Patch } from 'routing-controllers';
+import { Authorized, JsonController, Post, Get, Delete, QueryParams, Req, CurrentUser, Param, Body, Patch, Put } from 'routing-controllers';
 import { UserCreateDto, UserUpdateDto } from './user/dto/user.dto';
 import { SiteRole } from '@app/defines';
+import { IsBoolean, IsPort, IsString, IsNumber, IsInt, Max, IsPositive, IsEmail } from 'class-validator';
+import { sendMail } from '@app/modules/mail';
 
 const userService = Container.get(UserService);
 const groupService = Container.get(GroupService);
+const settingService = Container.get(SettingService);
+
+class SettingAllowPublicationRegistrationDto {
+    @IsBoolean()
+    enabled: boolean;
+}
+
+class SettingMailDto {
+    @IsString()
+    host: string;
+
+    @IsPositive()
+    @Max(65536)
+    port: number;
+
+    @IsString()
+    user: string;
+
+    @IsString()
+    password: string;
+}
+
+class SendMailDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    subject: string;
+
+    @IsString()
+    html: string;
+}
+
 @Authorized(SiteRole.Admin)
 @JsonController('/admin')
 export class AdminController {
@@ -36,5 +71,42 @@ export class AdminController {
     @Get('/group')
     async listGroup(@QueryParams() query: any) {
         return await groupService.list(query);
+    }
+
+    // @Get('/setting')
+    // async listSetting(@QueryParams() query: any) {
+    //     return await groupService.list(query);
+    // }
+
+
+
+    @Get('/setting/allowPublicRegistration')
+    async getAllowPublicRegistration() {
+        return {
+            enabled: await settingService.allowPublicRegistration()
+        };
+    }
+
+    @Put('/setting/allowPublicRegistration')
+    async setAllowPublicRegistration(@Body() dto: SettingAllowPublicationRegistrationDto) {
+        return {
+            enabled: await settingService.allowPublicRegistration(dto.enabled)
+        };
+    }
+
+    @Get('/setting/mail')
+    async getMail() {
+        return await settingService.mail();
+    }
+
+    @Put('/setting/mail')
+    async setMail(@Body() dto: SettingMailDto) {
+        return await settingService.mail(dto);
+    }
+
+
+    @Post('/setting/mail')
+    async sendMail(@Body() dto: SendMailDto) {
+        return sendMail(dto.email, dto.html, dto.subject);
     }
 }

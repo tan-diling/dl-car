@@ -9,8 +9,9 @@ export interface IUserToken {
 }
 
 export interface IIdentityService {
-    userLogin(dto: { email: string; password: string; device: string; ip: string; }): Promise<{ user: IUserToken, session: {refreshToken:string} }>;
-    userRefreshToken(dto: { refresh_token: string; }): Promise<IUserToken>;
+    userLogin(dto: { email: string; password: string; device: string; ip: string; }): Promise<{ user: IUserToken, session: { refreshToken: string } }>;
+    userLogout(dto: { user: string; device: string; }): Promise<{ message: string }>;
+    userRefreshToken(dto: { user: string; refresh_token: string; }): Promise<IUserToken>;
 }
 
 export const IIdentityServiceToken = new Token<IIdentityService>();

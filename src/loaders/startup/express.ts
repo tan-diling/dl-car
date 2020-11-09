@@ -14,6 +14,9 @@ import { BackendServer } from '../server';
 import * as jwt from 'jsonwebtoken';
 import { Container } from "typedi";
 import { userCheck, initPassport } from './passport';
+
+const cookieSession = require('cookie-session')
+
 // import { errorMiddleware } from '@app/middlewares/error.middleware';
 
 function useHttpContext(app: express.Application) {
@@ -52,6 +55,11 @@ export default (server: BackendServer) => {
   // It shows the real origin IP in the heroku or Cloudwatch logs
   app.enable('trust proxy');
 
+
+  app.use(cookieSession({
+    name: 'session',
+    keys: ['sessionKey1', 'sessionKey2']
+  }));
   //   // The magic package that prevents frontend developers going nuts
   //   // Alternate description:
   //   // Enable Cross Origin Resource Sharing to all origins by default
