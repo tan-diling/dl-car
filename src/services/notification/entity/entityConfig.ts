@@ -661,7 +661,7 @@ export const entityConfig: ExpressionRule[] = [
         ],
         actions: [
             {
-                receiver: "MEMBER_PM",
+                receiver: "MEMBER_OWNER",
                 channel: "db,mail"
             },
             {
