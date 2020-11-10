@@ -42,7 +42,7 @@ class MailNotificationSender implements NotificationSenderInterface {
         const mailInfo = await this.buildMailInfo(data);
         if (mailInfo) {
             const { email, subject, html } = mailInfo;
-            sendMail(email, html, subject).catch(error => {
+            sendMail({ email, html, subject }).catch(error => {
                 logger.error(`send mail error ${error}`);
             });
         }

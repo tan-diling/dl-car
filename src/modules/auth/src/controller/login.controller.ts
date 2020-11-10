@@ -27,8 +27,8 @@ export class LoginController {
         //     const ip = requestIp.getClientIp(req);
         //     console.log("logout ip -- " + ip);
         const user = req.session?.userId;
-        const ret = await this.service.logout({ user, device: dto.device });
         req.session = null;
+        const ret = await this.service.logout({ user, device: dto.device });
         return ret;
     }
 

@@ -107,6 +107,6 @@ export class AdminController {
 
     @Post('/setting/mail')
     async sendMail(@Body() dto: SendMailDto) {
-        return sendMail(dto.email, dto.html, dto.subject);
+        return sendMail(dto);
     }
 }

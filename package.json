@@ -83,6 +83,7 @@
     "@types/mongoose": "^5.7.30",
     "@types/mongoose-sequence": "^3.0.4",
     "@types/node": "^12.12.34",
+    "@types/nodemailer": "^6.4.0",
     "@types/passport": "^1.0.4",
     "@types/passport-jwt": "^3.0.2",
     "@types/request-ip": "0.0.35",

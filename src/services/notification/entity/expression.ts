@@ -105,51 +105,6 @@ export type ExpressionRule = {
     next?: boolean;
 };
 
-// const expressionExample: ExpressionRule = {
-//     comment: 'SEND EMAIL & NOTIFICATION',
-//     type: 'project.deliverable',
-//     expressions: [
-//         {
-//             // return true if status == in process   
-//             operator: 'EQ',
-//             params: [
-//                 {
-//                     operator: "VAR",
-//                     params: ["ENTITY", "status"],
-//                 },
-//                 'in-progress'
-//             ],
-//         },
-//         {
-//             //** return true if user is assignee of this.parent (requirement)  */
-//             operator: 'IN',
-//             params: [
-//                 {
-//                     operator: "VAR",
-//                     params: ["USER", "id"],
-//                 },
-//                 {
-//                     operator: "VAR",
-//                     params: ["ENTITY", "PARENT", "assignees"],
-//                 }
-//             ],
-//         },
-//         {
-//             // return true if user is  QA or Developer
-//             operator: 'IN',
-//             params: [
-//                 {
-//                     operator: "VAR",
-//                     params: ["USER", "projectRole"],
-//                 },
-//                 ["QA", "Develop"]
-//             ],
-//         },
-//     ],
-//     actions: [],
-// };
-
-
 export const getEntityContext = async (req, entityType: string, entityId, method: 'created' | 'updated' | 'deleted' | string, ) => {
     let entity: DocumentType<Resource> = null;
     let populate = "";

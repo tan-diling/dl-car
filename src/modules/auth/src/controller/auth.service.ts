@@ -4,6 +4,7 @@ import { IdentityService } from './identity.service';
 import { Inject, Token, Service } from 'typedi';
 import { IUserToken, IIdentityServiceToken, IIdentityService } from '../interface/login';
 import { JWT_OPTION } from '@app/config';
+import { UnauthorizedError } from 'routing-controllers';
 
 // const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
 
@@ -65,19 +66,19 @@ export class AuthService {
      */
     async refreshToken(dto: { user: string, refresh_token: string }) {
         // check token is valid
-        const user = await this.service.userRefreshToken(dto);
+        const loginUser = await this.service.userRefreshToken(dto);
 
         // generate access token 
         const userInfo = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
+            id: loginUser.id,
+            name: loginUser.name,
+            email: loginUser.email,
+            role: loginUser.role,
         };
 
         const access_token = createJwtToken(userInfo);
 
-        return { access_token };
+        return { access_token, refresh_token: loginUser.refresh_token };
     }
 
 }

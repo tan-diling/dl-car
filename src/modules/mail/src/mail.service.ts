@@ -28,17 +28,18 @@ logger.info(transportOption.auth.user);
  * @param subject mail title
  * @param html mail detail
  */
-export async function sendMail(email: string, html: string, subject: string = 'NOREPLY') {
+export async function sendMail(options: { email: string, html?: string, subject: string, text?: string }) {
 
   // create reusable transporter object using the default SMTP transport
   const transporter = createTransport(transportOption);
 
-  const mailOptions = {
+
+  const { email, subject, ...contentOptions } = options;
+  let mailOptions = {
     from: transportOption.auth.user, // sender
     to: email, // receiver
-    subject, // title
-    html: html,
-    // html,
+    subject: subject, // title
+    ...contentOptions,
   };
 
   try {

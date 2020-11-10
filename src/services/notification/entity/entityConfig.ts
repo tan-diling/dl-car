@@ -502,8 +502,14 @@ export const entityConfig: ExpressionRule[] = [
                         operator: 'GT',
                         params: [
                             {
-                                operator: "VAR",
-                                params: ["entity", "parent", "parent", "deadline"],
+                                operator: "DATE",
+                                params: [
+
+                                    {
+                                        operator: "VAR",
+                                        params: ["entity", "parent", "parent", "deadline"],
+                                    },
+                                ],
                             },
                             {
                                 operator: "DATE",
@@ -564,15 +570,33 @@ export const entityConfig: ExpressionRule[] = [
                     },
                     {
                         operator: "VAR",
-                        params: ["entity", "assignee"],
+                        params: ["entity", "assignees"],
                     },
                 ],
             },
         ],
-        actions: [{
-            receiver: "entity.assignee,parent.assignee,parent.parent.assignee,MEMBER_PM",
-            channel: "db,mail"
-        }],
+        actions: [
+            {
+                receiver: "entity.assignees,",
+                channel: "db,mail"
+            },
+            {
+                receiver: "entity.parent.assignees",
+                channel: "db,mail"
+            },
+            {
+                receiver: "entity.parent.parent.assignees",
+                channel: "db,mail"
+            },
+            {
+                receiver: "MEMBER_PM",
+                channel: "db,mail"
+            },
+            {
+                receiver: "CHILD_ASSIGNEE",
+                channel: "db,mail"
+            },
+        ],
     },
     {
         comment: 'Entity "created",SEND EMAIL & NOTIFICATION to PROJECT_MEMBER',

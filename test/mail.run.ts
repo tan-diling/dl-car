@@ -5,16 +5,16 @@
  * ```
  */
 
-require('module-alias/register') ;
+require('module-alias/register');
 
-import {sendMail } from '@app/modules/mail';
+import { sendMail } from '@app/modules/mail';
 
 
 async function run() {
     const receiver = 'tan.yw@dealing.tech';
-   const ret = await sendMail(receiver,new Date().toISOString()) ;
+    const ret = await sendMail({ email: receiver, subject: 'test', text: new Date().toISOString() });
 
-   console.log(`${receiver} result:${ret}`) ;
+    console.log(`${receiver} result:${ret}`);
 };
 
 run()

@@ -14,12 +14,12 @@ export default () => {
     /**
      * when user created, send user validate email 
      */
-    UserModel.on(RepoOperation.Created, (doc:User) => {
-        
-        const email = doc.email ;
-        const { subject, text } = buildMailOfUserConfirm( doc);
+    UserModel.on(RepoOperation.Created, (doc: User) => {
 
-        sendMail(email, text, subject).catch(error => {
+        const email = doc.email;
+        const { subject, text } = buildMailOfUserConfirm(doc);
+
+        sendMail({ email, text, subject }).catch(error => {
             console.log(`send mail error ${error}`);
         });
     });
@@ -50,8 +50,8 @@ export default () => {
 }
 
 /** mail template: user confirm  */
-function buildMailOfUserConfirm( doc: any): { subject: string; text: string; } {
-    const webServer = WebServer ;
+function buildMailOfUserConfirm(doc: any): { subject: string; text: string; } {
+    const webServer = WebServer;
     return {
         "subject": "Please confirm your Email to complete the GCP sign-up",
         "text": `
@@ -72,7 +72,7 @@ Thank you for joining us!
 
 /** mail template: group member confirm  */
 function buildMailOfGroupMemberConfirm(doc: any): { subject: string; text: string; } {
-    const webServer = WebServer ;
+    const webServer = WebServer;
     return {
         "subject": "Please confirm the group invitation ",
         "text": `
@@ -91,7 +91,7 @@ Thank you for joining us!
 
 /** mail template: project member confirm  */
 function buildMailOfProjectMemberConfirm(doc: any): { subject: string; text: string; } {
-    const webServer = WebServer ;
+    const webServer = WebServer;
     return {
         "subject": "Please confirm the project invitation ",
         "text": `

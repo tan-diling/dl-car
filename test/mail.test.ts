@@ -20,7 +20,7 @@ import { sendMail } from '@app/modules/mail';
 
 async function run() {
   const receiver = 'dealing790@gmail.com';
-  const ret = await sendMail(receiver, `<h1>new Date().toISOString()</h1>`);
+  const ret = await sendMail({ email: receiver, html: `<h1>new Date().toISOString()</h1>`, subject: 'html mail test' });
 
   console.log(`${receiver} result:${ret}`);
 };

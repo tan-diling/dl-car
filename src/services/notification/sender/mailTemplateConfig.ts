@@ -99,7 +99,7 @@ Thank you for joining us!
             }
         }
 
-        const subject = `[GCP] (${entityKey}) ${entity.type} ${entity.title} ${action}`;
+        const subject = `[GCP] (${entityKey}) ${entity.type} '${entity.title}' ${action}`;
 
         let url = '';
         const entityType = entity.type.toLowerCase();
@@ -123,7 +123,7 @@ Hi ${user.name},
 ${entityKey} ${action} by ${entityContext.user.name}
 ${desc}
 
-url: ${url}
+URL: ${url}
 
 
 Thank you,
