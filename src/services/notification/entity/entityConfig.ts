@@ -499,7 +499,7 @@ export const entityConfig: ExpressionRule[] = [
                         ]
                     },
                     {
-                        operator: 'GT',
+                        operator: 'LT',
                         params: [
                             {
                                 operator: "DATE",
@@ -577,7 +577,7 @@ export const entityConfig: ExpressionRule[] = [
         ],
         actions: [
             {
-                receiver: "entity.assignees,",
+                receiver: "entity.assignees",
                 channel: "db,mail"
             },
             {

@@ -308,7 +308,7 @@ export class EntityNotifyExecutor {
                 return binaryOperate(params[0], params[1], (x, y) => x <= y);
             case ExpressionOperator.IN:
                 if (Array.isArray(params[1])) {
-                    return Array.from(params[1]).includes(x => binaryOperate(x, params[0], (x, y) => x == y));
+                    return Array.from(params[1]).find(x => binaryOperate(x, params[0], (x, y) => x == y)) != null;
                 } else {
                     return false;
                 }
