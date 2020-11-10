@@ -629,7 +629,7 @@ export const entityConfig: ExpressionRule[] = [
         ],
     },
     {
-        comment: 'Entity "updated",SEND EMAIL & NOTIFICATION to MEMBER',
+        comment: 'Entity(project) "updated",SEND EMAIL & NOTIFICATION to MEMBER',
         type: 'project',
         method: "updated",
         expressions: [
