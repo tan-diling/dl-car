@@ -120,7 +120,6 @@ export class LoginSession {
 
 };
 
-
-export const UserModel = getModelForClass(User);
+export const UserModel = getModelForClass(User, { schemaOptions: { timestamps: true } });
 
 export const LoginSessionModel = getModelForClass(LoginSession);

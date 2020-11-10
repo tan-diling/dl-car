@@ -6,7 +6,7 @@ export enum NotificationStatus {
 
 export enum NotificationTopic {
     Invitation = "Invitation",
-    Project = "Project",
+    // Project = "Project",
     Entity = "Entity",
     // InvitationContact="InvitationContact",
     // InvitationGroup="InvitationGroup",

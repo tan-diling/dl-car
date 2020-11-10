@@ -32,7 +32,8 @@ export class ConversationService {
             })
             .populate({
                 path: "lastMessage"
-            }).exec();
+            })
+            .exec();
     }
 
     /**
@@ -48,6 +49,9 @@ export class ConversationService {
                     select: 'email name image',
                     path: 'user',
                 }
+            })
+            .populate({
+                path: "lastMessage"
             })
             .exec();
     }
@@ -250,7 +254,18 @@ export class ConversationService {
     }
 
 
-    async createActionMessage(dto: { conversation: string | Types.ObjectId, sender: string | Types.ObjectId, user: string | Types.ObjectId, time: Date, type: "enter" | "leave" | "read" | "typing" | string }, save = true) {
+    async createActionMessage(
+        dto: {
+            conversation: string | Types.ObjectId,
+            sender: string | Types.ObjectId,
+            user?: string | Types.ObjectId,
+            time?: Date,
+            title?: string,
+            image?: string,
+            type: "enter" | "leave" | "read" | "typing" | "updated" | string
+        },
+        save = true
+    ) {
         let { conversation, sender, ...data } = dto;
         // const save = data.type == 'enter' || 'leave' == data.type;
         if ('enter' == data.type) {
@@ -297,6 +312,18 @@ export class ConversationService {
         const message = await MessageModel.findById(messageId).exec();
 
         if (message) {
+            await ConversationMemberModel.findOneAndUpdate(
+                {
+                    user: user,
+                    conversation: message.conversation,
+                    deliverAt: { $lt: message.createdAt },
+                },
+                {
+                    deliverAt: message.createdAt
+                },
+            ).exec();
+
+
             if (message.userStatus?.get(idString) == 0) {
                 message.userStatus.set(idString, 1);
                 await message.save();
