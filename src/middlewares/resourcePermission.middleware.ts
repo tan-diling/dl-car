@@ -37,7 +37,7 @@ export function checkResourcePermission(options: { id?: string, type?: string, m
         const service = Container.get(ProjectPermissionService);
 
         const ctx: RequestContext = {
-            method: options.method || RequestOperation.RETRIEVE,
+            method: options.method != null ? options.method : RequestOperation.RETRIEVE,
             request,
             resourceType,
             resourceId,
