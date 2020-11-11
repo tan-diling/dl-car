@@ -52,7 +52,7 @@ export class ConversationController {
 
     @Patch('/:id([0-9a-f]{24})')
     async update(@Param('id') id: string, @Body() dto: UpdateConversationDto, @Req() request, @CurrentUser() currentUser) {
-        await this.service.updateConversation(id, dto);
+        await this.service.updateConversation(id, dto, currentUser.id);
         return await this.getById(id);
     }
 

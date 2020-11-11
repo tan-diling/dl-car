@@ -16,6 +16,7 @@
     "test:login": "mocha --exit  -r ts-node/register ./test/login.test.ts",
     "test:crud": "mocha --exit  -r ts-node/register ./test/crud.test.ts",
     "start": "node ./dist/src/index.js",
+    "dev:debug": "nodemon --inspect ./src/index.ts",
     "dev": "ts-node ./src/index.ts"
   },
   "engines": {

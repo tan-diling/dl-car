@@ -59,7 +59,7 @@ export class ChatContext {
         const userList = ChatContext.chatContextArray.map(x => x.user);
         for (const user of userList) {
             await conversationService.processUserMessageUnSent(user, async doc => {
-                await ChatContext.postMessage(user, { event: ChatMessageTopic.MESSAGE, message: doc });
+                await ChatContext.postMessage(user, { event: doc.topic, message: doc.message });
             });
         }
     }
@@ -246,14 +246,7 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
             await conversationService.updateMessageAsRead({ conversation, user: sender, time });
             const req = await conversationService.createActionMessage({ sender, user, conversation, time, type }, false);
 
-            const { userStatus, ...data } = req.toJSON();
-
-            for (const user of req.userStatus.keys()) {
-                await ChatContext.postMessage(user, { event: ChatMessageTopic.MESSAGE, message: data });
-            }
-
-
-            return { ...data, context: msg.context };
+            return { ...req.toJSON(), context: msg.context };
         }
 
         // if(type=="enter"){

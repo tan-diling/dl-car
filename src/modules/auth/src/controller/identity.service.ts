@@ -56,6 +56,7 @@ export class IdentityService implements IIdentityService {
     }
 
     async userLogin(dto: { email: string; password: string; device: string; ip: string; }) {
+        await this.clearExpiredLoginSession();
         const user = await this.UserModel.findOne({
             email: { $regex: new RegExp('^' + dto.email + '$', "i") },
             deleted: false,

@@ -3,9 +3,10 @@ import { ModelQueryService } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import { UserModel, User } from '../models/user';
 import { Types, CreateQuery } from 'mongoose';
-import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember, Conversation } from '@app/models';
+import { Message, ConversationModel, MessageModel, ConversationMemberModel, ConversationMember, Conversation, PendingMessageModel, PendingMessage } from '@app/models';
 import { DbService } from './db.service';
 import { logger } from '@app/config';
+import moment = require('moment');
 
 /**
  * user service
@@ -117,12 +118,17 @@ export class ConversationService {
      * @param id 
      * @param data 
      */
-    async updateConversation(id: string | Types.ObjectId, data: { title: string, image?: string }) {
+    async updateConversation(
+        id: string | Types.ObjectId,
+        data: { title: string, image?: string },
+        sender: string
+    ) {
         const conversation = await ConversationModel.findById(id).exec();
         if (conversation) {
             conversation.title = data.title;
             conversation.image = data.image;
             await conversation.save();
+            await this.createActionMessage({ conversation: id, type: 'updated', sender, user: sender, ...data }, false);
             return conversation;
         }
     }
@@ -142,8 +148,11 @@ export class ConversationService {
             for (const user of users) {
                 let member = await ConversationMemberModel.findOne({ user: user, conversation: conversation._id }).exec();
                 if (member == null) {
+                    const userModel = await UserModel.findById(user).exec();
+                    if (userModel == null) {
+                        continue;
+                    }
                     member = await ConversationMemberModel.create({ user: user, conversation: conversation._id });
-
 
                 } else {
                     if (member.isDeleted) {
@@ -214,29 +223,35 @@ export class ConversationService {
     private async createMessage(data: CreateQuery<DocumentType<Message>>, save: boolean = true) {
         const conversation = await ConversationModel.findById(data.conversation).populate('members').exec();
         if (conversation) {
-            const userStatus = new Map();
-            for (const member of conversation.members) {
-                userStatus.set(String((member as ConversationMember).user), 0);
-            }
 
-            if (save == false) {
-                const message = new MessageModel({ ...data, userStatus });
-                return message;
-            } else {
+            const message = new MessageModel({ ...data });
 
-                const message = await MessageModel.create({ ...data, userStatus });
+            const pendingMessages = (conversation.members as Array<ConversationMember>)
+                .filter(x => x.isDeleted != true)
+                .map(x => {
+                    return {
+                        receiver: x.user,
+                        topic: 'chat-message',
+                        message,
+                    };
+                });
+
+            await PendingMessageModel.create(pendingMessages);
+
+            if (save == true) {
+                await message.save();
 
                 conversation.lastMessageTime = message.sendAt;
                 conversation.lastMessageSeq = message.seq;
 
-
-
                 await conversation.save();
-
                 MessageModel.emit('created', message);
 
-                return message;
             }
+
+
+            return message;
+
 
         }
     }
@@ -291,17 +306,33 @@ export class ConversationService {
      * query user unsent messages;
      * @param user user id
      */
-    async processUserMessageUnSent(user: string | Types.ObjectId, callback) {
+    async processUserMessageUnSent(user: string | Types.ObjectId, callback: (doc: DocumentType<PendingMessage>) => Promise<void>) {
 
-        logger.info(`processUserMessageUnSent ${user}`);
+
         const idString = String(user);
 
-        const messageList = await MessageModel.find().where('userStatus.' + idString, 0).select('-userStatus').sort('seq').exec();
+        const messageList = await PendingMessageModel
+            .find({
+                receiver: user,
+                sendCount: { $lt: 1 },
+                sendAt: { $lt: new Date() },
+            })
+            .sort('-_id')
+            .exec();
 
-        for (const message of messageList) {
-            callback(message);
+        if (messageList.length > 0) {
+            logger.info(`processPendingMessage ${user} count:${messageList.length}`);
+            for (const message of messageList) {
 
-            await this.updateMessageSent(message._id, idString);
+                await callback(message);
+
+                message.sendCount = message.sendCount + 1;
+
+                message.sendAt = moment().add(10, 'second').toDate();
+
+                await message.save();
+
+            }
         }
     }
 
@@ -324,10 +355,6 @@ export class ConversationService {
             ).exec();
 
 
-            if (message.userStatus?.get(idString) == 0) {
-                message.userStatus.set(idString, 1);
-                await message.save();
-            }
         }
     }
 

@@ -110,19 +110,41 @@ export class Message {
     @prop()
     updatedAt?: Date;
 
-    @prop({ type: Number })
-    userStatus?: Map<string, number>;
+    // @prop({ type: Number })
+    // userStatus?: Map<string, number>;
 }
 
-// export class TextMessage extends Message {  
-//     @prop({})
-//     text: string;    
-// }
 
-// export class ImageMessage extends Message {  
-//     @prop({})
-//     image: string;    
-// }
+@modelOptions({ options: { allowMixed: 0 } })
+export class PendingMessage {
+
+    @prop({ ref: User })
+    receiver: Ref<User>;
+
+    @prop()
+    topic: string;
+
+    @prop()
+    message?: any;
+
+    @prop({ default: 0 })
+    sendCount?: number;
+
+    @prop({ default: Date.now })
+    sendAt?: Date;
+
+    @prop()
+    expiredAt?: Date;
+
+    @prop()
+    createdAt?: Date;
+
+    @prop()
+    updatedAt?: Date;
+
+}
+
+export const PendingMessageModel = getModelForClass(PendingMessage, { schemaOptions: { timestamps: true } });
 
 export const ConversationModel = getModelForClass(Conversation, { schemaOptions: { timestamps: true } });
 

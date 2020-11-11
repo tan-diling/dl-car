@@ -4,7 +4,14 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-   
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Node: Debug",
+            "processId": "${command:PickProcess}",
+            "restart": true,
+            "protocol": "inspector"
+        },
         {
             "name": "Debug",
             "type": "node",
@@ -13,53 +20,50 @@
             "args": [
                 ""
             ],
-            "env":{
-                "DEBUG":"express:*"            
+            "env": {
+                "DEBUG": "express:*"
             },
             "cwd": "${workspaceRoot}",
             "outputCapture": "std",
             "protocol": "inspector"
-            
         },
         {
             "name": "Debug ts",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",            
+            "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
             "args": [
                 "-r",
                 "tsconfig-paths/register",
                 "src/index.ts"
             ],
-            "env":{
-                "DEBUG":"express:*"            
+            "env": {
+                "DEBUG": "express:*"
             },
             "cwd": "${workspaceRoot}",
             "outputCapture": "std",
             "protocol": "inspector"
-            
         },
         {
             "name": "DebugTs(watch)",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable":"${workspaceRoot}/node_modules/.bin/ts-node-dev",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
             // "runtimeExecutable": "nodemon",
-            "args": [  
+            "args": [
                 "--watch",
                 "src",
                 "src/index.ts"
             ],
-            "env":{
-                "DEBUG":"express:*"            
+            "env": {
+                "DEBUG": "express:*"
             },
             "cwd": "${workspaceRoot}",
             "restart": true,
             // "console": "integratedTerminal",
             // "internalConsoleOptions": "neverOpen",
             "protocol": "inspector"
-            
-        },        
+        },
         {
             "name": "Debug current TS File",
             "type": "node",
@@ -68,8 +72,8 @@
             "args": [
                 "${file}"
             ],
-            "env":{
-                "DEBUG":"*"            
+            "env": {
+                "DEBUG": "*"
             },
             "cwd": "${workspaceRoot}",
             "protocol": "inspector"
