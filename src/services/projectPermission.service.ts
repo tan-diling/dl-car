@@ -174,6 +174,10 @@ export class ProjectPermissionService {
             if (ctx.method == RequestOperation.RETRIEVE) {
                 resourceId = ctx.request.params.parent;
             }
+
+            if (ctx.method == RequestOperation.CREATE) {
+                resourceId = ctx.request.params.parent;
+            }
         }
         if (resourceId) {
             //check current
