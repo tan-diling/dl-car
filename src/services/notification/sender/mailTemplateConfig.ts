@@ -4,21 +4,47 @@ import { ResourceType } from '@app/defines';
 /**
  * mail template define
  */
-const Mail_Header = `
-<div>
-<img style='display:block; width:20px;height:20px;'
-       src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAOvSURBVHgBhZRdaBxVFMfPuXf2zsxuPtZE0m2sJZZUERSpKagYJAoRGqlFobZRC6Jp8ibog1KlmheDRfRB+mJTsWCkWkV9CWp9ECQStO2DWrEINaW0TUM+2u52k9mZe+/pmZlsm27T5ixn7jL33t+cc/7nXoRl7P2f5xqV8Z7SVvRG2nZEmlaFmkBbOxtpGAsjfej/0m3f/fAqVmr3Yu2LvT9Vts9OXRyaPle8q3w5AMdT4Nb7UF/IMxAg5Ad/ACJD5zSIdz/ry+9fFjg4OCgu5HbsO/7byZfPn5pBosUJSlc1rGqAux+7F/JrmyE0RDqyyFAwBobaZ/bu5v32OuCj3T++d2l2fhdZQjbGEC5XjnWd66nwwBqGXY0UyMD+Q6+17IznRfzo2vJrX2nO7BKoUEoXROzCo3R0LQp1GNHpt0I+/O/46XZtzXAM0nGEFig09pWnP5jenkTY1vWLly/rk/y/dUmOxLEjEE3yljf+PLJpZGmUOz45uzYKM/9oAzmdioWc+kR0cX6DaAoyWziKVvY0MulzZB5HpqaNk3miFhbb5wN3nGbQF1FkOHV2FkpbarP1uR6BUm0TS9MUCmMHoV7/e/zxE3ATCyJ9tMLRxZ7WkkXS+nlHouqMM7ymTyLvX0fHNozALSwM8T9NlmtIYFnfxIk6HES3GUXCSRsF4wn4FlawUgg+MpDXxiBI2oygxYlTRayiUpMgjqwErIR6I3FYVI2EINHRkUJN8bg6RWIywRKXVgKWg+hZLjRVSZh0hp0TUrjHEoVjR5dFcUlKf92tYIX+E1vLgX1wIdQYsCBhZPlIGmTlx4SQ6mDcJjJtFVbY5YPiPHQzWP6l8TYTBR9VwgiC0HLqBtPzDRRZ+kpIY0alVBOYtIxPiy3U29VDhVpY69bRblWZP4zRwhowAVgdgubjEgM5wkkH6ftEiO7N1CsEjHB5RbWBSOKHx8N97/iwcHvZyEdANWxDWddDmSzXxOdD6/Jqh8cMb3DAoUz/5IF7hq8qu/lFM8yV7VvE8U/QjPkDzxR/51MggJwcy5/l0eePeQxSDHRZCAcd6Q1NHrj/7ZgjqsCOdjHg1MGQ10jgNQL4jRbvbNoI61uehKziFxR3muFRc+OlnhUS2t3CpwNt9+2ucm64ol54U+9ECYPc7K18gyXXmGFIcWEaLleKUDGGPJXDOtUw4Tq5t77Zk/1y6f5l77xNH5O7uhQ+I6V8jnPoZGhzMmFhim/JY1rbg+ViefTrPU2XavdeAfEC0Vgp/UliAAAAAElFTkSuQmCC' />
-Gestalter
-</div>
-<br/>
-` ;
-const Mail_Footer = `
-<br/>
-<div class='footer'>
+function generateHTML(content: string) {
+    const Mail_Layout =
+        `
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <title>Gestalter Mail Layout</title>
+  </head>
+  <body>
+    <p class="h1 border-bottom"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAOvSURBVHgBhZRdaBxVFMfPuXf2zsxuPtZE0m2sJZZUERSpKagYJAoRGqlFobZRC6Jp8ibog1KlmheDRfRB+mJTsWCkWkV9CWp9ECQStO2DWrEINaW0TUM+2u52k9mZe+/pmZlsm27T5ixn7jL33t+cc/7nXoRl7P2f5xqV8Z7SVvRG2nZEmlaFmkBbOxtpGAsjfej/0m3f/fAqVmr3Yu2LvT9Vts9OXRyaPle8q3w5AMdT4Nb7UF/IMxAg5Ad/ACJD5zSIdz/ry+9fFjg4OCgu5HbsO/7byZfPn5pBosUJSlc1rGqAux+7F/JrmyE0RDqyyFAwBobaZ/bu5v32OuCj3T++d2l2fhdZQjbGEC5XjnWd66nwwBqGXY0UyMD+Q6+17IznRfzo2vJrX2nO7BKoUEoXROzCo3R0LQp1GNHpt0I+/O/46XZtzXAM0nGEFig09pWnP5jenkTY1vWLly/rk/y/dUmOxLEjEE3yljf+PLJpZGmUOz45uzYKM/9oAzmdioWc+kR0cX6DaAoyWziKVvY0MulzZB5HpqaNk3miFhbb5wN3nGbQF1FkOHV2FkpbarP1uR6BUm0TS9MUCmMHoV7/e/zxE3ATCyJ9tMLRxZ7WkkXS+nlHouqMM7ymTyLvX0fHNozALSwM8T9NlmtIYFnfxIk6HES3GUXCSRsF4wn4FlawUgg+MpDXxiBI2oygxYlTRayiUpMgjqwErIR6I3FYVI2EINHRkUJN8bg6RWIywRKXVgKWg+hZLjRVSZh0hp0TUrjHEoVjR5dFcUlKf92tYIX+E1vLgX1wIdQYsCBhZPlIGmTlx4SQ6mDcJjJtFVbY5YPiPHQzWP6l8TYTBR9VwgiC0HLqBtPzDRRZ+kpIY0alVBOYtIxPiy3U29VDhVpY69bRblWZP4zRwhowAVgdgubjEgM5wkkH6ftEiO7N1CsEjHB5RbWBSOKHx8N97/iwcHvZyEdANWxDWddDmSzXxOdD6/Jqh8cMb3DAoUz/5IF7hq8qu/lFM8yV7VvE8U/QjPkDzxR/51MggJwcy5/l0eePeQxSDHRZCAcd6Q1NHrj/7ZgjqsCOdjHg1MGQ10jgNQL4jRbvbNoI61uehKziFxR3muFRc+OlnhUS2t3CpwNt9+2ucm64ol54U+9ECYPc7K18gyXXmGFIcWEaLleKUDGGPJXDOtUw4Tq5t77Zk/1y6f5l77xNH5O7uhQ+I6V8jnPoZGhzMmFhim/JY1rbg+ViefTrPU2XavdeAfEC0Vgp/UliAAAAAElFTkSuQmCC" class="float-left" alt="image"/>Gestalter</p>
+    <div class="container">
+    ${content} 
+    </div>
+    <div class="border-top">
   <div>Thank you,</div>
   <div>-Gestalter</div>
 </div>
-` ;
+    
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    
+  </body>
+</html>
+`;
+    return Mail_Layout;
+}
+
+
+
 export const mailTemplateConfig = {
     invitation: (ctx: any) => {
         const { user, server, doc } = ctx;
@@ -27,50 +53,46 @@ export const mailTemplateConfig = {
             case "InvitationContact":
                 return {
                     "subject": "Please confirm the contact invitation ",
-                    "html": `
-${Mail_Header}  
-<div>          
-<div>Hi ${user.name},<div>                    
+                    "html": generateHTML(`
+<div class="row">          
+<div class="h6">Hi ${user.name},</div>                    
 
 You have been invited as contact for ${doc.data.name}, please click the below link to view.
 
-<div><a href='${url}'>Show details</a></div>
+<a href="${url}" class="btn btn-primary" role="button">Show details</a>
 </div>
-${Mail_Footer} 
-`,
+`),
                 };
                 break;
             case "InvitationGroup":
                 return {
                     "subject": "Please confirm the group invitation ",
-                    "html": `
-${Mail_Header}  
-<div>          
-<div>Hi ${user.name},<div>                    
+                    "html": generateHTML(`
+
+<div class="row">          
+<div class="h6">Hi ${user.name},</div>                    
 
 You have been invited to join group ${doc.data.name}, please click the below link to view.
 
-<div><a href='${url}'>Show details</a></div>
+<a href="${url}" class="btn btn-primary" role="button">Show details</a>
 </div>
-${Mail_Footer}
-`,
+`),
                 };
                 break;
 
             case "InvitationProject":
                 return {
                     "subject": "Please confirm the project invitation ",
-                    "html": `
-                    ${Mail_Header}  
-                    <div>          
-                    <div>Hi ${user.name},<div>                    
+                    "html": generateHTML(`
+                    <div class="row">          
+                    <div class="h6">Hi ${user.name},</div>                    
                     
                     You have been invited to join project ${ doc.data.name}, please click the below link to view.
                     
-                    <div><a href='${url}'>Show details</a></div>
+                    <a href="${url}" class="btn btn-primary" role="button">Show details</a>
                     </div>
-                    ${Mail_Footer}                    
-                        `,
+                                
+                        `),
                 };
                 break;
         }
@@ -87,15 +109,6 @@ ${Mail_Footer}
         const body = entityContext.req?.body;
         let desc = body?._desc || "";
 
-        const updateList = [];
-        if (body) {
-            for (const k of Object.keys(body)) {
-                if (k.startsWith('_')) continue;
-                if (k == 'id') continue;
-                updateList.push(`${k}: ${body[k]} `);
-            }
-        }
-
         let action = entityContext.method;
         if (action == "member.append") {
             action = "add member";
@@ -111,9 +124,17 @@ ${Mail_Footer}
             action = action + ` ${body._user.name} `;
         } else {
             if (desc == "") {
-                if (updateList.length > 0) {
-                    desc = updateList.join('\n');
+                const updateList = [];
+                if (body) {
+                    for (const k of Object.keys(body)) {
+                        if (k.startsWith('_')) continue;
+                        if (k == 'id') continue;
+                        updateList.push(`<dt class="col-sm-3">${k}:</dt> <dd class="col-sm-9">${body[k]}</dd> `);
+                    }
                 }
+
+                desc = `<dl class="row">${updateList.join(' ')}</dl>`;
+
             }
         }
 
@@ -123,30 +144,28 @@ ${Mail_Footer}
         const entityType = entity.type.toLowerCase();
         switch (entityType) {
             case ResourceType.Project:
-                url = `${server} /project/detail / ${entity._id} `;
+                url = `${server}/project/detail/${entity._id}`;
                 break;
             case ResourceType.Goal:
             case ResourceType.Requirement:
             case ResourceType.Deliverable:
             case ResourceType.Task:
-                url = `${server} /project/${project._id} /${entityType}/${entity._id} `;
+                url = `${server}/project/${project._id}/${entityType}/${entity._id}`;
                 break;
 
         }
         return {
             "subject": subject,
-            "html": `
-                ${ Mail_Header}
-                <div>
-                    <div>Hi ${ user.name}, </div>
+            "html": generateHTML(`                
+                <div class="row">
+                    <div class="h6">Hi ${user.name}, </div>
 
-                    <div>${ entityKey} ${action} by ${entityContext.user.name} </div>
+                    <div>'${entity.title}' ${action} by ${entityContext.user.name} </div>
                     <div> ${ desc} </div>
 
-                    <div><a href='${url}' > Show details < /a></div >
-                </div>
-                ${ Mail_Footer}
-                `,
+                    <a href="${url}" class="btn btn-primary" role="button">Show details</a>
+                </div>                
+                `),
         };
 
     },
@@ -155,10 +174,9 @@ ${Mail_Footer}
         const { user, server, doc } = ctx;
         return {
             "subject": "Reset your password",
-            "html": `
-                ${ Mail_Header}
+            "html": generateHTML(`
                 <div>
-                    <div>Hi ${ user.name}, <div>
+                    <div class="h6">Hi ${ user.name}, <div>
                         We received a request to reset your password after confirming the verification code.Your GCP verification code is:
 
                 <h3>${ doc.code} </h3>
@@ -166,8 +184,7 @@ ${Mail_Footer}
                 Please do not forward or give this code to anyone.
 
 < /div>
-                ${ Mail_Footer}
-                `,
+                `),
         };
     }
 
