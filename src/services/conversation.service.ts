@@ -7,6 +7,7 @@ import { Message, ConversationModel, MessageModel, ConversationMemberModel, Conv
 import { DbService } from './db.service';
 import { logger } from '@app/config';
 import moment = require('moment');
+import { ChatMessageTopic } from './socketio/message.socket.service';
 
 /**
  * user service
@@ -226,18 +227,6 @@ export class ConversationService {
 
             const message = new MessageModel({ ...data });
 
-            const pendingMessages = (conversation.members as Array<ConversationMember>)
-                .filter(x => x.isDeleted != true)
-                .map(x => {
-                    return {
-                        receiver: x.user,
-                        topic: 'chat-message',
-                        message,
-                    };
-                });
-
-            await PendingMessageModel.create(pendingMessages);
-
             if (save == true) {
                 await message.save();
 
@@ -249,6 +238,17 @@ export class ConversationService {
 
             }
 
+            const pendingMessages = (conversation.members as Array<ConversationMember>)
+                .filter(x => x.isDeleted != true)
+                .map(x => {
+                    return {
+                        receiver: x.user,
+                        topic: ChatMessageTopic.MESSAGE,
+                        message,
+                    };
+                });
+
+            await PendingMessageModel.create(pendingMessages);
 
             return message;
 

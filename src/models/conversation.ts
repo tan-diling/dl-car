@@ -104,10 +104,10 @@ export class Message {
     @prop({ default: Date.now })
     sendAt?: Date;
 
-    @prop()
+    @prop({ default: Date.now })
     createdAt?: Date;
 
-    @prop()
+    @prop({ default: Date.now })
     updatedAt?: Date;
 
     // @prop({ type: Number })
