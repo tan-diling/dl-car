@@ -14,29 +14,20 @@ function generateHTML(content: string) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-
     <title>Gestalter Mail Layout</title>
   </head>
   <body>
-    <p class="h1 border-bottom"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAOvSURBVHgBhZRdaBxVFMfPuXf2zsxuPtZE0m2sJZZUERSpKagYJAoRGqlFobZRC6Jp8ibog1KlmheDRfRB+mJTsWCkWkV9CWp9ECQStO2DWrEINaW0TUM+2u52k9mZe+/pmZlsm27T5ixn7jL33t+cc/7nXoRl7P2f5xqV8Z7SVvRG2nZEmlaFmkBbOxtpGAsjfej/0m3f/fAqVmr3Yu2LvT9Vts9OXRyaPle8q3w5AMdT4Nb7UF/IMxAg5Ad/ACJD5zSIdz/ry+9fFjg4OCgu5HbsO/7byZfPn5pBosUJSlc1rGqAux+7F/JrmyE0RDqyyFAwBobaZ/bu5v32OuCj3T++d2l2fhdZQjbGEC5XjnWd66nwwBqGXY0UyMD+Q6+17IznRfzo2vJrX2nO7BKoUEoXROzCo3R0LQp1GNHpt0I+/O/46XZtzXAM0nGEFig09pWnP5jenkTY1vWLly/rk/y/dUmOxLEjEE3yljf+PLJpZGmUOz45uzYKM/9oAzmdioWc+kR0cX6DaAoyWziKVvY0MulzZB5HpqaNk3miFhbb5wN3nGbQF1FkOHV2FkpbarP1uR6BUm0TS9MUCmMHoV7/e/zxE3ATCyJ9tMLRxZ7WkkXS+nlHouqMM7ymTyLvX0fHNozALSwM8T9NlmtIYFnfxIk6HES3GUXCSRsF4wn4FlawUgg+MpDXxiBI2oygxYlTRayiUpMgjqwErIR6I3FYVI2EINHRkUJN8bg6RWIywRKXVgKWg+hZLjRVSZh0hp0TUrjHEoVjR5dFcUlKf92tYIX+E1vLgX1wIdQYsCBhZPlIGmTlx4SQ6mDcJjJtFVbY5YPiPHQzWP6l8TYTBR9VwgiC0HLqBtPzDRRZ+kpIY0alVBOYtIxPiy3U29VDhVpY69bRblWZP4zRwhowAVgdgubjEgM5wkkH6ftEiO7N1CsEjHB5RbWBSOKHx8N97/iwcHvZyEdANWxDWddDmSzXxOdD6/Jqh8cMb3DAoUz/5IF7hq8qu/lFM8yV7VvE8U/QjPkDzxR/51MggJwcy5/l0eePeQxSDHRZCAcd6Q1NHrj/7ZgjqsCOdjHg1MGQ10jgNQL4jRbvbNoI61uehKziFxR3muFRc+OlnhUS2t3CpwNt9+2ucm64ol54U+9ECYPc7K18gyXXmGFIcWEaLleKUDGGPJXDOtUw4Tq5t77Zk/1y6f5l77xNH5O7uhQ+I6V8jnPoZGhzMmFhim/JY1rbg+ViefTrPU2XavdeAfEC0Vgp/UliAAAAAElFTkSuQmCC" class="float-left" alt="image"/>Gestalter</p>
+    <p style="box-sizing:border-box;border-bottom-width:1px !important;border-bottom-style:solid !important;border-bottom-color:#dee2e6 !important;" >
+       <img style="width:20px;height:20px" src="https://dev.onwards.ai/assets/image/gest-logo.png" class="float-left" alt="image"/>
+       <bold>Gestalter </bold>
+    </p>
     <div class="container">
     ${content} 
     </div>
-    <div class="border-top">
-  <div>Thank you,</div>
-  <div>-Gestalter</div>
-</div>
-    
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-
-    
+    <div style="box-sizing:border-box;border-top-width:1px !important;border-top-style:solid !important;border-bottom-color:#dee2e6 !important;" > 
+      <div>Thank you,</div>
+      <div>-Gestalter</div>
+    </div>    
   </body>
 </html>
 `;
@@ -55,11 +46,11 @@ export const mailTemplateConfig = {
                     "subject": "Please confirm the contact invitation ",
                     "html": generateHTML(`
 <div class="row">          
-<div class="h6">Hi ${user.name},</div>                    
+<h3>Hi ${user.name},</h3>                    
 
 You have been invited as contact for ${doc.data.name}, please click the below link to view.
 
-<a href="${url}" class="btn btn-primary" role="button">Show details</a>
+<a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
 </div>
 `),
                 };
@@ -70,11 +61,11 @@ You have been invited as contact for ${doc.data.name}, please click the below li
                     "html": generateHTML(`
 
 <div class="row">          
-<div class="h6">Hi ${user.name},</div>                    
+<h3>Hi ${user.name},</h3>                                        
 
 You have been invited to join group ${doc.data.name}, please click the below link to view.
 
-<a href="${url}" class="btn btn-primary" role="button">Show details</a>
+<a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
 </div>
 `),
                 };
@@ -85,11 +76,11 @@ You have been invited to join group ${doc.data.name}, please click the below lin
                     "subject": "Please confirm the project invitation ",
                     "html": generateHTML(`
                     <div class="row">          
-                    <div class="h6">Hi ${user.name},</div>                    
+                    <h3>Hi ${user.name},</h3>                                      
                     
                     You have been invited to join project ${ doc.data.name}, please click the below link to view.
                     
-                    <a href="${url}" class="btn btn-primary" role="button">Show details</a>
+                    <a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
                     </div>
                                 
                         `),
@@ -158,12 +149,12 @@ You have been invited to join group ${doc.data.name}, please click the below lin
             "subject": subject,
             "html": generateHTML(`                
                 <div class="row">
-                    <div class="h6">Hi ${user.name}, </div>
+                <h3>Hi ${user.name},</h3>                    
 
                     <div>'${entity.title}' ${action} by ${entityContext.user.name} </div>
                     <div> ${ desc} </div>
 
-                    <a href="${url}" class="btn btn-primary" role="button">Show details</a>
+                    <a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
                 </div>                
                 `),
         };
@@ -176,7 +167,7 @@ You have been invited to join group ${doc.data.name}, please click the below lin
             "subject": "Reset your password",
             "html": generateHTML(`
                 <div>
-                    <div class="h6">Hi ${ user.name}, <div>
+                <h3>Hi ${user.name},</h3>                    
                         We received a request to reset your password after confirming the verification code.Your GCP verification code is:
 
                 <h3>${ doc.code} </h3>
