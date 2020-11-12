@@ -21,10 +21,10 @@ function generateHTML(content: string) {
        <img style="width:20px;height:20px" src="https://dev.onwards.ai/assets/image/gest-logo.png" class="float-left" alt="image"/>
        <bold>Gestalter </bold>
     </p>
-    <div class="container">
+    <div class="container" style="margin:20px 0px;">
     ${content} 
     </div>
-    <div style="box-sizing:border-box;border-top-width:1px !important;border-top-style:solid !important;border-bottom-color:#dee2e6 !important;" > 
+    <div style="box-sizing:border-box;border-top-width:1px !important;border-top-style:solid !important;border-top-color:#dee2e6 !important;" > 
       <div>Thank you,</div>
       <div>-Gestalter</div>
     </div>    
@@ -120,7 +120,7 @@ You have been invited to join group ${doc.data.name}, please click the below lin
                     for (const k of Object.keys(body)) {
                         if (k.startsWith('_')) continue;
                         if (k == 'id') continue;
-                        updateList.push(`<dt class="col-sm-3">${k}:</dt> <dd class="col-sm-9">${body[k]}</dd> `);
+                        updateList.push(`<dt class="col-sm-3" style="text-transform:capitalize!important;">${k}:</dt> <dd class="col-sm-9">${body[k]}</dd> `);
                     }
                 }
 
