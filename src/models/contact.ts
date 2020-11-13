@@ -1,6 +1,7 @@
 import { prop, Ref, plugin, getModelForClass, getDiscriminatorModelForClass, index } from '@typegoose/typegoose';
 import { User } from './user';
 import { Types } from 'mongoose';
+import { stringify } from 'querystring';
 
 
 
@@ -16,37 +17,43 @@ export class Contact {
   meta?: any;
 
   static async appendContact(user: string | Types.ObjectId, contact: string | Types.ObjectId) {
-    {
-      const filter = { userId: user, contact };
-      const c = await ContactModel.findOne(filter).exec();
-      if (c == null) {
-        await ContactModel.create(filter);
-      }
-    }
+    const ret = [];
 
-    {
-      const filter = { userId: contact, contact: user };
-      const c = await ContactModel.findOne(filter).exec();
-      if (c == null) {
-        await ContactModel.create(filter);
+    if (String(user) != String(contact)) {
+      {
+        const filter = { userId: user, contact };
+        const c = await ContactModel.findOne(filter).exec();
+
+        if (c == null) {
+          ret.push(await ContactModel.create(filter));
+        }
+      }
+
+      {
+        const filter = { userId: contact, contact: user };
+        const c = await ContactModel.findOne(filter).exec();
+        if (c == null) {
+          ret.push(await ContactModel.create(filter));
+        }
       }
     }
-    return;
+    return ret;
   }
 
   static async removeContact(user: string | any, contact: string | any) {
+    const ret = []
 
     {
       const filter = { userId: user, contact };
-      await ContactModel.findOneAndRemove(filter).exec();
+      ret.push(await ContactModel.findOneAndRemove(filter).exec());
 
     }
 
     {
       const filter = { userId: contact, contact: user };
-      await ContactModel.findOneAndRemove(filter).exec();
+      ret.push(await ContactModel.findOneAndRemove(filter).exec());
     }
-    return;
+    return ret;
   }
 
 };

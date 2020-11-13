@@ -19,7 +19,7 @@ class MailNotificationSender implements NotificationSenderInterface {
         const user = await findUserById(data.receiver);
 
         if (user) {
-            if (user.forbiddenMailNotification == true) {
+            if (data.skipMailCheck != true && user.forbiddenMailNotification == true) {
                 logger.debug(`mail forbidden  ${user.name} ,skipped `)
                 return;
             }

@@ -1,12 +1,14 @@
 import { Event, EventModel, Notification, NotificationModel } from '@app/models/notification';
 import { DocumentType, types } from '@typegoose/typegoose';
-import { Types } from 'mongoose';
+import { Types, isValidObjectId } from 'mongoose';
 import { InvitationContact, InvitationGroup, InvitationProject, Resource, ProjectMember } from '@app/models';
 import Container from 'typedi';
 import { NotificationTopic, NotificationAction, ProjectRole } from '@app/defines';
 import { executeNotificationSend } from './sender';
 import { Entity, EntityContext } from './entity/entityContext';
 import { entityEntityExecuteEval } from './entity';
+import { logger } from '@app/config';
+import { GroupService } from '../group.service';
 
 interface EventHandler {
     (ev: DocumentType<Event>): Promise<void>;
@@ -22,9 +24,6 @@ interface EventHandlerConfig {
 const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => {
     const inviteTypes: string[] = [
         NotificationTopic.Invitation,
-        // NotificationTopic.InvitationContact, 
-        // NotificationTopic.InvitationGroup, 
-        // NotificationTopic.InvitationProject
     ];
     if (!inviteTypes.includes(ev.type)) {
         throw new Error("not support invite type");
@@ -38,8 +37,6 @@ const invitationResponseNotifyForApiAction = async (ev: DocumentType<Event>) => 
             event: ev,
         });
     }
-
-
 }
 
 function invitationNotifyForMailAction<T extends InvitationContact>() {
@@ -104,36 +101,91 @@ const entityNotifyAction = async (ev: DocumentType<Event>) => {
     }
 };
 
+//send notification for group
+const groupNotifyAction = async (ev: DocumentType<Event>) => {
+    if (ev.type != NotificationTopic.Group) {
+        return;
+    }
 
-//send notification to project_manager
-const projectNotifyToProjectManagerAction = async (ev: DocumentType<Event>) => {
-    const doc = (ev.data as Resource);
+    let entity = ev.data.entity;
+    let users = entity.members;
 
-    const members = doc.members as Array<ProjectMember>;
-    for (const x of members.filter(x => x.projectRole == ProjectRole.ProjectManager)) {
+    if (!Array.isArray(users)) {
+        const groupId = entity.groupId || entity._id;
+
+        const groupServicer = Container.get(GroupService);
+        entity = await groupServicer.getById(groupId);
+
+        if (entity == null) {
+            throw new Error(`group notify ${ev.data.req?.method} ${ev.data.req?.url}`);
+        }
+
+        ev.data.entity = entity;
+        await ev.save();
+
+        users = entity.members;
+
+    }
+
+    users = users.map(x => x.userId);
+    for (const user of users) {
         await executeNotificationSend(
             {
                 executor: 'db',
-                receiver: x.userId as Types.ObjectId,
+                receiver: new Types.ObjectId(user),
                 event: ev,
 
             }
+
         );
     }
+
+
 };
 
-
-//send notification to project assignee
-const projectNotifyToAssigneeAction = async (ev: DocumentType<Event>) => {
-    const doc = (ev.data as Resource);
-    for (const x of doc.assignees) {
-        await executeNotificationSend({
-            executor: 'db',
-            receiver: x as Types.ObjectId,
-            event: ev,
-        });
+//send notification for contact
+const contactNotifyAction = async (ev: DocumentType<Event>) => {
+    if (ev.type != NotificationTopic.Contact) {
+        return;
     }
+
+    let entity = ev.data.entity;
+
+    let users = [];
+    if (Array.isArray(entity)) {
+        users = entity;
+    } else {
+        users = [entity];
+    }
+
+    users = users.map(x => x.userId);
+    for (const user of users) {
+        if (!isValidObjectId(user)) {
+            throw new Error(`contact notify ${ev.data.req?.method} ${ev.data.req?.url}`);
+        }
+
+        await executeNotificationSend(
+            {
+                executor: 'db',
+                receiver: new Types.ObjectId(user),
+                event: ev,
+            }
+        );
+    }
+
+
 };
+
+// //send notification for contact
+// const actionNotifyAction = async (ev: DocumentType<Event>) => {
+//     if (ev.type != NotificationTopic.Invitation) {
+//         return;
+//     }
+
+//     if (ev.action != NotificationAction.Status) {
+//         return;
+//     }
+// };
 
 
 export const notificationConfig: Array<EventHandlerConfig> = [];
@@ -154,55 +206,6 @@ notificationConfig.push(
         ]
 
     },
-    // {
-    //     topic: NotificationTopic.InvitationContact,
-    //     actions: [
-    //         {
-    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
-    //             action: invitationContactNotifyForMailAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },
-    //     ]
-
-    // },
-
-    // {
-    //     topic: NotificationTopic.InvitationGroup,
-    //     actions: [
-    //         {
-    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
-    //             action: invitationGroupNotifyForMailAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },
-    //     ]
-    // },
-    // //notification config define for Invitation Project
-    // {
-    //     topic: NotificationTopic.InvitationProject,
-    //     actions: [
-    //         {
-    //             expressions: [{ property: 'action', value: NotificationAction.Invite }],
-    //             action: invitationProjectNotifyForMailAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Accept }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },{
-    //             expressions: [{ property: 'action', value: NotificationAction.Reject }],
-    //             action: invitationResponseNotifyForApiAction,
-    //         },
-    //     ]
-    // },
-
     {
         topic: NotificationTopic.Entity,
         actions: [
@@ -212,30 +215,31 @@ notificationConfig.push(
                     await entityNotifyAction(ev);
                 },
             },
-            // {
-            //     expressions: [NotificationAction.Created],
-            //     action: async (ev: DocumentType<Event>) => {
-            //         await projectNotifyToProjectManagerAction(ev);
-            //     },
-            // }, {
-            //     expressions: [NotificationAction.Updated],
-            //     action: async (ev: DocumentType<Event>) => {
-            //         await projectNotifyToProjectManagerAction(ev);
-            //         await projectNotifyToAssigneeAction(ev);
-            //     },
-            // }, {
-            //     expressions: [NotificationAction.Status],
-            //     action: async (ev: DocumentType<Event>) => {
-            //         await projectNotifyToProjectManagerAction(ev);
-            //         await projectNotifyToAssigneeAction(ev);
-            //     },
-            // }, {
-            //     expressions: [NotificationAction.Deleted],
-            //     action: async (ev: DocumentType<Event>) => {
-            //         await projectNotifyToProjectManagerAction(ev);
-            //         await projectNotifyToAssigneeAction(ev);
-            //     },
-            // },
+
+        ]
+    },
+    {
+        topic: NotificationTopic.Group,
+        actions: [
+            {
+                expressions: [],
+                action: async (ev: DocumentType<Event>) => {
+                    await groupNotifyAction(ev);
+                },
+            },
+
+        ]
+    },
+    {
+        topic: NotificationTopic.Contact,
+        actions: [
+            {
+                expressions: [],
+                action: async (ev: DocumentType<Event>) => {
+                    await contactNotifyAction(ev);
+                },
+            },
+
         ]
     }
 );

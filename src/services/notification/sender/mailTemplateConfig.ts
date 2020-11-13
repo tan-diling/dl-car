@@ -135,13 +135,13 @@ You have been invited to join group ${doc.data.name}, please click the below lin
         const entityType = entity.type.toLowerCase();
         switch (entityType) {
             case ResourceType.Project:
-                url = `${server}/project/detail/${entity._id}`;
+                url = `${server}/project/detail/${entity._id}?userId=${user._id}`;
                 break;
             case ResourceType.Goal:
             case ResourceType.Requirement:
             case ResourceType.Deliverable:
             case ResourceType.Task:
-                url = `${server}/project/${project._id}/${entityType}/${entity._id}`;
+                url = `${server}/project/${project._id}/${entityType}/${entity._id}?userId=${user._id}`;
                 break;
 
         }

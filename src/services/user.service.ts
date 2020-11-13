@@ -184,6 +184,7 @@ export class UserService {
                 receiver: user._id,
                 event: { sender: user._id, type: 'user', action: 'forgetPassword', data: { code } },
                 mailTemplate: "forgetPassword",
+                skipMailCheck: true,
             }).catch(err => {
                 console.error("forget password mail send error")
             });

@@ -8,6 +8,9 @@ export enum NotificationTopic {
     Invitation = "Invitation",
     // Project = "Project",
     Entity = "Entity",
+    Group = "Group",
+    Contact = "Contact",
+    Notification = "Notification",
     // InvitationContact="InvitationContact",
     // InvitationGroup="InvitationGroup",
     // InvitationProject="InvitationProject",
@@ -22,7 +25,12 @@ export enum NotificationAction {
     Updated = "updated",
     Deleted = "deleted",
     Status = "status",
-    Member = "member",
+    MemberAppend = "member.append",
+    MemberUpdated = "member.updated",
+    MemberRemove = "member.remove",
+    AssigneeAppend = "assignee.append",
+    AssigneeRemove = "assignee.remove",
     Assignee = "assignee",
+    Member = "member",
 }
 

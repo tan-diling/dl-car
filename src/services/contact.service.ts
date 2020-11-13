@@ -61,11 +61,10 @@ export class ContactService {
         const contactUser = await ContactModel.findOne({ userId, contact: id }).exec();
 
         if (contactUser == null) {
-            return { result: false };
+            return [];
         }
 
-        await Contact.removeContact(userId, id);
-        return { result: true };
+        return await Contact.removeContact(userId, id);
     }
 
 

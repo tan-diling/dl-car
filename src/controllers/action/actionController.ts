@@ -2,13 +2,14 @@ import { Request, Response, NextFunction, query } from 'express';
 import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor } from 'routing-controllers';
 
 import * as moment from 'moment';
-import { SiteRole } from '@app/defines';
+import { SiteRole, NotificationTopic, NotificationAction } from '@app/defines';
 import { ActionService } from '@app/services/action.service';
 import { ActionStatusDto } from './dto/action.dto';
 import { ContactService } from '@app/services/contact.service';
 import { Container } from 'typedi';
 import { Types } from 'mongoose';
-import { actionNotificationInterceptor } from '@app/middlewares/action.interceptor';
+
+import { notificationInterceptor } from '@app/middlewares/notification.interceptor';
 
 @Authorized()
 @JsonController('/action')
@@ -17,7 +18,7 @@ export class ActionController {
     }
 
 
-    @UseInterceptor(actionNotificationInterceptor())
+    @UseInterceptor(notificationInterceptor(NotificationTopic.Invitation, NotificationAction.Status))
     @Post('/:id([0-9a-f]{24})/status')
     async response(@Param('id') id: string, @Body() dto: ActionStatusDto, @CurrentUser() currentUser) {
         return await this.service.status({ id, userId: currentUser.id, ...dto });
