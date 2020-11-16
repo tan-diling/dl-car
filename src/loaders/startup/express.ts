@@ -58,7 +58,8 @@ export default (server: BackendServer) => {
 
   app.use(cookieSession({
     name: 'session',
-    keys: ['sessionKey1', 'sessionKey2']
+    keys: ['sessionKey1', 'sessionKey2'],
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   }));
   //   // The magic package that prevents frontend developers going nuts
   //   // Alternate description:

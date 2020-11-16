@@ -8,6 +8,7 @@ import { logger } from '@app/config';
 import { ConversationService } from '../conversation.service';
 import { Container } from 'typedi';
 import { Type } from 'class-transformer';
+import { NotificationTopic } from '@app/defines';
 
 
 const conversationService = Container.get(ConversationService)
@@ -37,32 +38,14 @@ export class ChatContext {
         logger.info(`append clients count ${ChatContext.chatContextArray.length} `);
     }
 
-    static messageQueue: { user: string | Types.ObjectId, event: string, message: any }[] = [];
+    // static messageQueue: { user: string | Types.ObjectId, event: string, message: any }[] = [];
     static postMessage = async (user: string | Types.ObjectId, data: { event: string, message }) => {
-        ChatContext.messageQueue.push({ user, ...data });
-    }
-
-    static sendMessages = async () => {
-        while (true) {
-            const data = ChatContext.messageQueue.pop();
-            if (data === undefined) return;
-
-            for (const ctx of ChatContext.chatContextArray.filter(x => String(x.user) == String(data.user))) {
-                ctx.socket.emit(data.event, data.message);
-            }
-        }
-
-
-    }
-
-    static processUnsentMessage = async () => {
-        const userList = ChatContext.chatContextArray.map(x => x.user);
-        for (const user of userList) {
-            await conversationService.processUserMessageUnSent(user, async doc => {
-                await ChatContext.postMessage(user, { event: doc.topic, message: doc.message });
-            });
+        for (const ctx of ChatContext.chatContextArray.filter(x => String(x.user) == String(user))) {
+            ctx.postMessageQueue(data);
         }
     }
+
+
 
     static async startMessageProcess() {
         const sleep = function (ms) {
@@ -72,8 +55,12 @@ export class ChatContext {
         console.log('startMessageProcess...');
         while (true) {
             try {
-                await ChatContext.processUnsentMessage();
-                await ChatContext.sendMessages();
+                for (const context of ChatContext.chatContextArray) {
+                    await context.queueMessage();
+                    await context.pushMessageQueue();
+                }
+                // await ChatContext.processUnsentMessage();
+                // await ChatContext.sendMessages();
                 await sleep(1000);
             } catch (err) {
                 console.error(err);
@@ -85,8 +72,47 @@ export class ChatContext {
     constructor(
         public user: Types.ObjectId,
         public socket: ServerIO.Socket,
+        public scope: string = '*',
     ) {
         ChatContext.append(this);
+    }
+
+    async queueMessage() {
+        if (this.scope == "*" || this.scope.includes("message")) {
+            const user = this.user;
+            await conversationService.processPendingMessage(user, async doc => {
+                await this.postMessageQueue({ event: doc.topic, message: doc.message });
+                return true;
+            });
+        }
+    }
+
+    queue: { event: string, message: any }[] = [];
+    async postMessageQueue(data: { event: string, message }) {
+        let checked = false;
+        if (this.scope == "*") {
+            checked = true;
+        } else {
+            let type: string = data.message?.event?.type || "";
+            if (data.event == ChatMessageTopic.MESSAGE) { type = 'message' }
+
+            if (this.scope.includes(type.toLowerCase())) {
+                checked = true;
+            }
+        }
+
+        if (checked) {
+            return this.queue.push(data);
+        }
+    }
+
+    async pushMessageQueue() {
+        while (true) {
+            const data = this.queue.pop();
+            if (data === undefined) return;
+
+            this.socket.emit(data.event, data.message);
+        }
     }
 
     remove() {
@@ -151,7 +177,8 @@ class MessageData {
     user: string;
 
     @IsMongoId()
-    conversation: string;
+    @IsOptional()
+    conversation?: string;
 
     @IsMongoId()
     @IsOptional()
@@ -177,6 +204,10 @@ class MessageData {
     @IsOptional()
     @Type(() => Date)
     time?: Date;
+
+    @IsString()
+    @IsOptional()
+    scope?: string;
 }
 
 
@@ -189,6 +220,7 @@ export const enum ChatMessageTopic {
 }
 
 enum ChatMessageType {
+    SUBSCRIBE = "subscribe",
     TEXT = "text",
     IMAGE = "image",
     ACTION = "action",
@@ -216,6 +248,15 @@ class ChatRequestDto {
  * @param processMap 
  */
 function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
+    /**text process */
+    processMap.set(ChatMessageType.SUBSCRIBE, async (ctx: ChatContext, msg: ChatRequestDto) => {
+        // return null;
+        const { user, scope } = msg.data;
+
+        ctx.scope = scope;
+
+        return { ...msg, };
+    });
 
     /**text process */
     processMap.set(ChatMessageType.TEXT, async (ctx: ChatContext, msg: ChatRequestDto) => {

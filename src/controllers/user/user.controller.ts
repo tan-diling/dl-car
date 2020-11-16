@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect } from 'routing-controllers';
+import { JsonController, Post, Get, BodyParam, Body, QueryParams, Req, QueryParam, Param, Patch, Delete, Authorized, CurrentUser, MethodNotAllowedError, InternalServerError, Redirect, UseInterceptor } from 'routing-controllers';
 
 import * as moment from 'moment';
 import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
 import { UserService } from '../../services/user.service';
-import { SiteRole } from '@app/defines';
+import { SiteRole, NotificationTopic, NotificationAction } from '@app/defines';
 import { ContactService } from '@app/services/contact.service';
+import { notificationInterceptor } from '@app/middlewares/notification.interceptor';
 
 enum Operation {
     CREATE,
@@ -135,6 +136,7 @@ export class UserController {
 
     @Authorized()
     @Patch('/user/profile')
+    @UseInterceptor(notificationInterceptor(NotificationTopic.User, NotificationAction.Updated))
     async setProfile(@Req() request, @Body() dto: UserUpdateDto) {
 
         await this.service.update(request.user.id, dto);

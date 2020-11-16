@@ -18,6 +18,7 @@ export class LoginController {
         console.log("login ip -- " + ip);
         const ret = await this.service.login({ ip, ...dto });
         req.session.userId = ret.id;
+        req.session.token = ret.refresh_token;
         return ret;
 
     }
@@ -35,7 +36,11 @@ export class LoginController {
     @Post('/refresh_token')
     async refresh_token(@Body() dto: RefreshTokenDto, @Req() req: Request) {
         const user = req.session?.userId;
-        return await this.service.refreshToken({ user, refresh_token: dto.refresh_token });
+        const refresh_token = dto.refresh_token || req.session?.token;
+        const ret = await this.service.refreshToken({ user, refresh_token });
+        req.session.token = ret.refresh_token;
+        return ret;
+
     }
 
 }

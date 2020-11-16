@@ -8,6 +8,7 @@ export enum NotificationTopic {
     Invitation = "Invitation",
     // Project = "Project",
     Entity = "Entity",
+    User = "User",
     Group = "Group",
     Contact = "Contact",
     Notification = "Notification",

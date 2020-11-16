@@ -306,7 +306,7 @@ export class ConversationService {
      * query user unsent messages;
      * @param user user id
      */
-    async processUserMessageUnSent(user: string | Types.ObjectId, callback: (doc: DocumentType<PendingMessage>) => Promise<void>) {
+    async processPendingMessage(user: string | Types.ObjectId, callback: (doc: DocumentType<PendingMessage>) => Promise<boolean>) {
 
 
         const idString = String(user);
@@ -324,13 +324,16 @@ export class ConversationService {
             logger.info(`processPendingMessage ${user} count:${messageList.length}`);
             for (const message of messageList) {
 
-                await callback(message);
+                const ret = await callback(message);
 
-                message.sendCount = message.sendCount + 1;
+                if (ret) {
 
-                message.sendAt = moment().add(10, 'second').toDate();
+                    message.sendCount = message.sendCount + 1;
 
-                await message.save();
+                    message.sendAt = moment().add(10, 'second').toDate();
+
+                    await message.save();
+                }
 
             }
         }

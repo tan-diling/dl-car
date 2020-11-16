@@ -20,7 +20,7 @@ export class LogoutDto {
 
 export class RefreshTokenDto {
     @IsString()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     refresh_token: string;
 
 }

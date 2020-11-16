@@ -17,10 +17,13 @@ export class IdentityService implements IIdentityService {
     LoginSessionModel = mongoose.model<any & mongoose.Document>('LoginSession');
 
     private async clearExpiredLoginSession() {
-        await this.LoginSessionModel.remove({ refreshTime: { $lt: new Date() } }).exec();
+        await this.LoginSessionModel.deleteMany({ refreshTime: { $lt: new Date() } }).exec();
     }
 
     async userRefreshToken(dto: { user: string, refresh_token: string; }) {
+        if (!dto.refresh_token) {
+            throw new UnauthorizedError('refresh_invalid');
+        }
         const session = await this.LoginSessionModel.findOne({ refreshToken: dto.refresh_token }).exec();
         if (session == null) {
             throw new UnauthorizedError('refresh_invalid');

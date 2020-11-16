@@ -9,6 +9,7 @@ import { Entity, EntityContext } from './entity/entityContext';
 import { entityEntityExecuteEval } from './entity';
 import { logger } from '@app/config';
 import { GroupService } from '../group.service';
+import { ContactService } from '../contact.service';
 
 interface EventHandler {
     (ev: DocumentType<Event>): Promise<void>;
@@ -176,16 +177,31 @@ const contactNotifyAction = async (ev: DocumentType<Event>) => {
 
 };
 
-// //send notification for contact
-// const actionNotifyAction = async (ev: DocumentType<Event>) => {
-//     if (ev.type != NotificationTopic.Invitation) {
-//         return;
-//     }
+//send notification for user
+const userNotifyAction = async (ev: DocumentType<Event>) => {
+    if (ev.type != NotificationTopic.User) {
+        return;
+    }
 
-//     if (ev.action != NotificationAction.Status) {
-//         return;
-//     }
-// };
+    let entity = ev.data.entity;
+
+    const contactServicer = Container.get(ContactService);
+    const users = await contactServicer.listContactUser(entity._id);
+
+    for (const user of users) {
+
+        await executeNotificationSend(
+            {
+                executor: 'db',
+                receiver: new Types.ObjectId(user._id),
+                event: ev,
+            }
+        );
+    }
+
+    // if (!Array.isArray(users)) {
+
+};
 
 
 export const notificationConfig: Array<EventHandlerConfig> = [];
@@ -237,6 +253,18 @@ notificationConfig.push(
                 expressions: [],
                 action: async (ev: DocumentType<Event>) => {
                     await contactNotifyAction(ev);
+                },
+            },
+
+        ]
+    },
+    {
+        topic: NotificationTopic.User,
+        actions: [
+            {
+                expressions: [],
+                action: async (ev: DocumentType<Event>) => {
+                    await userNotifyAction(ev);
                 },
             },
 
