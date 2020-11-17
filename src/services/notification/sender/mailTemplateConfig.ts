@@ -6,27 +6,12 @@ import { ResourceType } from '@app/defines';
  */
 function generateHTML(data: { name: string, content: string, url: string }) {
     const link = !data.url ? "" : ` 
-<div
-    class="btn"
-    style="
-    padding: 0 40px;
-    background: #0063ff;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
-    text-align: center;
-    color: #ffffff;
-    height: 40px;
-    line-height: 40px;
-    display: inline-block;
-    margin-top: 28px;
-    cursor: pointer;
-    "
+<div class="btn"
+    style="padding: 0 40px;background: #0063ff;box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);border-radius: 8px;text-align: center;color: #ffffff;height: 40px;line-height: 40px;display: inline-block;margin-top: 28px;cursor: pointer;"
     >
   <!-- button -->
-  <a href="${data.url}" >
-  Show details
-  </a>
-  </div>`;
+  <a style="text-decoration:none;color: #ffffff;"  href="${data.url}" >Show details</a>
+</div>`;
 
     const Mail_Layout =
         `
@@ -42,13 +27,7 @@ function generateHTML(data: { name: string, content: string, url: string }) {
     <body>
       <div
         class="root"
-        style="
-        font-size: 14px;
-        color: #2f2f2f;
-        font-family: Poppins;
-        padding: 40px 80px;
-        max-width: 480px;
-        "
+        style="font-size: 14px;color: #2f2f2f;font-family: Poppins;padding: 40px 80px;max-width: 480px;"
         >
         <div
           style="
@@ -177,11 +156,11 @@ export const mailTemplateConfig = {
                     for (const k of Object.keys(body)) {
                         if (k.startsWith('_')) continue;
                         if (k == 'id') continue;
-                        updateList.push(`<dt class="col-sm-3" style="text-transform:capitalize!important;">${k}:</dt> <dd class="col-sm-9">${body[k]}</dd> `);
+                        updateList.push(`<div><span style="text-transform:capitalize!important;">${k}:</span> <span >${body[k]}</span><div> `);
                     }
                 }
 
-                desc = `<dl class="row">${updateList.join(' ')}</dl>`;
+                desc = `${updateList.join(' ')}`;
 
             }
         }
