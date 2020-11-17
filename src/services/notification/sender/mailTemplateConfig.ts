@@ -137,7 +137,9 @@ export const mailTemplateConfig = {
         let desc = body?._desc || "";
 
         let action = entityContext.method;
-        if (action == "member.append") {
+        if (action == "status") {
+            action = 'status updated';
+        } else if (action == "member.append") {
             action = "add member";
             action = action + ` ${body._user.name} `;
         } else if (action == "member.remove") {
@@ -185,7 +187,7 @@ export const mailTemplateConfig = {
             "subject": subject,
             "html": generateHTML({
                 name: user.name,
-                content: `     <div>'${entity.title}' ${action} by ${entityContext.user.name} </div> <div> ${desc} </div>`,
+                content: `     <div>'${entity.title}' ${action} by ${entityContext.user.name} </div> <div> ${desc} </div><div>Please click the 'Show details' button to view more.</div>`,
                 url,
             }),
         };
