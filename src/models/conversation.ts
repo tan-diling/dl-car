@@ -79,6 +79,16 @@ export class ConversationMember {
     @prop()
     updatedAt?: Date;
 
+
+    async getLastReadMessage(this: DocumentType<ConversationMember>) {
+        return await MessageModel.findOne({
+            conversation: this.conversation,
+            createdAt: { $lte: this.readAt },
+        })
+            .sort('-_id')
+            .exec();
+    };
+
 }
 
 

@@ -78,7 +78,7 @@ export class AuthService {
 
         const access_token = createJwtToken(userInfo);
 
-        return { access_token, refresh_token: loginUser.refresh_token };
+        return { ...userInfo, access_token, refresh_token: loginUser.refresh_token };
     }
 
 }

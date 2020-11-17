@@ -45,7 +45,7 @@ export class ContactService {
      */
     async listContactUser(userId: string) {
         const l = await ContactModel.find({ userId }).exec();
-        return UserModel.find().where('_id').in(l.map(x => x.contact));
+        return UserModel.find({ deleted: false }).where('_id').in(l.map(x => x.contact));
     }
 
     async listPendingActionUser(userId: string) {

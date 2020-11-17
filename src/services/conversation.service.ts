@@ -58,6 +58,25 @@ export class ConversationService {
             .exec();
     }
 
+    // async listConversationStatisticsByUser2(user: string | Types.ObjectId) {
+    //     const ret = await ConversationMemberModel.find(
+    //         {
+    //             user,
+    //             isDeleted: false
+    //         }
+    //     )
+    //         .populate('unread')
+    //         .exec();
+
+    //     return ret.map(x => {
+    //         return {
+    //             conversation: x.conversation,
+    //             unread: x.unread,
+    //         }
+    //     });
+
+    // }
+
     async listConversationStatisticsByUser(user: string | Types.ObjectId) {
         const userId = new Types.ObjectId(user);
         const aggr =
