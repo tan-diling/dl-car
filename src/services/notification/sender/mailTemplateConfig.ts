@@ -4,36 +4,107 @@ import { ResourceType } from '@app/defines';
 /**
  * mail template define
  */
-function generateHTML(content: string) {
+function generateHTML(data: { name: string, content: string, url: string }) {
+    const link = !data.url ? "" : ` 
+<div
+    class="btn"
+    style="
+    padding: 0 40px;
+    background: #0063ff;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    text-align: center;
+    color: #ffffff;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    margin-top: 28px;
+    cursor: pointer;
+    "
+    >
+  <!-- button -->
+  <a href="${data.url}" >
+  Show details
+  </a>
+  </div>`;
+
     const Mail_Layout =
         `
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <title>Gestalter Mail Layout</title>
-  </head>
-  <body>
-    <p style="box-sizing:border-box;border-bottom-width:1px !important;border-bottom-style:solid !important;border-bottom-color:#dee2e6 !important;" >
-       <img style="width:20px;height:20px" src="https://dev.onwards.ai/assets/image/gest-logo.png" class="float-left" alt="image"/>
-       <bold>Gestalter </bold>
-    </p>
-    <div class="container" style="margin:20px 0px;">
-    ${content} 
+      <title>Gestalter Mail Layout</title>
+    </head>
+    <body>
+      <div
+        class="root"
+        style="
+        font-size: 14px;
+        color: #2f2f2f;
+        font-family: Poppins;
+        padding: 40px 80px;
+        max-width: 480px;
+        "
+        >
+        <div
+          style="
+          box-sizing: border-box;
+          border-bottom: 1px solid #dee2e6;
+          display: flex;
+          align-items: center;
+          height: 72px;
+          "
+          >
+          <img
+            style="width: 20px; height: 20px; margin-right: 6px"
+            src="https://dev.onwards.ai/assets/image/gest-logo.png"
+            class="float-left"
+            alt="logo"
+           />
+          <div style="font-weight: 500">Gestalter</div>
+        </div>
+        <div class="container" style="margin: 20px 0px">          
+          <div
+          class="head"
+          style="
+          font-weight: bold;
+          font-size: 20px;
+          line-height: 34px;
+          margin: 32px 0 12px;
+          "
+          >
+          <!-- hi name -->
+          Hi ${data.name},
+          </div>
+          <div class="content" style="font-weight: 500; line-height: 24px; max-width: 360px">
+          <!-- mgs content -->
+          ${data.content}          
+          </div>
+        
+          ${link}
+        </div>
+        <div
+          style="
+          box-sizing: border-box;
+          border-top: 1px solid #dee2e6;
+          line-height: 24px;
+          margin-top: 40px;
+          "
+          >
+          <div style="margin-top: 12px">Thank you,</div>
+          <div style="margin-top: 12px">-Gestalter</div>
+        </div>
     </div>
-    <div style="box-sizing:border-box;border-top-width:1px !important;border-top-style:solid !important;border-top-color:#dee2e6 !important;" > 
-      <div>Thank you,</div>
-      <div>-Gestalter</div>
-    </div>    
   </body>
-</html>
+</html>        
+
 `;
     return Mail_Layout;
 }
-
 
 
 export const mailTemplateConfig = {
@@ -44,46 +115,32 @@ export const mailTemplateConfig = {
             case "InvitationContact":
                 return {
                     "subject": "Please confirm the contact invitation ",
-                    "html": generateHTML(`
-<div class="row">          
-<h3>Hi ${user.name},</h3>                    
-
-You have been invited as contact for ${doc.data.name}, please click the below link to view.
-
-<a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
-</div>
-`),
+                    "html": generateHTML({
+                        name: user.name,
+                        content: `You have been invited as contact for ${doc.data.name}, please click the below link to view.`,
+                        url,
+                    }),
                 };
                 break;
             case "InvitationGroup":
                 return {
                     "subject": "Please confirm the group invitation ",
-                    "html": generateHTML(`
-
-<div class="row">          
-<h3>Hi ${user.name},</h3>                                        
-
-You have been invited to join group ${doc.data.name}, please click the below link to view.
-
-<a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
-</div>
-`),
+                    "html": generateHTML({
+                        name: user.name,
+                        content: `You have been invited to join group ${doc.data.name}, please click the below link to view.`,
+                        url,
+                    }),
                 };
                 break;
 
             case "InvitationProject":
                 return {
                     "subject": "Please confirm the project invitation ",
-                    "html": generateHTML(`
-                    <div class="row">          
-                    <h3>Hi ${user.name},</h3>                                      
-                    
-                    You have been invited to join project ${ doc.data.name}, please click the below link to view.
-                    
-                    <a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
-                    </div>
-                                
-                        `),
+                    "html": generateHTML({
+                        name: user.name,
+                        content: `You have been invited to join project ${doc.data.name}, please click the below link to view.`,
+                        url,
+                    }),
                 };
                 break;
         }
@@ -147,16 +204,11 @@ You have been invited to join group ${doc.data.name}, please click the below lin
         }
         return {
             "subject": subject,
-            "html": generateHTML(`                
-                <div class="row">
-                <h3>Hi ${user.name},</h3>                    
-
-                    <div>'${entity.title}' ${action} by ${entityContext.user.name} </div>
-                    <div> ${ desc} </div>
-
-                    <a href="${url}" class="btn btn-primary" role="button" style="box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-block;font-weight:400;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-width:1px;border-style:solid;padding-top:.375rem;padding-bottom:.375rem;padding-right:.75rem;padding-left:.75rem;font-size:1rem;line-height:1.5;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;color:#fff;background-color:#007bff;border-color:#007bff;" >Show details</a>
-                </div>                
-                `),
+            "html": generateHTML({
+                name: user.name,
+                content: `     <div>'${entity.title}' ${action} by ${entityContext.user.name} </div> <div> ${desc} </div>`,
+                url,
+            }),
         };
 
     },
@@ -165,17 +217,11 @@ You have been invited to join group ${doc.data.name}, please click the below lin
         const { user, server, doc } = ctx;
         return {
             "subject": "Reset your password",
-            "html": generateHTML(`
-                <div>
-                <h3>Hi ${user.name},</h3>                    
-                        We received a request to reset your password after confirming the verification code.Your GCP verification code is:
-
-                <h3>${ doc.code} </h3>
-
-                Please do not forward or give this code to anyone.
-
-< /div>
-                `),
+            "html": generateHTML({
+                name: user.name,
+                content: `     <div>We received a request to reset your password after confirming the verification code.Your GCP verification code is: </div> <h3>${doc.code} </h3>Please do not forward or give this code to anyone.`,
+                url: '',
+            }),
         };
     }
 
