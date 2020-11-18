@@ -78,12 +78,30 @@ export class ChatContext {
     }
 
     async queueMessage() {
+        const user = this.user;
         if (this.scope == "*" || this.scope.includes("message")) {
-            const user = this.user;
             await conversationService.processPendingMessage(user, async doc => {
                 await this.postMessageQueue({ event: doc.topic, message: doc.message });
                 return true;
             });
+        };
+        if (this.scope == "*" || this.scope.includes("conversation")) {
+
+
+            const ret = await conversationService.listConversationStatisticsByUser2(user);
+            if (ret) {
+                await this.postMessageQueue({
+                    event: ChatMessageTopic.NOTIFICATION,
+                    message: {
+                        event: {
+                            data: ret,
+                            type: 'Conversation',
+                            action: "statistics"
+                        },
+                    },
+                });
+                return true;
+            }
         }
     }
 

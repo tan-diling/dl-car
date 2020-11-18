@@ -14,6 +14,7 @@ import { ChatMessageTopic } from './socketio/message.socket.service';
  */
 export class ConversationService {
 
+    userLastMessageMap = new Map<string, DocumentType<Message>>();
     private queryService = new ModelQueryService();
     constructor() {
     }
@@ -58,31 +59,44 @@ export class ConversationService {
             .exec();
     }
 
-    // async listConversationStatisticsByUser2(user: string | Types.ObjectId) {
-    //     const ret = await ConversationMemberModel.find(
-    //         {
-    //             user,
-    //             isDeleted: false
-    //         }
-    //     )
-    //         .populate('unread')
-    //         .exec();
+    async listConversationStatisticsByUser2(user: string | Types.ObjectId) {
+        const userId = String(user);
+        if (this.userLastMessageMap.get(userId)) {
+            this.userLastMessageMap.delete(userId);
+            return await this.listConversationStatisticsByUser(user);
+        }
 
-    //     return ret.map(x => {
-    //         return {
-    //             conversation: x.conversation,
-    //             unread: x.unread,
-    //         }
-    //     });
+    }
 
-    // }
+    async listStatisticsByUser(user: string | Types.ObjectId) {
+        const userId = new Types.ObjectId(user);
+        const list = await this.listByUser(userId);
+
+        const ret = [];
+        for (const x of list) {
+            let { _id, isGroup, title, lastMessageTime } = x;
+            let members = x.members as Array<any>;
+            const readMessageTime = members.find(u => String(u.user?._id) == String(user))?.readAt;
+            if (lastMessageTime?.valueOf() > readMessageTime?.valueOf()) {
+                if (isGroup != true) {
+                    title = members.find(u => String(u.user?._id) != String(user))?.user?.name;
+                }
+                const unread = await MessageModel.countDocuments({ conversation: _id, createdAt: { $gt: readMessageTime } }).exec();
+                ret.push({ _id, isGroup, title, unread });
+            }
+        }
+
+        return ret;
+    }
 
     async listConversationStatisticsByUser(user: string | Types.ObjectId) {
+        return await this.listStatisticsByUser(user);
         const userId = new Types.ObjectId(user);
         const aggr =
             [{
                 $match: {
                     user: userId,
+                    isDeleted: false,
                 }
             }, {
                 $lookup: {
@@ -118,6 +132,8 @@ export class ConversationService {
 
         return ConversationMemberModel.aggregate(aggr).exec();
     }
+
+
 
 
     async listMessage(query) {
@@ -240,6 +256,8 @@ export class ConversationService {
         return conversation;
     }
 
+
+
     private async createMessage(data: CreateQuery<DocumentType<Message>>, save: boolean = true) {
         const conversation = await ConversationModel.findById(data.conversation).populate('members').exec();
         if (conversation) {
@@ -260,6 +278,7 @@ export class ConversationService {
             const pendingMessages = (conversation.members as Array<ConversationMember>)
                 .filter(x => x.isDeleted != true)
                 .map(x => {
+                    this.userLastMessageMap.set(String(x.user), message);
                     return {
                         receiver: x.user,
                         topic: ChatMessageTopic.MESSAGE,
