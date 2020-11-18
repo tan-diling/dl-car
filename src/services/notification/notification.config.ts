@@ -44,9 +44,15 @@ function invitationNotifyForMailAction<T extends InvitationContact>() {
 
     const action = async (ev: DocumentType<Event>) => {
         const doc = (ev.data as T);
+        const receiver = doc.receiver as Types.ObjectId;
+        await executeNotificationSend({
+            executor: 'db',
+            receiver,
+            event: ev,
+        });
         await executeNotificationSend({
             executor: 'mail',
-            receiver: doc.receiver as Types.ObjectId,
+            receiver: receiver,
             event: ev,
             mailTemplate: 'invitation'
         });

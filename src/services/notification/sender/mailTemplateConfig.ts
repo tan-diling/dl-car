@@ -93,20 +93,20 @@ export const mailTemplateConfig = {
         switch (doc.__t || doc.type) {
             case "InvitationContact":
                 return {
-                    "subject": "Please confirm the contact invitation ",
+                    "subject": "[GCP] Please confirm the contact invitation ",
                     "html": generateHTML({
                         name: user.name,
-                        content: `You have been invited as contact for ${doc.data.name}, please click the below link to view.`,
+                        content: `You have been invited as contact for ${doc.data.name}, please click the 'Show details' button to accept or decline.`,
                         url,
                     }),
                 };
                 break;
             case "InvitationGroup":
                 return {
-                    "subject": "Please confirm the group invitation ",
+                    "subject": "[GCP] Please confirm the group invitation ",
                     "html": generateHTML({
                         name: user.name,
-                        content: `You have been invited to join group ${doc.data.name}, please click the below link to view.`,
+                        content: `You have been invited to join group ${doc.data.name}, please click the 'Show details' button to accept or decline.`,
                         url,
                     }),
                 };
@@ -114,10 +114,10 @@ export const mailTemplateConfig = {
 
             case "InvitationProject":
                 return {
-                    "subject": "Please confirm the project invitation ",
+                    "subject": "[GCP] Please confirm the project invitation ",
                     "html": generateHTML({
                         name: user.name,
-                        content: `You have been invited to join project ${doc.data.name}, please click the below link to view.`,
+                        content: `You have been invited to join project ${doc.data.name}, please click the 'Show details' button to accept or decline.`,
                         url,
                     }),
                 };
@@ -143,13 +143,13 @@ export const mailTemplateConfig = {
             action = "add member";
             action = action + ` ${body._user.name} `;
         } else if (action == "member.remove") {
-            action = "delete member";
+            action = "deleted member";
             action = action + ` ${body._user.name} `;
         } else if (action == "assignee.append") {
             action = "add assignee";
             action = action + ` ${body._user.name} `;
         } else if (action == "assignee.remove") {
-            action = "delete assignee";
+            action = "deleted assignee";
             action = action + ` ${body._user.name} `;
         } else {
             if (desc == "") {
@@ -167,7 +167,7 @@ export const mailTemplateConfig = {
             }
         }
 
-        const subject = `[GCP](${entityKey}) ${entity.type} '${entity.title}' ${action} `;
+        const subject = `[GCP](${entityKey})${entity.type} '${entity.title}' ${action} `;
 
         let url = '';
         const entityType = entity.type.toLowerCase();
@@ -187,7 +187,7 @@ export const mailTemplateConfig = {
             "subject": subject,
             "html": generateHTML({
                 name: user.name,
-                content: `     <div>'${entity.title}' ${action} by ${entityContext.user.name} </div> <div> ${desc} </div><div>Please click the 'Show details' button to view more.</div>`,
+                content: `<div>${entity.type} '${entity.title}' ${action} by ${entityContext.user.name}. </div> <div> ${desc} </div><div>Please click the 'Show details' button to view more.</div>`,
                 url,
             }),
         };
@@ -197,10 +197,10 @@ export const mailTemplateConfig = {
     forgetPassword: (ctx: any) => {
         const { user, server, doc } = ctx;
         return {
-            "subject": "Reset your password",
+            "subject": "[GCP] Verification Code for resetting your password",
             "html": generateHTML({
                 name: user.name,
-                content: `     <div>We received a request to reset your password after confirming the verification code.Your GCP verification code is: </div> <h3>${doc.code} </h3>Please do not forward or give this code to anyone.`,
+                content: `     <div>We received a request to reset your password after confirming the verification code. Your GCP verification code is: </div> <h3>${doc.code} </h3>Please do not forward or give this code to anyone.`,
                 url: '',
             }),
         };

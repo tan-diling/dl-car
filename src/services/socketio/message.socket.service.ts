@@ -72,7 +72,7 @@ export class ChatContext {
     constructor(
         public user: Types.ObjectId,
         public socket: ServerIO.Socket,
-        public scope: string = '*',
+        public scope: string = '',
     ) {
         ChatContext.append(this);
     }
