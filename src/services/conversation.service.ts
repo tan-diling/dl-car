@@ -267,7 +267,8 @@ export class ConversationService {
                     };
                 });
 
-            await PendingMessageModel.create(pendingMessages);
+            const pendingMessageArray = await PendingMessageModel.create(pendingMessages);
+            PendingMessageModel.emit('created', pendingMessageArray);
 
             return message;
 

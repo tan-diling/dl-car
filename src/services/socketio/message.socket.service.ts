@@ -253,6 +253,7 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
         // return null;
         const { user, scope } = msg.data;
 
+        logger.info(`user:${user},subscribe:${scope}`);
         ctx.scope = scope;
 
         return { ...msg, };

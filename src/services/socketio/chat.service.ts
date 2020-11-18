@@ -9,20 +9,23 @@ import { ConversationService } from '../conversation.service';
 const userService = Container.get(UserService);
 
 export const chatBot = async (socket: ServerIO.Socket) => {
-    console.log("socket connected  %s.", socket.id);
+    const nsp = socket.nsp;
+    console.log("socket connected  %s. size: %s", socket.id, Object.keys(nsp.sockets).length);
+
 
     const id = socket.handshake.query['token'];
     const user = await userService.getByToken(id);
     if (user == null) {
         logger.error("chat connect error NOTFOUND", id);
         socket.error("token error");
+        socket.disconnect();
         return;
     }
 
     const ctx = new ChatContext(user._id, socket);
 
     socket.on("disconnect", () => {
-        console.log("socket disconnected %s", socket.id);
+        console.log("socket disconnected %s. size: %s", socket.id, Object.keys(nsp.sockets).length);
 
         ctx.remove();
 
