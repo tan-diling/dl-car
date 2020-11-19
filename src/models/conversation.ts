@@ -146,7 +146,7 @@ export class PendingMessage {
     @prop()
     expiredAt?: Date;
 
-    @prop()
+    @prop({ index: true, expires: 60 * 5 })
     createdAt?: Date;
 
     @prop()

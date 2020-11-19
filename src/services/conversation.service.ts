@@ -366,12 +366,14 @@ export class ConversationService {
                 const ret = await callback(message);
 
                 if (ret) {
+                    // PendingMessageModel.findByIdAndUpdate(message._id) ;
 
-                    message.sendCount = message.sendCount + 1;
-
-                    message.sendAt = moment().add(10, 'second').toDate();
-
-                    await message.save();
+                    await message.updateOne(
+                        {
+                            sendCount: message.sendCount + 1,
+                            sendAt: moment().add(10, 'second').toDate(),
+                        }
+                    ).exec();
                 }
 
             }
