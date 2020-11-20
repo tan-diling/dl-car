@@ -131,7 +131,7 @@ export const mailTemplateConfig = {
         const entityContext = doc as EntityContext<Entity>;
         const entity = entityContext.entity;
         const project = (entity.parents[0] || entity) as ProjectEntity;
-        const entityKey = entity.parents.length == 0 ? `${project.key} ` : `${project.key} -${entity.seq} `;
+        const entityKey = entity.parents.length == 0 ? `${project.key}` : `${project.key} - ${entity.seq}`;
 
         const body = entityContext.req?.body;
         let desc = body?._desc || "";
@@ -167,7 +167,7 @@ export const mailTemplateConfig = {
             }
         }
 
-        const subject = `[GCP](${entityKey})${entity.type} '${entity.title}' ${action} `;
+        const subject = `[GCP](${entityKey}) ${entity.type} '${entity.title}' ${action} `;
 
         let url = '';
         const entityType = entity.type.toLowerCase();
