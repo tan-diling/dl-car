@@ -45,6 +45,11 @@ export class NotificationService {
         return { user: receiver, time: Date.now() };
     }
 
+    async setReadAllByReceiver(receiver: string | Types.ObjectId) {
+        await NotificationModel.updateMany({ receiver: receiver }, { status: NotificationStatus.Read }).exec();
+        return { user: receiver, time: Date.now() };
+    }
+
 
     async publish(type: NotificationTopic | string, action: NotificationAction | string, data: any, sender: Types.ObjectId) {
 
