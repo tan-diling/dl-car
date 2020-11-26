@@ -240,6 +240,53 @@ export class GroupService {
  * @param query 
  */
     async relatedMember(dto: { userId: string, q?: string }) {
+        const groups = await this.listByMember(dto.userId, '');
+
+        const users = new Map<string, any>();
+        for (const g of groups) {
+            for (const u of g.members) {
+                let checked = (u.deleted != true);
+                const user = u.user;
+                const q = String(dto.q || "").toLowerCase();
+                if (q) {
+                    checked = false;
+                    if (user.name.toLowerCase().includes(q)) {
+                        checked = true;
+                    }
+                    if (user.email.toLowerCase().includes(q)) {
+                        checked = true;
+                    }
+                }
+
+                if (checked) {
+
+                    users.set(String(user._id), user);
+                }
+            }
+        }
+
+        const ret = []
+        for (const u of users.keys()) {
+
+            const gmList = await GroupMemberModel
+                .find({ userId: u })
+                .populate('groupId')
+                .exec();
+
+            const user = users.get(u) || {};
+            ret.push({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                groups: gmList.map(x => x.groupId)
+            });
+        }
+
+        return ret;
+
+
+
         const userId = Types.ObjectId(dto.userId);
         // const userGroupList = await GroupMemberModel.find({userId}).exec();
 
