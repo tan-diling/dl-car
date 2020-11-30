@@ -217,8 +217,9 @@ export class ResourceRelatedBase {
   @prop({ required: true, ref: () => Resource })
   parent: Ref<Resource>;
 
-  @prop({ required: true })
-  creator: Types.ObjectId;
+
+  @prop({ ref: User, required: true })
+  creator: Ref<User>;
 
   @prop({ default: false })
   deleted?: boolean;

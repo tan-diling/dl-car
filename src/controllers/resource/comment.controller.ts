@@ -28,7 +28,7 @@ export class CommentController {
     @Get(`/:parent([0-9a-f]{24})/${type}`)
     @UseBefore(...checkResourcePermission({ id: 'parent' }))
     async list(@Param('parent') parent: string, @QueryParams() query: any, @Req() request) {
-        return await this.repoService.list({ ...query, parent: parent });
+        return await this.repoService.list({ ...query, parent: parent, populate: "creator" });
 
     }
 
