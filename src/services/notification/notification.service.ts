@@ -40,6 +40,10 @@ export class NotificationService {
         return await DbService.list(NotificationModel, query);
     }
 
+    async count(query: any) {
+        return await DbService.count(NotificationModel, query);
+    }
+
     async deleteAllByReceiver(receiver: string | Types.ObjectId) {
         await NotificationModel.updateMany({ receiver: receiver }, { status: NotificationStatus.Deleted }).exec();
         return { user: receiver, time: Date.now() };

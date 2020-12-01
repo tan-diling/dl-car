@@ -38,6 +38,20 @@ export class NotificationController {
         // return await this.service.list(query) ;
     }
 
+    @Get('/my/statistics')
+    async statistics(@QueryParams() query: any, @Req() request, @CurrentUser() currentUser) {
+        const unread =
+            await this.service.count({
+                status: [NotificationStatus.Unread].join(','),
+                ...query,
+                receiver: Types.ObjectId(currentUser.id),
+                // populate: "event,event.sender",
+                // fields: "event.sender.name,event.sender.email,event.sender.image"
+            });
+
+        return { unread };
+    }
+
     @Delete('/my')
     async clearMy(@CurrentUser() currentUser) {
 
