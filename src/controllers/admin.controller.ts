@@ -80,12 +80,6 @@ export class AdminController {
 
 
 
-    @Get('/setting/allowPublicRegistration')
-    async getAllowPublicRegistration() {
-        return {
-            enabled: await settingService.allowPublicRegistration()
-        };
-    }
 
     @Put('/setting/allowPublicRegistration')
     async setAllowPublicRegistration(@Body() dto: SettingAllowPublicationRegistrationDto) {

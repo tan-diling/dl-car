@@ -7,6 +7,8 @@ import { UserService } from '../../services/user.service';
 import { SiteRole, NotificationTopic, NotificationAction } from '@app/defines';
 import { ContactService } from '@app/services/contact.service';
 import { notificationInterceptor } from '@app/middlewares/notification.interceptor';
+import { SettingService } from '@app/services';
+import { Container } from 'typedi';
 
 enum Operation {
     CREATE,
@@ -30,53 +32,7 @@ export class UserController {
     constructor(private service: UserService, private contactService: ContactService) {
     }
 
-    // checkPermission(ctx: RequestContext) {
 
-
-    //     switch (ctx.method) {
-    //         case Operation.CREATE:
-    //             break;
-    //         case Operation.RETRIEVE:
-    //             break;
-    //         case Operation.UPDATE:
-    //             // 'admin' site_user can update all
-    //             if (ctx.user?.role == 'admin')
-    //                 return;
-
-    //             // other site_user can update his/her self information
-    //             if (ctx.user?.id != ctx.filter?.id)
-    //                 throw new MethodNotAllowedError('permission check error');
-
-    //             // user info:"role" , "defaultContact" maintained by 'admin'
-    //             if (ctx.dto?.role != null || ctx.dto?.defaultContact != null)
-    //                 throw new MethodNotAllowedError('permission check error');
-    //             break;
-    //         case Operation.DELETE:
-    //             if (ctx.user?.id == ctx.filter?.id)
-    //                 throw new MethodNotAllowedError('permission check: cannot delete self');
-    //             break;
-    //         default:
-    //             throw new InternalServerError('check permission error');
-    //     }
-    // }
-
-    // async processRequest(ctx: RequestContext) {
-    //     this.checkPermission(ctx);
-    //     switch (ctx.method) {
-    //         case Operation.CREATE:
-    //             return await this.service.create(ctx.dto);
-    //             break;
-    //         case Operation.RETRIEVE:
-    //             return await this.service.list(ctx.filter);
-    //             break;
-    //         case Operation.DELETE:
-    //             return await this.service.delete(ctx.filter.id);
-    //             break;
-    //         case Operation.UPDATE:
-    //             return await this.service.update(ctx.filter.id, ctx.dto);
-    //             break;
-    //     }
-    // }
 
     @Post('/sign_up')
     async signUp(@Body() dto: VisitorUserCreateDto) {
@@ -141,6 +97,15 @@ export class UserController {
 
         await this.service.update(request.user.id, dto);
         return await this.getProfile(request);
+    }
+
+
+    @Get('/setting/allowPublicRegistration')
+    async getAllowPublicRegistration() {
+        const settingService = Container.get(SettingService);
+        return {
+            enabled: await settingService.allowPublicRegistration()
+        };
     }
 
 }
