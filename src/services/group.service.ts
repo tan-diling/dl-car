@@ -245,8 +245,11 @@ export class GroupService {
         const users = new Map<string, any>();
         for (const g of groups) {
             for (const u of g.members) {
+
+
                 let checked = (u.deleted != true);
                 const user = u.user;
+                if (user == null) continue;
                 const q = String(dto.q || "").toLowerCase();
                 if (q) {
                     checked = false;
