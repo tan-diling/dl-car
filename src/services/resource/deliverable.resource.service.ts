@@ -16,15 +16,6 @@ export class DeliverableResourceService extends ResourceService<Deliverable>{
         this.model = DeliverableModel;
     }
 
-    async get(filter) {
-        const doc = await super.get(filter);
-
-        if (doc != null) {
-            return { ...doc.toJSON(), completion: await CheckList.getCompletion(doc._id) };
-        }
-
-        return doc;
-    }
 
 }
 
