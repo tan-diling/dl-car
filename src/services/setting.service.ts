@@ -1,7 +1,16 @@
 import { SettingModel } from '@app/models/setting';
-import { mailConfig } from '@app/config';
+import { mailConfig, MailConfig } from '@app/config';
 
 type SettingKeys = "AllowPublicRegistration" | "Mail";
+
+
+function setMailConfig(val: MailConfig) {
+    mailConfig.host = val.host;
+    mailConfig.port = val.port;
+    mailConfig.user = val.user;
+    mailConfig.password = val.password;
+}
+
 /**
  * setting service
  */
@@ -31,21 +40,21 @@ export class SettingService {
         return (await this.get('AllowPublicRegistration')) == true;
     }
 
-    async mail(val?: { host: string, port: number, user: string, password: string }) {
+    async mail(val?: MailConfig) {
         if (val != null) {
             this.set('Mail', val);
 
-            mailConfig.host = val.host;
-            mailConfig.port = val.port;
-            mailConfig.user = val.user;
-            mailConfig.password = val.password;
+            setMailConfig(val);
 
         }
 
-        const ret = await this.get('Mail');
+        const ret = await this.get('Mail') as MailConfig;
 
         return { ...mailConfig, ...ret, };
     }
+}
 
-
+export const SettingServiceStartup = async () => {
+    const service = new SettingService();
+    setMailConfig(await service.mail());
 }

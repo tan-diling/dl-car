@@ -2,12 +2,18 @@ import { config_get } from './config';
 
 const Mail_Server_Host: string = config_get("mail.host", "smtp.gmail.com");
 const Mail_Server_Port: string = config_get("mail.port", "465");
-const Mail_Server_User: string = config_get("mail.user", "dl@testmvp.com");
-const Mail_Server_Password: string = config_get("mail.password", "Zt:[1nY{/LDh4r");
+const Mail_Server_User: string = config_get("mail.user", "dev@nicjob.com");
+const Mail_Server_Password: string = config_get("mail.password", "nicjob@dealing2702");
 
 
+export interface MailConfig {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+}
 
-export let mailConfig = {
+export let mailConfig: MailConfig = {
     host: Mail_Server_Host,
     port: Number(Mail_Server_Port),
     // secure: true, // true for 465, false for other ports

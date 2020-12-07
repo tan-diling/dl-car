@@ -5,23 +5,6 @@
 import { createTransport, TransportOptions } from 'nodemailer';
 import { logger, mailConfig } from '@app/config';
 
-const transportOption = {
-  host: mailConfig.host,
-  port: mailConfig.port,
-  connectionTimeout: 20 * 1000,
-  // secure: true, // true for 465, false for other ports
-  auth: {
-    user: mailConfig.user,
-    pass: mailConfig.password,
-  },
-  debug: true,
-  log: true,
-  transactionLog: true,
-};
-
-logger.info(transportOption.auth.user);
-
-
 /**
  * send email
  * @param email target mail
@@ -29,6 +12,22 @@ logger.info(transportOption.auth.user);
  * @param html mail detail
  */
 export async function sendMail(options: { email: string, html?: string, subject: string, text?: string }) {
+
+  const transportOption = {
+    host: mailConfig.host,
+    port: mailConfig.port,
+    connectionTimeout: 20 * 1000,
+    secure: true, // true for 465, false for other ports
+    auth: {
+      user: mailConfig.user,
+      pass: mailConfig.password,
+    },
+    debug: true,
+    log: true,
+    transactionLog: true,
+  };
+
+  logger.info(transportOption.auth.user);
 
   // create reusable transporter object using the default SMTP transport
   const transporter = createTransport(transportOption);
