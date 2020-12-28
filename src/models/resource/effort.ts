@@ -17,12 +17,16 @@ export class Effort extends ResourceRelatedBase {
 
   @prop()
   effort: number;
-    
-  @prop( )
-  assignee: Types.ObjectId ;
+
+  // @prop( )
+  // assignee: Types.ObjectId ;
+
+
+  @prop({ ref: User, required: true })
+  assignee: Ref<User>;
 
   static async getTotalEffort(resourceId: Types.ObjectId) {
-    const resource = await ResourceModel.findById(resourceId).select({totalEffort:1}).exec();
+    const resource = await ResourceModel.findById(resourceId).select({ totalEffort: 1 }).exec();
 
     if (resource.totalEffort < 0) {
       const agg = [
@@ -34,7 +38,7 @@ export class Effort extends ResourceRelatedBase {
               _id: resource._id,
             }]
           }
-        },{
+        }, {
           '$lookup': {
             'from': 'efforts',
             'localField': '_id',
@@ -50,7 +54,7 @@ export class Effort extends ResourceRelatedBase {
             'efforts.deleted': false,
             'deleted': false,
           }
-        }, {          
+        }, {
           '$group': {
             '_id': null,
             'totalEffort': {
@@ -62,7 +66,7 @@ export class Effort extends ResourceRelatedBase {
 
       const docs = await ResourceModel.aggregate<{ _id: any, totalEffort: number }>(agg).exec();
 
-      resource.totalEffort = docs.length>0 ? docs[0].totalEffort : 0;
+      resource.totalEffort = docs.length > 0 ? docs[0].totalEffort : 0;
       await resource.save();
     }
     return resource.totalEffort;
