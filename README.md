@@ -39,7 +39,37 @@ this project design for backend framework
   - token.json   # google apis auth token file
   - credentials.json   # google apis auth credentials file
 - dist/ # build output dir
+- .env # env config file
 
+### deploy
+## system requirement 
+  linux 
+  node  v10.16+
+## .evn file config  
+```
+## jwt secret 
+JWT_SECRET=dealing
+JWT_ALGORITHM=HS256
+
+## mongo db connect 
+#GCP_MONGODB_URL=mongodb://localhost:27017/dealing
+
+## backend http server port
+PORT=3000
+
+##default google mail account, later User can change it in gcp system
+GCP_MAIL_USER=dl@testmvp.com
+GCP_MAIL_PASSWORD=dl@dealing2702
+
+## GCP WEBSITE URL 
+GCP_WEBSERVER=https://dev.onwards.ai
+
+## GCP DEBUG OPTION for database, 
+#GCP_DEBUG=db
+```
+## compile & run
+  - `npm install & npm run build & npm run start`
+  
 
 ### api 
 #### mock server
@@ -70,25 +100,7 @@ chcon -R -t httpd_sys_content_t /www/public_html/onwards.ai/private/gcp-frontend
 #### build
 - build api 
   > https://cicd.dev.onwards.ai/job/test01/build?token=gest_client_portal_backend
-#### account info
-```
-cicd.dev.intime.ai
-tan
-TFoPw0IDWUGa4ZtXGL8JlyA1@FT8kxs
 
-cicd.dev.onwards.ai
-tan
-G5tgDVn2Wrwl6lsEH&gt;oVOKEAs@850EH
-```
-
-
-google username: dl@testmvp.com
-
-additional linked email alias: onwards.admin@testmvp.com
-
-pw:Zt:[1nY{/LDh4r
-
-```
 nginx config for socketio
 ================================================================
 upstream socket_nodes{

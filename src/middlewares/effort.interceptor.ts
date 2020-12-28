@@ -6,7 +6,9 @@ import { Types } from 'mongoose';
 import { logger } from '@app/config';
 import * as util from 'util';
 
-
+/**
+ * effort interceptor
+ */
 export function effortInterceptor() {
     const it = async (action: Action, content: any) => {
         if (content) {

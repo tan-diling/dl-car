@@ -39,7 +39,7 @@ export class EffortController {
     @Get(`/:parent([0-9a-f]{24})/${type}`)
     async list(@Param('parent') parent: string, @QueryParams() query: any, @Req() request) {
 
-        return await this.repoService.list({ ...query, parent: parent, populate: "creator" });
+        return await this.repoService.list({ ...query, parent: parent, populate: "assignee" });
 
     }
 

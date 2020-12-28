@@ -29,7 +29,7 @@ function serverStartup() {
   const server = BackendServer.getInstance();
 
   server.register("socketio", async (server) => {
-    /** register image static path */
+    /** register chat server  */
     initChatSocket(server.httpServer);
   });
 

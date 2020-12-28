@@ -4,7 +4,11 @@ import { Container } from 'typedi';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 
 
-
+/**
+ * user role check middleware
+ * when api request, use this middleware to check 
+ * @param roles 
+ */
 export const userCheckMiddleware = (...roles: string[]) => {
 
     function middle(request: Request, response: any, next?: (err?: any) => any): any {
