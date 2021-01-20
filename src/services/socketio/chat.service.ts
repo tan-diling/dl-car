@@ -8,6 +8,9 @@ import { ConversationService } from '../conversation.service';
 
 const userService = Container.get(UserService);
 
+/**
+ * init client socket connect and bind client event
+ */
 export const chatBot = async (socket: ServerIO.Socket) => {
     const nsp = socket.nsp;
     console.log("socket connected  %s. size: %s", socket.id, Object.keys(nsp.sockets).length);

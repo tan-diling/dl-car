@@ -47,6 +47,9 @@ export class ChatContext {
 
 
 
+    /**
+     * main chat sender task,send message every seconds when send buffer exists message pending to emit
+     */
     static async startMessageProcess() {
         const sleep = function (ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -190,6 +193,9 @@ type ContextInterface = {
     requestId: string;
 }
 
+/**
+ * chat message data dto define
+ */
 class MessageData {
     @IsMongoId()
     user: string;
@@ -228,7 +234,9 @@ class MessageData {
     scope?: string;
 }
 
-
+/**
+ * chat message topic define
+ */
 export const enum ChatMessageTopic {
     REQUEST = 'chat-request',
     REQUEST_ACK = 'chat-request-ack',
@@ -237,6 +245,9 @@ export const enum ChatMessageTopic {
     NOTIFICATION = 'notification',
 }
 
+/**
+ * chat message type
+ */
 enum ChatMessageType {
     SUBSCRIBE = "subscribe",
     TEXT = "text",
@@ -245,6 +256,9 @@ enum ChatMessageType {
 };
 
 
+/**
+ * chat message request dto
+ */
 class ChatRequestDto {
     @IsOptional()
     context: ContextInterface;
@@ -266,7 +280,7 @@ class ChatRequestDto {
  * @param processMap 
  */
 function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
-    /**text process */
+    /**subscribe process */
     processMap.set(ChatMessageType.SUBSCRIBE, async (ctx: ChatContext, msg: ChatRequestDto) => {
         // return null;
         const { user, scope } = msg.data;
@@ -309,15 +323,6 @@ function configChatProcessMap(processMap: Map<string, ChatProcessFunction>) {
             return { ...req.toJSON(), context: msg.context };
         }
 
-        // if(type=="enter"){
-        //     const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
-        //     return req;
-        // }
-
-        // if(type=="leave"){
-        //     const req = await conversationService.createActionMessage({ sender, user, conversation, time, type });
-        //     return req;
-        // }
     });
 
 }
@@ -357,7 +362,7 @@ export class ChatProcessor extends EventEmitter {
 
 
     /**
-     * 
+     * main process for chat message
      * @param ctx {@link ChatContext}
      * @param msg 
      */
