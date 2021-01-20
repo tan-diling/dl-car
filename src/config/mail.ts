@@ -2,8 +2,8 @@ import { config_get } from './config';
 
 const Mail_Server_Host: string = config_get("mail.host", "smtp.gmail.com");
 const Mail_Server_Port: string = config_get("mail.port", "465");
-const Mail_Server_User: string = config_get("mail.user", "dev@nicjob.com");
-const Mail_Server_Password: string = config_get("mail.password", "nicjob@dealing2702");
+const Mail_Server_User: string = config_get("mail.user", "dilingcloud@gmail.com");
+const Mail_Server_Password: string = config_get("mail.password", "");
 
 
 export interface MailConfig {

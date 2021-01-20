@@ -5,7 +5,7 @@ import { UnauthorizedError } from 'routing-controllers';
 import { mongoose } from '@typegoose/typegoose';
 import moment = require('moment');
 
-// const jwtSecretOrKey = process.env.JWT_SECRET || "dealing";
+// const jwtSecretOrKey = process.env.JWT_SECRET || "diling";
 
 const jwtOptions = JWT_OPTION;
 interface IUserToken {

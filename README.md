@@ -1,4 +1,4 @@
-# Gestalter Client Portal Backend
+# DL Client Portal Backend
 *********************************************************************
 
 this project design for backend framework 
@@ -48,18 +48,18 @@ this project design for backend framework
 ## .evn file config  
 ```
 ## jwt secret 
-JWT_SECRET=dealing
+JWT_SECRET=diling
 JWT_ALGORITHM=HS256
 
 ## mongo db connect 
-#GCP_MONGODB_URL=mongodb://localhost:27017/dealing
+#GCP_MONGODB_URL=mongodb://localhost:27017/diling
 
 ## backend http server port
 PORT=3000
 
 ##default google mail account, later User can change it in gcp system
 GCP_MAIL_USER=dl@testmvp.com
-GCP_MAIL_PASSWORD=dl@dealing2702
+GCP_MAIL_PASSWORD=dl@diling2702
 
 ## GCP WEBSITE URL 
 GCP_WEBSERVER=https://dev.onwards.ai

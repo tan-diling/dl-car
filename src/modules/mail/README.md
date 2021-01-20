@@ -1,4 +1,4 @@
-### dealing backend calendar module
+### diling backend calendar module
 *********************************************************************
 access google calendar
 - core

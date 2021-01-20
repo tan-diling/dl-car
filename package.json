@@ -27,9 +27,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbink.com/gestalter/gest-client-portal-backend.git"
+    "url": ""
   },
-  "author": "tan.yw@dealing.tech",
+  "author": "tan.yw@diling.tech",
   "license": "MIT",
   "dependencies": {
     "@typegoose/typegoose": "^7.3.0",

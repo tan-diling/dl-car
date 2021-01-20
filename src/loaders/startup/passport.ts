@@ -8,12 +8,12 @@ const jwtOption = JWT_OPTION;
 const strategyOptions: StrategyOptions = {
     secretOrKey: jwtOption.secretOrKey,
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('bearer'),
-    // issuer:"dealing.tech",
+    // issuer:"diling.tech",
     // audience?: string;
     algorithms: [jwtOption.algorithm],
     // ignoreExpiration?: boolean;
     passReqToCallback: true,
-    // jsonWebTokenOptions:{issuer:"dealing.tech",}
+    // jsonWebTokenOptions:{issuer:"diling.tech",}
 };
 
 const getStrategy = (): passport.Strategy => {

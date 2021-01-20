@@ -58,7 +58,7 @@ function buildMailOfUserConfirm(doc: any): { subject: string; text: string; } {
 Hi Sir/Madam,
 
 Please confirm your GCP account.
-Before you can log into Gestalter Client Portal, you must confirm your email address with clicking the below link.
+Before you can log into DL Client Portal, you must confirm your email address with clicking the below link.
 
 ${webServer}/api/user/email_validate?email=${doc.email}&id=${doc.id}
 
@@ -66,7 +66,7 @@ Password: ${doc.password}
 
 Thank you for joining us!
 
-- Gestalter`
+- DL`
     };
 }
 
@@ -84,7 +84,7 @@ URL: ${webServer}/group/confirm/${doc.groupId}
 
 Thank you for joining us!
 
-- Gestalter`
+- DL`
     };
 }
 
@@ -103,7 +103,7 @@ URL: ${webServer}/project/confirm/${doc.projectId}
 
 Thank you for joining us!
 
-- Gestalter`
+- DL`
     };
 }
 

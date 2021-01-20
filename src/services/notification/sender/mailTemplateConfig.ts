@@ -22,7 +22,7 @@ function generateHTML(data: { name: string, content: string, url: string }) {
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-      <title>Gestalter Mail Layout</title>
+      <title>DL Mail Layout</title>
     </head>
     <body>
       <div
@@ -44,7 +44,7 @@ function generateHTML(data: { name: string, content: string, url: string }) {
             class="float-left"
             alt="logo"
            />
-          <div style="font-weight: 500">Gestalter</div>
+          <div style="font-weight: 500">DL</div>
         </div>
         <div class="container" style="margin: 20px 0px">          
           <div
@@ -75,7 +75,7 @@ function generateHTML(data: { name: string, content: string, url: string }) {
           "
           >
           <div style="margin-top: 12px">Thank you,</div>
-          <div style="margin-top: 12px">-Gestalter</div>
+          <div style="margin-top: 12px">-DL</div>
         </div>
     </div>
   </body>

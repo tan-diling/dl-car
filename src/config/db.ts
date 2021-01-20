@@ -2,7 +2,7 @@ import { config_get, DEBUG } from './config';
 
 import { ResourceType, PermissionOperation, ProjectRole } from '@app/defines';
 
-export const MONGODB_URL: string = config_get('mongodb.url') || 'mongodb://localhost:27017/dealing';
+export const MONGODB_URL: string = config_get('mongodb.url') || 'mongodb://localhost:27017/diling';
 
 const dbInitData = [];
 
@@ -12,14 +12,13 @@ dbInitData.push({
     "dataArray": [
         {
             "key": {
-                "email": "onwards.admin@testmvp.com"
+                "email": "dilingcloud@gmail.com"
             },
             "doc": {
                 "name": "Site Admin",
-                "email": "onwards.admin@testmvp.com",
-                "password": "Dealing.123",
+                "password": "88888888",
                 "emailValidated": true,
-                "company": "Gestalter",
+                "company": "Diling",
                 "role": "admin",
                 "deleted": false,
             }
