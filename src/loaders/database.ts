@@ -11,7 +11,6 @@ import { Db } from 'mongodb';
 import * as mongoose from 'mongoose';
 import { setLogLevel, LogLevels } from '@typegoose/typegoose';
 
-
 let db: Db = null;
 
 if (DB_DEBUG) {
@@ -39,7 +38,7 @@ async function init_db(db: Db) {
     }
 }
 
-export const db_startup = async (init?: Function): Promise<Db> => {
+export const database_startup = async (init?: Function): Promise<Db> => {
     if (db != null)
         return db;
 

@@ -5,8 +5,6 @@ import * as moment from 'moment';
 import { UserCreateDto, UserUpdateDto, EmailExistDto, VisitorUserCreateDto, ChangePasswordDto } from './dto/user.dto';
 import { UserService } from '../../services/user.service';
 import { SiteRole, NotificationTopic, NotificationAction } from '@app/defines';
-import { ContactService } from '@app/services/contact.service';
-import { notificationInterceptor } from '@app/middlewares/notification.interceptor';
 import { SettingService } from '@app/services';
 import { Container } from 'typedi';
 
@@ -29,10 +27,8 @@ interface RequestContext {
 
 @JsonController()
 export class UserController {
-    constructor(private service: UserService, private contactService: ContactService) {
+    constructor(private service: UserService) {
     }
-
-
 
     @Post('/sign_up')
     async signUp(@Body() dto: VisitorUserCreateDto) {
@@ -54,7 +50,7 @@ export class UserController {
     async emailValidate(@QueryParam('id') id: string, @QueryParam('email') email: string) {
         await this.service.validateEmail({ id, email });
 
-        await this.contactService.addDefaultContact(id);
+        
     }
 
     @Post('/user/email_exists')
@@ -92,7 +88,7 @@ export class UserController {
 
     @Authorized()
     @Patch('/user/profile')
-    @UseInterceptor(notificationInterceptor(NotificationTopic.User, NotificationAction.Updated))
+    // @UseInterceptor(notificationInterceptor(NotificationTopic.User, NotificationAction.Updated))
     async setProfile(@Req() request, @Body() dto: UserUpdateDto) {
 
         await this.service.update(request.user.id, dto);

@@ -2,10 +2,9 @@ import { DocumentType } from '@typegoose/typegoose';
 import { ModelQueryService } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
-import { UserModel, User, LoginSessionModel } from '../models/user';
+import { UserModel, User, SessionModel } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
 import { OneTimePin } from '@app/models';
-import { executeNotificationSend } from './notification/sender';
 import { UpdateQuery } from 'mongoose';
 import { SettingService } from './setting.service';
 import { Container } from 'typedi';
@@ -21,7 +20,7 @@ export class UserService {
     }
 
     async changePassword(dto: { email: string, oldPassword: string, newPassword: string }) {
-        const user = await User.findByMail(dto.email);
+        const user = await User.find(dto.email);
         if (user && user.password == dto.oldPassword) {
             user.password = dto.newPassword;
             await user.save();
@@ -104,7 +103,7 @@ export class UserService {
     }
 
     async getByToken(token: string) {
-        const userSession = await LoginSessionModel.findOne({ refreshToken: token }).populate('user').exec();
+        const userSession = await SessionModel.findOne({ refreshToken: token }).populate('user').exec();
 
         return userSession?.user as DocumentType<User>;
     }
@@ -141,13 +140,7 @@ export class UserService {
     }
 
 
-    async getContacts(id) {
-        const doc = await this.getById(id);
-        if (doc) {
-            await doc.populate("contacts").execPopulate();
-            return doc.contacts;
-        }
-    }
+
 
     /**
      * get user by email ,if not exist,create a new user (inviter user fro sign up,)
@@ -179,16 +172,7 @@ export class UserService {
             const key = `forget_${user._id}`
             const code = await OneTimePin.generateCode(key);
 
-            executeNotificationSend({
-                executor: "mail",
-                receiver: user._id,
-                event: { sender: user._id, type: 'user', action: 'forgetPassword', data: { code } },
-                mailTemplate: "forgetPassword",
-                skipMailCheck: true,
-            }).catch(err => {
-                console.error("forget password mail send error")
-            });
-
+          
             return { message: 'email send' };
         }
 

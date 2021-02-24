@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, MaxLength, IsBoolean } from 'class-validator';
+import { IsInt, IsMongoId, Min, ValidateNested, IsString, IsOptional, IsIn, IsEmail, IsCreditCard, Matches, IsDateString, IsObject, IsDate, IsEnum, MaxLength, IsBoolean, IsPhoneNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 /** user name rule: <first> [middle] <last> */
@@ -25,21 +25,13 @@ export class VisitorUserCreateDto {
     @MaxLength(24)
     name: string;
 
-    @IsEmail()
-    email: string;
+    @IsPhoneNumber('CN')
+    phone: string;
 
     @IsString()
     @Matches(RULE_PASSWORD_REGEX)
     password: string;
-
-    @IsString()
-    @IsOptional()
-    company?: string;
-
-    @IsString()
-    @IsOptional()
-    job?: string;
-
+   
 }
 
 export class ChangePasswordDto {
@@ -81,9 +73,6 @@ export class UserCreateDto {
     @IsOptional()
     defaultContact?: boolean;
 }
-
-
-
 
 export class EmailExistDto {
 

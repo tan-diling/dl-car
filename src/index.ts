@@ -13,40 +13,30 @@ moduleAlias.addAliases({
   '@app': __dirname,
 });
 
-import { BackendServer } from '@app/loaders/server';
+import { App } from './app';
 
-import { controllers } from '@app/routes';
+import { controllers, routers } from '@app/routes';
 
-import subscriber from '@app/subscriber';
+// import subscriber from '@app/subscriber';
 import * as express from 'express';
 import { PHOTO_BASE_PATH } from '@app/config';
-import { initChatSocket } from './services/socketio';
-import { SettingServiceStartup } from './services';
 
 function serverStartup() {
 
   /** define backend api server */
-  const server = BackendServer.getInstance();
+  const server = App.getInstance();
 
-  server.register("socketio", async (server) => {
-    /** register chat server  */
-    initChatSocket(server.httpServer);
-  });
 
-  server.register("subscriber", async (server) => {
-    /** register image static path */
-    server.expressApp.use('/image', express.static(PHOTO_BASE_PATH));
+  // server.register("subscriber", async (server) => {
+  //   /** register image static path */
+  //   server.expressApp.use('/image', express.static(PHOTO_BASE_PATH));
 
-    /** add subscriber for mail service, etc... */
-    await subscriber();
-  });
-
-  server.register("service startup", async (server) => {
-    await SettingServiceStartup();
-  });
+  //   /** add subscriber for mail service, etc... */
+  //   await subscriber();
+  // });
 
   /** register api controller (router config) */
-  server.registerController(...controllers);
+  server.registerRouter(...routers);
 
   server.start();
 }

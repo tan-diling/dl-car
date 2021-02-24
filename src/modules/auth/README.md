@@ -1,25 +1,23 @@
-### diling backend Auth module
+### dealing backend Auth module
 *********************************************************************
 
 
 ## api
 - /login
-- /refresh-token
+- /refresh
+- /logout
 
 ## default user schema
 - user
   - _id
   - email
-  - name
-  - password
-  - emailValidated
+  - password  
   - ...
-- login-session
+- session
   - _id
   - device
-  - refreshToken
-  - accessTime
-  - refreshTime
+  - refreshToken  
+  - expireAt
   - user: ref(user)
   
 

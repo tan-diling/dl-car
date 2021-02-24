@@ -69,7 +69,10 @@ paths:
     post:
       summary: create user
       operationId: post-user
-      description: "admin create a user , \n-  system will send a confirm email to mail,\n-  before user login, user need to validate it's mail \n"
+      description: |
+        admin create a user , 
+        -  system will send a confirm email to mail,
+        -  before user login, user need to validate it's mail 
       requestBody:
         content:
           application/json:
@@ -209,7 +212,7 @@ paths:
                   type: string
                 phone:
                   type: string
-                  pattern: "\\d{10}"
+                  pattern: '\d{10}'
                 department:
                   type: string
                 job:
@@ -222,12 +225,12 @@ paths:
                     - staff
                     - client
                     - visitor
-                  description: "for role: 'admin' "
+                  description: 'for role: ''admin'' '
                 company:
                   type: string
                 defaultContact:
                   type: boolean
-                  description: "for role: 'admin' "
+                  description: 'for role: ''admin'' '
             examples:
               'manage user ':
                 value:
@@ -297,9 +300,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  access_token:
+                  accessToken:
                     type: string
-                  refresh_token:
+                  refreshToken:
                     type: string
                   id:
                     type: string
@@ -342,7 +345,7 @@ paths:
               properties:
                 device:
                   type: string
-                email:
+                phone:
                   type: string
                   format: email
                 password:
@@ -351,7 +354,7 @@ paths:
                   maxLength: 30
               required:
                 - device
-                - email
+                - phone
                 - password
             examples:
               example-1:
@@ -496,7 +499,11 @@ paths:
                   email: user01@admin.com
                   password: '12345678'
         description: ''
-      description: "user sign up ,\n-  default role is 'client'\n-  system will send a email to mail,\n-  before user login, user need to validate it's mail "
+      description: |-
+        user sign up ,
+        -  default role is 'client'
+        -  system will send a email to mail,
+        -  before user login, user need to validate it's mail 
     parameters: []
   /group:
     get:
@@ -894,7 +901,7 @@ paths:
                   value:
                     - deleted: false
                       _id: 5f1e4348d8dad04124078bd8
-                      title: 'new project#002'
+                      title: new project#002
                       description: here is simple desc
                       logo: /images/logo.png
                       creator: 5efff7849eaf1f3b9266da2b
@@ -913,7 +920,7 @@ paths:
                           status: confirmed
                     - deleted: false
                       _id: 5f1e628732333f602da84a49
-                      title: 'new project#002'
+                      title: new project#002
                       description: here is simple desc
                       logo: /images/logo.png
                       creator: 5efff7849eaf1f3b9266da2b
@@ -967,7 +974,7 @@ paths:
                     deleted: false
                     _id: 5f222e82f3fb6808c2a70445
                     key: NP
-                    title: 'new project#003'
+                    title: new project#003
                     description: here is simple desc
                     creator: 5efff7849eaf1f3b9266da2b
                     createdAt: '2020-07-30T02:20:50.064Z'
@@ -1002,7 +1009,7 @@ paths:
               example-1:
                 value:
                   key: NP
-                  title: 'new project#002'
+                  title: new project#002
                   description: here is simple desc
   '/resource/project/{id}':
     parameters:
@@ -1026,7 +1033,7 @@ paths:
                 example-1:
                   value:
                     _id: '012345678901234567890001'
-                    title: 'new project#001'
+                    title: new project#001
                     description: here is simple desc
                     created_at: '2020-02-02T03:45:00Z'
                     update_at: '2020-02-02T03:45:00Z'
@@ -1055,7 +1062,7 @@ paths:
                 example-1:
                   value:
                     _id: '012345678901234567890001'
-                    title: 'new project#001'
+                    title: new project#001
                     description: here is simple desc
                     created_at: '2020-02-02T03:45:00Z'
                     update_at: '2020-02-02T03:45:00Z'
@@ -1100,7 +1107,7 @@ paths:
             examples:
               example-1:
                 value:
-                  title: 'new project#001'
+                  title: new project#001
                   description: here is simple desc
               example-2:
                 value:
@@ -1109,7 +1116,9 @@ paths:
                       role: project_qa
                     - user: '12345698745621452002'
                       role: project_develop
-        description: "- every body argument is optional\n- members is only modified by 'project_admin' "
+        description: |-
+          - every body argument is optional
+          - members is only modified by 'project_admin' 
     delete:
       summary: delete project
       operationId: delete-project-id
@@ -1124,7 +1133,7 @@ paths:
                 example-1:
                   value:
                     _id: '012345678901234567890001'
-                    title: 'new project#001'
+                    title: new project#001
                     description: here is simple desc
                     created_at: '2020-02-02T03:45:00Z'
                     update_at: '2020-02-02T03:45:00Z'
@@ -1306,7 +1315,7 @@ components:
         example-1:
           deleted: false
           _id: 5f1e628732333f602da84a49
-          title: 'new project#002'
+          title: new project#002
           description: here is simple desc
           logo: /images/logo.png
           creator: 5efff7849eaf1f3b9266da2b

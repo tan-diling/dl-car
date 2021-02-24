@@ -1,1 +1,1 @@
-export {controllers} from '@app/controllers'
+export { controllers, routers } from '@app/controllers'

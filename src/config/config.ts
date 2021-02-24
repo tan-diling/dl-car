@@ -5,7 +5,7 @@ console.log('NODE_CONFIG_ENV: ' + config.util.getEnv('NODE_CONFIG_ENV'));
 
 export const DEBUG = config.util.getEnv('NODE_CONFIG_ENV') == "development";
 
-const AppPrefix = 'GCP_'
+const AppPrefix = 'DLC_'
 
 export const config_get = (key: string, val: any = undefined): any => {
     let v = val;
