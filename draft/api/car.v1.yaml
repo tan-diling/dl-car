@@ -1,0 +1,393 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: dl-car
+  description: ''
+servers:
+  - url: 'http://localhost:3000/api'
+    description: localhost
+paths:
+  /user/login:
+    post:
+      summary: ''
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  user:
+                    type: string
+                  expiredAt:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    accessToken: string
+                    refreshToken: string
+                    user: string
+                    expiredAt: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  description: ''
+                password:
+                  type: string
+                device:
+                  type: string
+                code:
+                  type: string
+              required:
+                - phone
+                - device
+      tags:
+        - user
+        - auth
+    parameters: []
+  /user/logout:
+    post:
+      summary: Your GET endpoint
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+      operationId: get-logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                device:
+                  type: string
+    parameters: []
+  /sms/code:
+    post:
+      summary: ''
+      operationId: post-sms-otp
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                reason:
+                  type: string
+      description: ''
+      tags:
+        - auth
+    parameters: []
+  /user/register:
+    post:
+      summary: ''
+      operationId: post-user-register
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UserProfile'
+                - type: object
+                  properties:
+                    code:
+                      type: string
+                    phone:
+                      type: string
+            examples:
+              example-1:
+                value:
+                  ageGroup: string
+                  sex: string
+                  region: string
+                  phone: string
+                  name: string
+                  image: string
+                  code: string
+  /user/profile:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              examples:
+                example-1:
+                  value:
+                    ageGroup: string
+                    sex: string
+                    region: string
+      operationId: get-user-profile
+    put:
+      summary: ''
+      operationId: put-user-profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                ageGroup:
+                  type: string
+                region:
+                  type: string
+                image:
+                  type: string
+                sex:
+                  type: string
+  /car:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vote:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vote'
+                  commodity:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Commodity'
+              examples:
+                example-1:
+                  value:
+                    vote:
+                      - id: string
+                        startDate: string
+                        endDate: string
+                        title: string
+                        description: string
+                        product:
+                          id: string
+                          title: string
+                          description: string
+                          image:
+                            - string
+                          part:
+                            - id: string
+                              group: string
+                              value: string
+                              required: true
+                        image: string
+                    commodity:
+                      - id: string
+                        product:
+                          id: string
+                          title: string
+                          description: string
+                          image:
+                            - string
+                          part:
+                            - id: string
+                              group: string
+                              value: string
+                              required: true
+                        parts:
+                          - id: string
+                            group: string
+                            value: string
+                            required: true
+                        title: string
+                        description: string
+                        price: string
+                        startTime: string
+                        endTime: string
+                        count: 0
+      operationId: get-car-catalog
+    parameters: []
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: int64
+        phone:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+      required:
+        - _id
+        - phone
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    UserProfile:
+      title: UserProfile
+      type: object
+      properties:
+        ageGroup:
+          type: string
+        sex:
+          type: string
+        region:
+          type: string
+        phone:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+    Vote:
+      title: Vote
+      type: object
+      properties:
+        id:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        product:
+          $ref: '#/components/schemas/Product'
+        image:
+          type: string
+    Product:
+      title: Product
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: array
+          items:
+            type: string
+        part:
+          type: array
+          items:
+            $ref: '#/components/schemas/Part'
+      x-examples:
+        example-1:
+          id: string
+          title: string
+          description: string
+          image:
+            - string
+          part:
+            - id: string
+              group: string
+              title: string
+              description: string
+              required: string
+    Part:
+      title: Part
+      type: object
+      properties:
+        id:
+          type: string
+        group:
+          type: string
+        value:
+          type: string
+        required:
+          type: boolean
+    VoteResult:
+      title: VoteResult
+      type: object
+      properties:
+        id:
+          type: string
+        vote:
+          type: string
+        user:
+          type: string
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Part'
+    Commodity:
+      title: Commodity
+      type: object
+      properties:
+        id:
+          type: string
+        product:
+          $ref: '#/components/schemas/Product'
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Part'
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        count:
+          type: number
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+security:
+  - JWT: []
+tags:
+  - name: user
+  - name: auth

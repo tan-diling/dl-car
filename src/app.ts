@@ -24,7 +24,7 @@ export class App {
 
   private static instance: App;
 
-  private readonly prefix = '/api';
+  readonly prefix = '/api';
 
   static getInstance(): App {
     if (!App.instance) {

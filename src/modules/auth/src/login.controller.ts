@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as passport from 'passport';
 import * as requestIp from 'request-ip';
-import { UserModel,Session } from '@app/models';
+import { UserModel,Session, SessionModel } from '@app/models';
 import { prop, Ref, plugin, getModelForClass, DocumentType, getDiscriminatorModelForClass, index, QueryMethod, ReturnModelType, queryMethod, modelOptions } from '@typegoose/typegoose';
 
 import { sign } from 'jsonwebtoken';
@@ -30,7 +30,7 @@ export const login = function (req: Request, res: Response, next: NextFunction) 
         const device = String(req.body['device'] || 'default');
         const ip = requestIp.getClientIp(req);
         // const staff = req.user as Staff;
-        UserModel.buildSession({ device, user, ip })
+        SessionModel.buildSession({ device, user, ip })
             .then(sess => {
                 req.login(sess, err => {
                     if (err) { return next(err) }

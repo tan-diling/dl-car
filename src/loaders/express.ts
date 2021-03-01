@@ -19,6 +19,7 @@ import { StrategyOptions, ExtractJwt, Strategy } from 'passport-jwt';
 
 import { usePassport } from './passport';
 import { errorMiddleware } from '@app/middlewares/error.middleware';
+import { useExpressServer } from 'routing-controllers';
 
 const cookieSession = require('cookie-session')
 

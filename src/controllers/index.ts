@@ -1,5 +1,5 @@
 import { router as AuthRouter } from '@app/modules/auth';
-// import { UserController } from './user/user.controller';
+import { UserController } from './user/user.controller';
 
 // import { AdminController } from './admin.controller';
 import { Router } from 'express';
@@ -19,7 +19,7 @@ export const controllers = [
     // AdminController,
 
     // LoginController,
-    // UserController,
+    UserController,
     // PasswordController,
     // PhotoController,
     // ImageController,

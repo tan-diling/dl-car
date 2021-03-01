@@ -75,17 +75,6 @@ export const database_startup = async (init?: Function): Promise<Db> => {
     return db;
 };
 
-
-function getModel<T>(name: string, schema: Schema) {
-    // db_startup().finally();
-    // let m =  model<T & Document>(name);
-    // if((m == null) && (schema!=null)) 
-    {
-        return model<T & Document>(name, schema);
-    }
-    // return m ;
-}
-
 /** user login model */
 
 // export * from './model/photo';

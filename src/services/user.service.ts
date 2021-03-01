@@ -2,7 +2,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { ModelQueryService } from '@app/modules/query';
 import { NotFoundError, NotAcceptableError, UnauthorizedError } from 'routing-controllers';
 import * as randToken from 'rand-token';
-import { UserModel, User, SessionModel } from '../models/user';
+import { User, UserModel, SessionModel } from '../models/user';
 import { RepoOperation, SiteRole } from '@app/defines';
 import { OneTimePin } from '@app/models';
 import { UpdateQuery } from 'mongoose';
@@ -19,8 +19,8 @@ export class UserService {
     constructor() {
     }
 
-    async changePassword(dto: { email: string, oldPassword: string, newPassword: string }) {
-        const user = await User.find(dto.email);
+    async changePassword(dto: { phone: string, oldPassword: string, newPassword: string }) {
+        const user = await UserModel.findByKey(dto.phone);
         if (user && user.password == dto.oldPassword) {
             user.password = dto.newPassword;
             await user.save();
@@ -31,60 +31,28 @@ export class UserService {
         throw new NotAcceptableError("password_check_error");
     }
 
-    async signUp(dto: Partial<User>) {
-        const allowed = await this.settingService.allowPublicRegistration();
-        if (!allowed) {
-            throw new NotAcceptableError('Account registration is disabled.');
-        }
-        return await this.create(dto);
-    }
+    // async signUp(dto: Partial<User>) {
+    //     const allowed = await this.settingService.allowPublicRegistration();
+    //     if (!allowed) {
+    //         throw new NotAcceptableError('Account registration is disabled.');
+    //     }
+    //     return await this.create(dto);
+    // }
 
 
     /**
      * create an new user
      * @param dto 
      */
-    async create(dto: Partial<User>) {
+    async create(dto: Partial<User>,initPassword:string='88888888') {
+        let {password,...user} = dto ;
+        
+        await UserModel.register(user,password || initPassword);        
 
-        let user = await User.findByMail(dto.email);
-        if (user != null) {
-            if (user.role != '') {
-                throw new NotAcceptableError('account_exists');
-            } else {
-                user = await UserModel.findByIdAndUpdate(user._id, dto).exec();
-            }
-        } else {
-            user = new UserModel(dto);
-            await user.save();
-        }
-
-        if (user.role != '') {
-            user.emailValidated = false;
-            if (!user.password) user.password = process.env.GCP_DEFAULT_PASSWORD || randToken.uid(8);
-
-            await user.save();
-
-            UserModel.emit(RepoOperation.Created, user);
-        }
-        return user;
+        return UserModel.findByKey(user.phone) ;
     }
 
-    /**
-     * validate user email
-     * @param dto 
-     */
-    async validateEmail(dto: { email: string, id: string }) {
 
-        let user = await this.getById(dto.id);
-        if (user != null && user.email == dto.email) {
-            user.emailValidated = true;
-            await user.save();
-
-            return;
-        }
-
-        throw new NotAcceptableError('user id or email error');
-    }
 
     /**
      * get user list
@@ -140,54 +108,14 @@ export class UserService {
     }
 
 
-
-
-    /**
-     * get user by email ,if not exist,create a new user (inviter user fro sign up,)
-     * @param email 
-     * @param options 
-     */
-    async getUserByEmailForce(email: string, options?: Partial<User>) {
-        const defaultInvitationUser = { name: 'New User', company: '', role: '' };
-        let user = await User.findByMail(email);
-
-        if (user == null) {
-            user = await this.create({ ...defaultInvitationUser, ...options, email: email });
-        }
-
-        return user;
-    }
-
-    async getByEmail(email: string) {
-        return await User.findByMail(email);
-    }
-
-    /**
-     * user attempt query forget password OTP by email,
-     * @param email 
-     */
-    async forgetUserPasswordAndSendEmail(email: string) {
-        const user = await User.findByMail(email);
-        if (user) {
-            const key = `forget_${user._id}`
-            const code = await OneTimePin.generateCode(key);
-
-          
-            return { message: 'email send' };
-        }
-
-        return { error: 'user not found' };
-
-    }
-
     /**
      * check OTP
      * @param dto 
      */
-    async checkValidateCodeOfForget(dto: { email: string, code: string, }) {
-        const user = await User.findByMail(dto.email);
-        if (user) {
-            const key = `forget_${user._id}`
+    async checkValidateCode(dto: { phone: string, code: string, }) {
+        // const user = await UserModel.findOne({phone}).exec;
+        // if (user) {
+            const key = `forget_${dto.phone}`
             const success = await OneTimePin.validateCode(key, dto.code);
             if (success) {
                 const code = await OneTimePin.generateCode(key);
@@ -197,30 +125,30 @@ export class UserService {
             }
         }
 
-        return { error: 'user not found' };
-    }
+        // return { error: 'user not found' };
+    
 
-    /**
-     * user reset password with OTP 
-     * @param email 
-     */
-    async resetUserPasswordWithOTP(dto: { email: string, code: string, password: string }) {
-        const user = await User.findByMail(dto.email);
-        if (user) {
-            const key = `forget_${user._id}`
-            const success = await OneTimePin.validateCode(key, dto.code);
-            if (success) {
-                user.password = dto.password;
-                await user.save();
-                return { message: 'password changed' };
-            } else {
-                return { error: 'OTP validation failure' };
-            }
+    // /**
+    //  * user reset password with OTP 
+    //  * @param email 
+    //  */
+    // async resetUserPasswordWithOTP(dto: { email: string, code: string, password: string }) {
+    //     const user = await User.findByMail(dto.email);
+    //     if (user) {
+    //         const key = `forget_${user._id}`
+    //         const success = await OneTimePin.validateCode(key, dto.code);
+    //         if (success) {
+    //             user.password = dto.password;
+    //             await user.save();
+    //             return { message: 'password changed' };
+    //         } else {
+    //             return { error: 'OTP validation failure' };
+    //         }
 
-        }
+    //     }
 
-        return { error: 'user not found' };
+    //     return { error: 'user not found' };
 
-    }
+    // }
 
 }

@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist/*",
     "build": "tsc",
     "#build-docker": "docker build -t dilingcloud/car.backend .",
-    "doc:api": "ts-node ./draft/doc.ts ",
+    "api": "ts-node ./draft/doc.ts ",
     "run:login": "ts-node test/login.run.ts",
     "run:web": "ts-node test/web.run.ts",
     "rune:mail": "ts-node test/mail.run.ts",
