@@ -115,7 +115,7 @@ server {
     listen 443 ssl;
     listen [::]:443 ssl;
 
-    server_name dev.onwards.ai _;
+    server_name dev.xxxxx.ai _;
 
   ...
 
@@ -140,18 +140,18 @@ server {
 }    
 
 =============================================================
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c wss://dev.xxxxx.ai/socket.io/?transport=websocket
+[ ~]$ wscat -c wss://dev.xxxxx.ai/socket.io/?transport=websocket
 error: Unexpected server response: 400
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://dev.xxxxx.ai/socket.io/?transport=websocket
+[ ~]$ wscat -c ws://dev.xxxxx.ai/socket.io/?transport=websocket
 error: Unexpected server response: 301
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://127.0.0.1/socket.io/?transport=websocket
+[ ~]$ wscat -c ws://127.0.0.1/socket.io/?transport=websocket
 Connected (press CTRL+C to quit)
 < 0{"sid":"ezaXyZnPQXnayw-hAAHm","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
 < 40
-> [tan@c1-mean-dl05-onwards-ai ~]$ ^C
-[tan@c1-mean-dl05-onwards-ai ~]$ ping dev.onwards.ai
+> [ ~]$ ^C
+[ ~]$ ping dev.onwards.ai
 PING dev.onwards.ai (66.27.53.100) 56(84) bytes of data.
 64 bytes from mail.rysonate.com (66.27.53.100): icmp_seq=1 ttl=64 time=0.202 ms
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://66.27.53.100/socket.io/?transport=websocket
+[ ~]$ wscat -c ws://66.27.53.100/socket.io/?transport=websocket
 error: Unexpected server response: 404
 ```
