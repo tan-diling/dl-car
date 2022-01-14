@@ -139,19 +139,4 @@ server {
     }
 }    
 
-=============================================================
-[ ~]$ wscat -c wss://dev.xxxxx.ai/socket.io/?transport=websocket
-error: Unexpected server response: 400
-[ ~]$ wscat -c ws://dev.xxxxx.ai/socket.io/?transport=websocket
-error: Unexpected server response: 301
-[ ~]$ wscat -c ws://127.0.0.1/socket.io/?transport=websocket
-Connected (press CTRL+C to quit)
-< 0{"sid":"ezaXyZnPQXnayw-hAAHm","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
-< 40
-> [ ~]$ ^C
-[ ~]$ ping dev.onwards.ai
-PING dev.onwards.ai (66.27.53.100) 56(84) bytes of data.
-64 bytes from mail.rysonate.com (66.27.53.100): icmp_seq=1 ttl=64 time=0.202 ms
-[ ~]$ wscat -c ws://66.27.53.100/socket.io/?transport=websocket
-error: Unexpected server response: 404
-```
+
