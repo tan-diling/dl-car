@@ -45,10 +45,10 @@ this project design for backend framework
 ## system requirement 
   linux 
   node  v10.16+
-## .evn file config  
+## .evn file config example 
 ```
 ## jwt secret 
-JWT_SECRET=diling
+JWT_SECRET=xxxxxxxxx
 JWT_ALGORITHM=HS256
 
 ## mongo db connect 
@@ -58,11 +58,11 @@ JWT_ALGORITHM=HS256
 PORT=3000
 
 ##default google mail account, later User can change it in gcp system
-GCP_MAIL_USER=dl@testmvp.com
-GCP_MAIL_PASSWORD=dl@diling2702
+#GCP_MAIL_USER= ####@gmail.com
+#GCP_MAIL_PASSWORD=xxxx
 
 ## GCP WEBSITE URL 
-GCP_WEBSERVER=https://dev.onwards.ai
+GCP_WEBSERVER=https://xxxxxxxxx.ai
 
 ## GCP DEBUG OPTION for database, 
 #GCP_DEBUG=db
@@ -93,13 +93,13 @@ chcon -R -t httpd_sys_content_t /www/public_html/onwards.ai/private/gcp-frontend
 ```
 
 ### develop server
-- https://dev.onwards.ai
+- https://dev.xxxxxx.ai
 
 ### cicd server
-- https://cicd.dev.onwards.ai
+- https://cicd.dev.xxxxxx.ai
 #### build
 - build api 
-  > https://cicd.dev.onwards.ai/job/test01/build?token=gest_client_portal_backend
+  > https://cicd.dev.xxxxxx.ai/job/test01/build?token=gest_client_portal_backend
 
 nginx config for socketio
 ================================================================
@@ -140,9 +140,9 @@ server {
 }    
 
 =============================================================
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c wss://dev.onwards.ai/socket.io/?transport=websocket
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c wss://dev.xxxxx.ai/socket.io/?transport=websocket
 error: Unexpected server response: 400
-[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://dev.onwards.ai/socket.io/?transport=websocket
+[tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://dev.xxxxx.ai/socket.io/?transport=websocket
 error: Unexpected server response: 301
 [tan@c1-mean-dl05-onwards-ai ~]$ wscat -c ws://127.0.0.1/socket.io/?transport=websocket
 Connected (press CTRL+C to quit)
